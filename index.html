@@ -93,18 +93,17 @@
   .row { display: flex; gap: 4cqw; flex-wrap: wrap; justify-content: center; }
 
   #start { gap: 2.5cqh; }
-  .cards { display: flex; gap: 3cqw; }
+  .cards { display: flex; gap: 1.4cqw; width: 100%; justify-content: center; }
   .card {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1cqh;
-    min-width: 15cqw; height: 32cqh; padding: 1.5cqh 2cqw;
+    flex: 1 1 0; max-width: 13cqw; min-width: 0; min-height: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1cqh;
+    height: 31cqh; padding: 1.2cqh 0.5cqw;
     color: var(--ink); background: #2a1650;
-    font-size: clamp(11px, 4.5cqh, 18px);
+    font-size: clamp(8px, 3.4cqh, 14px); letter-spacing: 0; line-height: 1.1;
+    box-shadow: 3px 3px 0 #000; border-width: 2px;
   }
   .card[aria-pressed="true"] { background: #4a1a70; outline: 3px solid var(--accent); outline-offset: 2px; }
-  .card img { height: 19cqh; width: auto; image-rendering: pixelated; }
-  .card.locked { opacity: 0.5; cursor: not-allowed; }
-  .card.locked:active { transform: none; box-shadow: 4px 4px 0 #000; }
-  .card .q { font-size: 14cqh; line-height: 19cqh; color: #8a7fa8; }
+  .card img { width: auto; image-rendering: pixelated; }
 
   .story {
     position: absolute; left: 0; right: 0; top: 0;
@@ -205,14 +204,7 @@
   <section id="start" class="overlay" aria-labelledby="start-title" hidden>
     <h1 id="start-title">¡Ojo al paso!</h1>
     <p class="small">Misión: junta la mayor cantidad de puntos sin pisar ni un popó.</p>
-    <div class="cards" role="group" aria-label="Elige tu personaje">
-      <button class="card" type="button" aria-pressed="true" aria-label="Rafa">
-        <img id="rafa-portrait" alt="">
-        <span>RAFA</span>
-      </button>
-      <button class="card locked" type="button" disabled aria-label="Personaje bloqueado"><span class="q">?</span><span>???</span></button>
-      <button class="card locked" type="button" disabled aria-label="Personaje bloqueado"><span class="q">?</span><span>???</span></button>
-    </div>
+    <div class="cards" id="cards" role="group" aria-label="Elige tu personaje"></div>
     <div class="row">
       <button id="play" type="button">JUGAR</button>
       <button id="story-btn" class="secondary" type="button">HISTORIA</button>
@@ -279,8 +271,14 @@
   const BEST_KEY = 'ojo-al-paso:record';
   const RANK_KEY = 'ojo-al-paso:ranking', NAME_KEY = 'ojo-al-paso:nombre', RANK_SIZE = 10;
 
+  // El lienzo tiene el doble de pixeles reales (1600×600), pero todo el juego
+  // sigue dibujando en coordenadas de 800×300: sprites más finos, misma lógica.
+  const RES = 2;
   const canvas = document.getElementById('screen');
+  canvas.width = W * RES;
+  canvas.height = H * RES;
   const ctx = canvas.getContext('2d');
+  ctx.setTransform(RES, 0, 0, RES, 0, 0);
   ctx.imageSmoothingEnabled = false;
 
   const $ = (id) => document.getElementById(id);
@@ -295,92 +293,226 @@
   const portrait = matchMedia('(orientation: portrait) and (max-width: 900px)');
   const touch = matchMedia('(pointer: coarse)');
 
-  // ---- Sprites pixel art originales ----
+  // ---- Sprites pixel art originales, estilo 16 bits ----
+  // Cada dibujo se escribe a baja resolución y aquí se "mejora" como en Mario 3:
+  // 1) Scale2x: duplica la resolución redondeando las diagonales;
+  // 2) contorno oscuro alrededor de la silueta;
+  // 3) sombreado: luz desde arriba a la izquierda, sombra abajo a la derecha.
+  const OUTLINE = '#140c1c';
+  function scale2x(grid) {
+    const h = grid.length, w = grid[0].length;
+    const at = (x, y) => (x < 0 || y < 0 || x >= w || y >= h ? '.' : grid[y][x]);
+    const out = Array.from({ length: h * 2 }, () => new Array(w * 2));
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const p = at(x, y), a = at(x, y - 1), b = at(x + 1, y), c = at(x - 1, y), d = at(x, y + 1);
+        out[y * 2][x * 2] = c === a && c !== d && a !== b ? a : p;
+        out[y * 2][x * 2 + 1] = a === b && a !== c && b !== d ? b : p;
+        out[y * 2 + 1][x * 2] = d === c && d !== b && c !== a ? c : p;
+        out[y * 2 + 1][x * 2 + 1] = b === d && b !== a && d !== c ? d : p;
+      }
+    }
+    return out;
+  }
+  function addOutline(grid) {
+    const h = grid.length + 2, w = grid[0].length + 2;
+    const at = (x, y) => (x < 1 || y < 1 || x > w - 2 || y > h - 2 ? '.' : grid[y - 1][x - 1]);
+    return Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => {
+      const p = at(x, y);
+      if (p !== '.') return p;
+      return [at(x - 1, y), at(x + 1, y), at(x, y - 1), at(x, y + 1)].some((n) => n !== '.' && n !== '@') ? '@' : '.';
+    }));
+  }
+  function shadeHex(hex, f) {
+    const n = parseInt(hex.slice(1), 16);
+    const ch = (v) => Math.max(0, Math.min(255, Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f)));
+    return `rgb(${ch(n >> 16)}, ${ch((n >> 8) & 255)}, ${ch(n & 255)})`;
+  }
   function makeSprite(rows, palette, cellW, cellH) {
+    let grid = scale2x(rows.map((r) => [...r]));
+    grid = addOutline(grid);
+    cellW /= 2; cellH /= 2;
+    const h = grid.length, w = grid[0].length;
     const c = document.createElement('canvas');
-    c.width = Math.ceil(rows[0].length * cellW);
-    c.height = Math.ceil(rows.length * cellH);
+    c.width = Math.ceil(w * cellW * RES);
+    c.height = Math.ceil(h * cellH * RES);
     const g = c.getContext('2d');
-    rows.forEach((row, y) => {
-      [...row].forEach((ch, x) => {
-        if (ch === '.') return;
-        g.fillStyle = palette[ch];
-        g.fillRect(Math.floor(x * cellW), Math.floor(y * cellH), Math.ceil(cellW), Math.ceil(cellH));
-      });
-    });
+    const solid = (x, y) => y >= 0 && y < h && x >= 0 && x < w && grid[y][x] !== '.' && grid[y][x] !== '@';
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const k = grid[y][x];
+        if (k === '.') continue;
+        let color = k === '@' ? OUTLINE : palette[k];
+        if (k !== '@') {
+          const same = (dx, dy) => solid(x + dx, y + dy) && grid[y + dy][x + dx] === k;
+          if (!same(1, 0) || !same(0, 1)) color = shadeHex(color, -0.22);
+          else if (!solid(x - 1, y) || !solid(x, y - 1)) color = shadeHex(color, 0.25);
+        }
+        g.fillStyle = color;
+        g.fillRect(Math.floor(x * cellW * RES), Math.floor(y * cellH * RES), Math.ceil(cellW * RES), Math.ceil(cellH * RES));
+      }
+    }
+    // Tamaño y desplazamiento en coordenadas del juego (el contorno sobresale una celda).
+    c.lw = w * cellW; c.lh = h * cellH; c.ox = -cellW; c.oy = -cellH;
     return c;
   }
+  const blit = (s, x, y) => ctx.drawImage(s, x + s.ox, y + s.oy, s.lw, s.lh);
 
-  // Rafa: jockey rojo de visera negra plana, pelo café largo, polerón negro con
-  // esqueletos y etiqueta naranja con su nombre, buzo gris.
-  const KID_PAL = {
-    r: '#d8323c', k: '#151515', h: '#6b4528', s: '#f0c39a', e: '#2a1a10',
-    d: '#1d1d22', w: '#f2f2f2', o: '#f39a3c', g: '#7d7f86', n: '#2a2a2a',
+  // ---- Personajes (la familia) ----
+  // Cuerpo de 14 celdas de ancho mirando a la derecha + piernas que se animan.
+  // 'g' = pantalón y 'n' = zapatos; cada personaje pone sus colores.
+  const LEGS = {
+    a:   ['...gggggg.....', '..gg....gg....', '.gg......gg...', '.nn......nn...'],
+    b:   ['...gggggg.....', '....gggg......', '....g.gg......', '...nn.nn......'],
+    air: ['...gggggg.....', '..ggg..ggnn...', '..nn..........', '..............'],
   };
-  const KID_TOP = [
-    '....rrrrr.....',
-    '...rrrrrrr....',
-    '..rrrrrrrrr...',
-    '..hhkkkkkkkkk.',
-    '..hhhsssss....',
-    '.hhhssssess...',
-    '.hhhsssssss...',
-    '.hhhhssssss...',
-    '.hhhh.ssss....',
-    '.hhddddddd....',
-    '..ddwdwddds...',
-    '..dddowoodd...',
-    '..ddwdwdd.....',
-    '...dddddd.....',
+  const BABY_LEGS = {  // shorts rojos y piernitas
+    a:   ['...rrrrr......', '...ss..ss.....', '..ss....ss....', '..nn....nn....'],
+    b:   ['...rrrrr......', '....ssss......', '....s.ss......', '...nn.nn......'],
+    air: ['...rrrrr......', '..sss..ssnn...', '..nn..........', '..............'],
+  };
+  const BASE_PAL = { s: '#f0c39a', e: '#2a1a10', k: '#151515', g: '#7d7f86', n: '#2a2a2a' };
+
+  // Cara de asco estilo manhwa (16×16): 4 filas de pelo/gorro propias + esta base.
+  // H = pelo a los costados; los "overlays" agregan lentes o barba (_ = no tocar).
+  const FACE_BASE = [
+    'HHsbsbsbsbsbsbHH', 'HHsbsbsbsbsbsbHH', 'HHssssssssssssHH',
+    'HHsessssssssesHH', 'HHssessssssessHH', 'HHsessssssssesHH',
+    'HHggssssssssggHH', 'HHsssmmmmmmsssHH', 'HHssmsmsmmsmssHH',
+    'HH.sssmttmsss.HH', 'HH..ssssttss..HH', 'HH...ssssss...HH',
   ];
-  const KID_RUN_A = ['...gggggg.....', '..gg....gg....', '.gg......gg...', '.nn......nn...'];
-  const KID_RUN_B = ['...gggggg.....', '....gggg......', '....g.gg......', '...nn.nn......'];
-  const KID_AIR   = ['...gggggg.....', '..ggg..ggnn...', '..nn..........', '..............'];
+  const SHADES = { 3: 'LLLLLffLLLLL', 4: '_LLLL__LLLL_', 5: '_s________s_' };
+  const CLEAR_GLASSES = { 2: '_ffff__ffff_', 6: '_ffff__ffff_' };
+  const BEARD = { 7: 'z__________z', 8: 'z__________z', 9: 'zzzz____zzzz', 10: '__zzzz__zz__', 11: '___zzzzzz___' };
+
+  const CHARACTERS = [
+    { id: 'rafa', name: 'RAFA',
+      // Jockey rojo de visera negra, pelo largo, polerón con esqueletos y etiqueta naranja.
+      pal: { r: '#d8323c', h: '#6b4528', d: '#1d1d22', w: '#f2f2f2', o: '#f39a3c' },
+      body: [
+        '....rrrrr.....', '...rrrrrrr....', '..rrrrrrrrr...', '..hhkkkkkkkkk.',
+        '..hhhsssss....', '.hhhssssess...', '.hhhsssssss...', '.hhhhssssss...',
+        '.hhhh.ssss....', '.hhddddddd....', '..ddwdwddds...', '..dddowoodd...',
+        '..ddwdwdd.....', '...dddddd.....',
+      ],
+      face: { top: ['...rrrrrrrrrr...', '..rrrrrrrrrrrr..', '.rrrrrrrrrrrrrr.', '.kkkkkkkkkkkkkk.'], side: 'h' } },
+    { id: 'baby-rafa', name: 'BABY RAFA', legs: BABY_LEGS,
+      // Sombrero de paja con cinta turquesa, polerón a rayas, shorts rojos.
+      pal: { w: '#e8dcc0', T: '#3fa7a0', N: '#24345e', W: '#f2f2f2', r: '#d8323c', s: '#f3c9a5', m: '#c0505a', n: '#3fa7a0' },
+      body: [
+        '....wwwww.....', '...wwwwwww....', '...TTTTTTT....', '.wwwwwwwwwww..',
+        '...sssssss....', '...ssssess....', '...sssssms....', '..NNNNNNNs....',
+        '..WWWWWWW.....', '..NNNNNNN.....',
+      ],
+      face: { top: ['....wwwwwwww....', '...wwwwwwwwww...', '..TTTTTTTTTTTT..', 'wwwwwwwwwwwwwwww'], side: '.' } },
+    { id: 'seba', name: 'SEBA 80s',
+      // Niño ochentero: pelo negro, chaleco gris con cuello amarillo, jeans y botas.
+      pal: { h: '#1e1712', s: '#d9a77c', y: '#e8c547', x: '#a8a8a0', g: '#2f5fa8', n: '#3a2a20' },
+      body: [
+        '....hhhhh.....', '...hhhhhhh....', '..hhhhhhhhh...', '..hhhhhhhh....',
+        '..hhsssssss...', '..hsssssess...', '..hssssssss...', '...sssssss....',
+        '....yyyyy.....', '..xxxxxxxxs...', '..xxxxxxxx....', '..xxxxxxxx....',
+        '..xxxxxxxx....', '...xxxxxx.....',
+      ],
+      face: { top: ['....hhhhhhhh....', '..hhhhhhhhhhhh..', '.hhhhhhhhhhhhhh.', '.hhhhhhhhhhhhhh.'], side: '.' } },
+    { id: 'vicky', name: 'VICKY',
+      // Pelo ondulado largo, lentes de sol rosados, polera tropical, shorts y sandalias.
+      pal: { h: '#5a3a22', p: '#e8455a', f: '#e8455a', L: '#3a2030', m: '#d24a6a', q: '#f08a3c', v: '#3aa86a', r: '#d8323c', g: '#f0c39a', n: '#8a5a2b' },
+      body: [
+        '...hhhhhh.....', '..hhhhhhhh....', '.hhhhhhhhhh...', '.hhhssssssh...',
+        '.hhhsppLpLp...', '.hhhsssssss...', '.hhhsssmmss...', 'hhhh.sssss....',
+        'hhhqqqqqqq....', '.hqqvqqvqqs...', '..qqqqvqqq....', '..qvqqqqvq....',
+        '..rrrrrrr.....', '...rrrrrr.....',
+      ],
+      face: { top: ['...hhhhhhhhhh...', '..hhhhhhhhhhhh..', '.hhhhhhhhhhhhhh.', 'hhhhhhhhhhhhhhhh'], side: 'h', overlays: [SHADES] } },
+    { id: 'pipe', name: 'PIPE',
+      // Jockey naranjo, lentes espejados, barba, camisa blanca con flamencos.
+      pal: { o: '#f08a2c', O: '#d06a1c', h: '#2b1d16', M: '#ff7a3c', L: '#ff7a3c', f: '#c0c0c0', z: '#3a2a20', m: '#f2f2f2', w: '#f8f2f2', F: '#ff7aa8', g: '#c2a878', n: '#6b4528' },
+      body: [
+        '....ooooo.....', '...ooooooo....', '..ooooooooo...', '..hhOOOOOOOOO.',
+        '..hssssssss...', '..hsssMMfMM...', '..zssssssss...', '..zzsmmmmzz...',
+        '...zzzzzzz....', '..wwFwwwFws...', '..wwwwFwww....', '..wFwwwwFw....',
+        '..wwwwwwww....', '...wwFwww.....',
+      ],
+      face: { top: ['...oooooooooo...', '..oooooooooooo..', '.oooooooooooooo.', '.OOOOOOOOOOOOOO.'], side: '.', overlays: [SHADES, BEARD] } },
+    { id: 'angie', name: 'ANGIE',
+      // Pelo largo oscuro, lentes, polera blanca con guatita de embarazada, pantalón ancho.
+      pal: { h: '#2b1d16', f: '#c9a27a', w: '#f5f5f5', m: '#c0606a', g: '#5d6470', n: '#f2f2f2' },
+      body: [
+        '...hhhhhh.....', '..hhhhhhhh....', '.hhhhhhhhhh...', '.hhhssssss....',
+        '.hhhsssfef....', '.hhhssssss....', '.hhhsssmss....', 'hhhh.ssss.....',
+        'hhhwwwwww.....', 'hh.wwwwwws....', '..wwwwwwww....', '..wwwwwwwww...',
+        '..wwwwwwwww...', '..gggggggg....',
+      ],
+      face: { top: ['...hhhhhhhhhh...', '..hhhhhhhhhhhh..', '.hhhhhhhhhhhhhh.', 'hhhhhhhhhhhhhhhh'], side: 'h', overlays: [CLEAR_GLASSES] } },
+    { id: 'francisco', name: 'FRANCISCO',
+      // Metalero: jockey negro hacia atrás, lentes oscuros, polera negra con emblema dorado.
+      pal: { y: '#d4a63a', h: '#2b1d16', L: '#1c2450', f: '#151515', d: '#151515', W: '#eeeeee', m: '#b0606a', g: '#2c3550', n: '#151515' },
+      body: [
+        '....kkkkk.....', '...kkkkkkk....', '.kkkkkkkkk....', '..hhssssss....',
+        '..hsLLLLLL....', '..hsssssss....', '..hssmmsss....', '...ssssss.....',
+        '..WddddddW....', '..WddyyddWW...', '..WdyyyydWWs..', '..ddyyyydd....',
+        '..dddddddd....', '...dddddd.....',
+      ],
+      face: { top: ['...kkkkkkkkkk...', '..kkkkkkkkkkkk..', '.kkkkkkkyykkkkk.', '.kkkkkkkkkkkkkk.'], side: '.', overlays: [SHADES] } },
+  ];
+
   const PX = 3;
-  const kidFrames = {
-    runA: makeSprite([...KID_TOP, ...KID_RUN_A], KID_PAL, PX, PX),
-    runB: makeSprite([...KID_TOP, ...KID_RUN_B], KID_PAL, PX, PX),
-    air:  makeSprite([...KID_TOP, ...KID_AIR],  KID_PAL, PX, PX),
-  };
-  const KID_X = 90, KID_FEET = 18 * PX, KID_GROUND_Y = GROUND - KID_FEET;
-
-  // Reacción al pisar: Rafa se pone verde y aparece una viñeta con cara de asco
-  // estilo manhwa (ojos > <, rayas azules en la frente, lengua afuera).
-  const SICK_PAL = { ...KID_PAL, s: '#b9d99a' };
-  kidFrames.sick = makeSprite([...KID_TOP, ...KID_RUN_A], SICK_PAL, PX, PX);
-  kidFrames.sickAir = makeSprite([...KID_TOP, ...KID_AIR], SICK_PAL, PX, PX);
-  const FACE_PAL = { r: '#d8323c', k: '#151515', h: '#6b4528', s: '#f0c39a', b: '#5a7bd8', e: '#2a1a10', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
-  const FACE = [
-    '...rrrrrrrrrr...',
-    '..rrrrrrrrrrrr..',
-    '.rrrrrrrrrrrrrr.',
-    '.kkkkkkkkkkkkkk.',
-    'hhsbsbsbsbsbsbhh',
-    'hhsbsbsbsbsbsbhh',
-    'hhsssssssssssshh',
-    'hhsesssssssseshh',
-    'hhssessssssesshh',
-    'hhsesssssssseshh',
-    'hhggssssssssgghh',
-    'hhsssmmmmmmssshh',
-    'hhssmsmsmmsmsshh',
-    'hh.sssmttmsss.hh',
-    'hh..ssssttss..hh',
-    'hh...ssssss...hh',
-  ];
-  const bubble = (() => {
+  const SICK_SKIN = '#b9d99a';
+  function makeFace(face) {
+    const rows = FACE_BASE.map((r, i) => {
+      let row = r.replace(/H/g, face.side);
+      for (const ov of face.overlays || []) {
+        if (!ov[i]) continue;
+        row = row.slice(0, 2) + [...ov[i]].map((c, k) => (c === '_' ? row[2 + k] : c)).join('') + row.slice(14);
+      }
+      return row;
+    });
+    return [...face.top, ...rows];
+  }
+  function makeBubble(faceSprite) {
     const c = document.createElement('canvas');
-    c.width = 100; c.height = 112;
+    c.width = 100 * RES; c.height = 112 * RES;
+    c.lw = 100; c.lh = 112;
     const g = c.getContext('2d');
+    g.scale(RES, RES);
+    g.imageSmoothingEnabled = false;
     g.fillStyle = '#000'; g.fillRect(0, 0, 100, 100);
     g.fillStyle = '#fff6e0'; g.fillRect(4, 4, 92, 92);
     g.fillStyle = '#000';
     g.fillRect(8, 96, 16, 4); g.fillRect(8, 100, 12, 4); g.fillRect(8, 104, 8, 4); g.fillRect(8, 108, 4, 4);
     g.fillStyle = '#fff6e0';
     g.fillRect(12, 96, 8, 4); g.fillRect(12, 100, 4, 4);
-    g.drawImage(makeSprite(FACE, FACE_PAL, 5, 5), 10, 10);
+    g.drawImage(faceSprite, 10 + faceSprite.ox, 10 + faceSprite.oy, faceSprite.lw, faceSprite.lh);
     return c;
-  })();
+  }
+  for (const ch of CHARACTERS) {
+    const pal = { ...BASE_PAL, ...ch.pal };
+    const sick = { ...pal, s: SICK_SKIN };
+    const legs = ch.legs || LEGS;
+    ch.h = (ch.body.length + 4) * PX;
+    ch.frames = {
+      runA: makeSprite([...ch.body, ...legs.a], pal, PX, PX),
+      runB: makeSprite([...ch.body, ...legs.b], pal, PX, PX),
+      air: makeSprite([...ch.body, ...legs.air], pal, PX, PX),
+      sick: makeSprite([...ch.body, ...legs.a], sick, PX, PX),
+      sickAir: makeSprite([...ch.body, ...legs.air], sick, PX, PX),
+    };
+    const facePal = { ...pal, b: '#5a7bd8', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
+    ch.bubble = makeBubble(makeSprite(makeFace(ch.face), facePal, 5, 5));
+  }
+
+  // Personaje elegido: estos valores cambian al elegir otro en el menú.
+  const KID_X = 90;
+  let hero, kidFrames, KID_H, KID_GROUND_Y, bubble;
+  function useHero(id) {
+    hero = CHARACTERS.find((c) => c.id === id) || CHARACTERS[0];
+    kidFrames = hero.frames;
+    bubble = hero.bubble;
+    KID_H = hero.h;
+    KID_GROUND_Y = GROUND - KID_H;
+  }
+
 
   const POOP_PAL = { d: '#7a4a1e', h: '#b0743a', w: '#ffffff', k: '#111111', m: '#3b200b' };
   const POOP = [
@@ -758,7 +890,7 @@
   }
 
   function hits(o) {
-    const kx = KID_X + 10, ky = kid.y + 9, kw = 18, kh = 42;
+    const kx = KID_X + 10, ky = kid.y + 9, kw = 18, kh = KID_H - 12;
     const oy = GROUND + 2 - o.h;
     const ox = o.x + o.w * 0.18, oyy = oy + o.h * 0.25, ow = o.w * 0.64, oh = o.h * 0.75;
     return kx < ox + ow && kx + kw > ox && ky < oyy + oh && ky + kh > oyy;
@@ -854,7 +986,7 @@
       if (t >= 3.3) {
         if (!stingerDone) { stingerDone = true; Music.stinger(); }
         storyPoop.x = poopX;
-        ctx.drawImage(storyPoop.sprite, poopX, GROUND + 2 - storyPoop.h);
+        blit(storyPoop.sprite, poopX, GROUND + 2 - storyPoop.h);
         drawStink(storyPoop, t);
       }
       const step = walking ? Math.floor(t * 6) % 2 : 0;
@@ -867,8 +999,8 @@
         const u = k / 12;
         ctx.fillRect(Math.round(hx + (cx - hx) * u), Math.round(hy + (cy - hy) * u + Math.sin(u * Math.PI) * 6), 2, 2);
       }
-      ctx.drawImage(man[step], Math.round(manX), manY);
-      ctx.drawImage(squat ? dog.squat : step ? dog.b : dog.a, Math.round(dogX), dogY + (squat ? 3 : 0));
+      blit(man[step], Math.round(manX), manY);
+      blit(squat ? dog.squat : step ? dog.b : dog.a, Math.round(dogX), dogY + (squat ? 3 : 0));
       if (t >= 4.0 && t < 6.5) {
         ctx.font = 'bold 16px "Courier New", monospace';
         ctx.textBaseline = 'top';
@@ -881,19 +1013,21 @@
       // La vereda minada y Rafa que se da cuenta.
       if (t >= 0.2 && !stingerDone) { stingerDone = true; Music.stinger(); }
       scenePoops.forEach((p, k) => {
-        ctx.drawImage(p.sprite, p.x, GROUND + 2 - p.h);
+        blit(p.sprite, p.x, GROUND + 2 - p.h);
         if (k % 2 === 0) drawStink(p, t + k);
       });
       drawFlies(scenePoops[2].x + 26, GROUND - 60, sceneFlies, t);
       drawFlies(scenePoops[4].x + 23, GROUND - 58, sceneFlies, t + 1.7);
-      ctx.drawImage(kidFrames.runA, KID_X, KID_GROUND_Y);
+      // La historia es de Rafa, aunque se haya elegido otro personaje.
+      const rafa = CHARACTERS[0], rafaY = GROUND - rafa.h;
+      blit(rafa.frames.runA, KID_X, rafaY);
       if (t >= 0.5 && Math.floor(t * 4) % 2 === 0) {
         ctx.font = 'bold 40px "Courier New", monospace';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#000';
-        ctx.fillText('!', KID_X + 16 + 2, KID_GROUND_Y - 46 + 2);
+        ctx.fillText('!', KID_X + 16 + 2, rafaY - 46 + 2);
         ctx.fillStyle = '#ffd23f';
-        ctx.fillText('!', KID_X + 16, KID_GROUND_Y - 46);
+        ctx.fillText('!', KID_X + 16, rafaY - 46);
       }
     }
   }
@@ -947,7 +1081,7 @@
 
     if (state === 'story') { drawStory(); return; }
 
-    for (const o of obstacles) ctx.drawImage(o.sprite, Math.round(o.x), GROUND + 2 - o.h);
+    for (const o of obstacles) blit(o.sprite, Math.round(o.x), GROUND + 2 - o.h);
 
     // Nubecitas del pedo al saltar.
     for (const p of puffs) {
@@ -961,7 +1095,7 @@
     if (state === 'over') frame = kid.onGround ? kidFrames.sick : kidFrames.sickAir;
     else if (!kid.onGround) frame = kidFrames.air;
     else if (state === 'running') frame = Math.floor(distance / 36) % 2 ? kidFrames.runB : kidFrames.runA;
-    ctx.drawImage(frame, KID_X, Math.round(kid.y));
+    blit(frame, KID_X, Math.round(kid.y));
     if (state === 'over') drawReaction();
 
     if (state !== 'start' && state !== 'begin') {
@@ -995,7 +1129,7 @@
     drawFlies(KID_X + 21, GROUND - 30, flies, t);  // moscas alrededor de Rafa
     // Viñeta con la cara de asco: aparece con un "pop" desde la cola.
     const s = Math.min(1, t / 0.15);
-    const w = Math.round(bubble.width * s), h = Math.round(bubble.height * s);
+    const w = Math.round(bubble.lw * s), h = Math.round(bubble.lh * s);
     if (w < 4) return;
     const bottom = KID_GROUND_Y - 2, left = KID_X + 22;
     ctx.drawImage(bubble, left, bottom - h, w, h);
@@ -1084,7 +1218,7 @@
     if (state !== 'running' || !kid.onGround) return;
     kid.vy = -JUMP_VELOCITY;
     kid.onGround = false;
-    puffs.push({ x: KID_X + 2, y: kid.y + 38, t: 0 });
+    puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0 });
     Music.jump();
   }
 
@@ -1245,9 +1379,39 @@
   });
   portrait.addEventListener('change', () => { if (portrait.matches) pause(); });
 
+  // ---- Selección de personaje ----
+  const HERO_KEY = 'ojo-al-paso:personaje';
+  const cardsEl = $('cards');
+  for (const ch of CHARACTERS) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'card';
+    btn.dataset.id = ch.id;
+    btn.setAttribute('aria-label', ch.name);
+    const img = document.createElement('img');
+    img.alt = '';
+    img.src = ch.frames.runA.toDataURL();
+    img.style.height = `${(17 * ch.h / 54).toFixed(1)}cqh`;  // el bebé se ve más bajito
+    const label = document.createElement('span');
+    label.textContent = ch.name;
+    btn.append(img, label);
+    btn.addEventListener('click', () => pickHero(ch.id));
+    cardsEl.append(btn);
+  }
+  function pickHero(id) {
+    useHero(id);
+    try { localStorage.setItem(HERO_KEY, hero.id); } catch { /* sin almacenamiento */ }
+    for (const b of cardsEl.children) b.setAttribute('aria-pressed', String(b.dataset.id === hero.id));
+    reset();
+    announce(`Elegiste a ${hero.name}`);
+  }
+  let savedHero = null;
+  try { savedHero = localStorage.getItem(HERO_KEY); } catch { /* sin almacenamiento */ }
+  useHero(savedHero);
+  for (const b of cardsEl.children) b.setAttribute('aria-pressed', String(b.dataset.id === hero.id));
+
   reset();
   ui.startBest.textContent = best;
-  $('rafa-portrait').src = kidFrames.runA.toDataURL();
   // Primera visita: la historia (necesita un toque para poder sonar). Después, directo al menú.
   let storySeen = false;
   try { storySeen = localStorage.getItem(STORY_KEY) === '1'; } catch { /* sin almacenamiento */ }

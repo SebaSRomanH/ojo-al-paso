@@ -1,5 +1,12 @@
 # Historial de cambios
 
+## 0.5 — 2026-11-03
+
+- **Seis personajes nuevos de la familia:** Baby Rafa, Seba 80s, Vicky, Pipe, Angie y Francisco, cada uno con su cara de asco propia.
+- El menú muestra los siete personajes y recuerda el que elegiste.
+- Baby Rafa es más bajito, con una caja de colisión proporcional.
+- **Gráficos estilo 16 bits (tipo Mario 3):** el doble de resolución, bordes redondeados, contorno oscuro y sombreado en todos los personajes, popós, Don Cochino, Bigote y las caras de asco. Los textos del lienzo también se ven más nítidos.
+
 ## 0.4 — 2026-11-03
 
 - **Rafa:** nuevo personaje pixel art (jockey rojo, pelo largo, polerón negro con esqueletos), también en la viñeta de asco.

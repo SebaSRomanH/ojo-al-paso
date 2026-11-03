@@ -1,6 +1,6 @@
-# Especificación de producto — v0.4
+# Especificación de producto — v0.5
 
-Estado: v0.4 publicada en producción (aprobada por el propietario en su teléfono). Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
+Estado: v0.4 en producción; v0.5 en desarrollo local. Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
 
 Entornos:
 
@@ -34,7 +34,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | RF-06 | **Velocidad exponencial:** v(t) = 300 · e^(k·t) px/s con k = ln(6)/20, es decir ×6 a los 20 s (≈1800 px/s), con tope técnico de 3000 px/s. Objetivo: partida promedio ≈10 s; a los 20 s es casi imposible. | 0.2 |
 | RF-07 | Pausa manual mediante botón o Esc. Pérdida de foco, pestaña oculta y orientación vertical móvil también pausan. Retomar exige SEGUIR, Espacio o Flecha arriba. | 0.1 |
 | RF-08 | En pantallas de hasta 900 px de ancho en vertical se bloquea el inicio y se indica girar el dispositivo. En horizontal la zona de juego cabe en el alto disponible y contempla safe areas. No se fuerza una API de bloqueo de orientación. | 0.1 |
-| RF-09 | Gráficos originales pixel art de estética años 80. Sin logos, sprites, música ni personajes de Mario o Chrome Dino. Cacas caricaturescas sin contenido gráfico. | 0.1 |
+| RF-09 | Gráficos originales pixel art de estética años 80. Sin logos, sprites, música ni personajes de Mario o Chrome Dino. Cacas caricaturescas sin contenido gráfico. **Acabado estilo 16 bits** (inspirado en el look de Mario 3, sin copiar sus sprites): los dibujos se escriben a baja resolución y al cargar se procesan con Scale2x (doble resolución con diagonales suavizadas), contorno oscuro de 1 pixel y sombreado (luz arriba-izquierda, sombra abajo-derecha). El lienzo tiene el doble de pixeles reales (1600×600) con la misma lógica de 800×300. | 0.1 · 0.5 |
 | RF-10 | En URL pública, COMPARTIR usa Web Share API o copia el enlace; cancelación sin error visible. En local informa que primero hace falta publicar. No realiza envíos sin intervención del usuario. | 0.1 |
 | RF-11 | Un único HTML autónomo que no solicita fuentes, imágenes, audio ni scripts externos al jugar. | 0.1 |
 | RF-12 | **Música y sonido:** tema chiptune original de estilo heavy metal de los 80 (bajo y guitarras galopantes, dos guitarras armonizadas en Mi menor, 160 BPM, 32 compases ≈48 s) generado con Web Audio. Debe sonar continuo en loop: la última sección termina en Si y resuelve en el Mi inicial. No reproduce melodías de terceros (p. ej. *The Trooper*); solo se inspira en el estilo. Efectos de salto, choque y aumento de velocidad. Suena al jugar y se detiene en pausa y al chocar. | 0.2 |
@@ -44,7 +44,8 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | RF-16 | **Aviso de velocidad:** cada 5 s aparece parpadeando "¡MÁS RÁPIDO! x…" con un sonido y un anuncio accesible. El HUD muestra siempre `VEL x…`. | 0.2 |
 | RF-17 | **Controles de sonido y pausa** de al menos 52 px CSS, con íconos (parlante y dos barras). Silenciar se recuerda entre visitas; tecla M en computador. | 0.2 |
 | RF-18 | **Historia de intro** en dos pantallas animadas, con texto y botones SIGUIENTE/SALTAR (Espacio avanza, Esc salta). (1) Don Cochino pasea a Bigote mirando el celular; Bigote hace caca y él sigue diciendo "…nadie me vio". (2) La vereda llena de cacas con moscas y olor; Rafa se asusta (!) y se presenta la misión. Música de susto en Mi menor armónica a 72 BPM (latido, trémolo, melodía lenta) y un golpe disonante en cada momento clave. Se muestra en la primera visita tras "TOCA PARA EMPEZAR" (el navegador exige un toque para sonar); después se puede repetir con el botón HISTORIA. | 0.4 |
-| RF-19 | **Selección de personaje** en la pantalla inicial: tarjeta de Rafa (seleccionada) y dos tarjetas bloqueadas "???" para futuros personajes. Muestra la misión, el récord y los botones JUGAR, HISTORIA y COMPARTIR. | 0.4 |
+| RF-19 | **Selección de personaje** en la pantalla inicial: una tarjeta por personaje con su dibujo y nombre; la elegida se marca en amarillo y se recuerda entre visitas. Muestra la misión, el récord y los botones JUGAR, HISTORIA y COMPARTIR. | 0.4 · 0.5 |
+| RF-20 | **Personajes de la familia** (inspirados en fotos del propietario; las fotos no se incluyen en el juego): **Rafa**; **Baby Rafa** (sombrero de paja con cinta turquesa, polerón a rayas, shorts rojos; más bajo: 42 px en vez de 54 y caja de colisión proporcional); **Seba 80s** (el propietario de niño: pelo negro, chaleco gris con cuello amarillo, jeans, botas); **Vicky** (pelo ondulado largo, lentes de sol rosados, polera tropical); **Pipe** (jockey naranjo, lentes espejados, barba, camisa con flamencos); **Angie** (embarazada: pelo largo, lentes, polera blanca con guatita, pantalón ancho gris); **Francisco** (metalero: jockey negro hacia atrás, lentes oscuros, polera negra con emblema dorado sin logos de bandas). Cada uno tiene su propia cara de asco (RF-13) con su gorro, pelo, lentes o barba. La historia (RF-18) siempre muestra a Rafa. | 0.5 |
 
 ## Historias de usuario
 
@@ -60,7 +61,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | HU-08 | Como jugador, quiero música con energía que acompañe la carrera y poder silenciarla. | RF-12/17. |
 | HU-09 | Como jugador, quiero que pisar una caca sea gracioso y no solo un "game over". | RF-13. |
 | HU-10 | Como jugador, quiero entender por qué hay cacas en la calle y cuál es mi misión. | RF-18. |
-| HU-11 | Como jugador, quiero elegir con quién juego (por ahora Rafa) y saber que vendrán más. | RF-19. |
+| HU-11 | Como jugador, quiero elegir con quién juego entre los personajes de mi familia. | RF-19/20. |
 
 ## Verificación
 
@@ -72,8 +73,8 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 - Renderizado objetivo 60 FPS en un móvil moderno; **pendiente de medir en dispositivos físicos**.
 - Delta limitado a 100 ms y simulación en pasos de hasta 1/120 s. El tope de 3000 px/s evita atravesar cacas entre pasos.
 - Controles HTML con nombres accesibles, foco visible, teclado y anuncios de cambio de estado. El juego depende de percepción visual y reflejos; no se afirma accesibilidad integral ni certificación WCAG.
-- Cero recursos de terceros en runtime. Sin telemetría, cookies, login ni datos personales. Datos guardados solo en el navegador: récord, ranking (iniciales y puntaje), últimas iniciales, preferencia de sonido e historia vista.
-- La foto de referencia del personaje no se incluye en el repositorio ni en el juego; solo se usó para diseñar el sprite.
+- Cero recursos de terceros en runtime. Sin telemetría, cookies, login ni datos personales. Datos guardados solo en el navegador: récord, ranking (iniciales y puntaje), últimas iniciales, preferencia de sonido, historia vista y personaje elegido.
+- Las fotos de referencia de los personajes no se incluyen en el repositorio ni en el juego; solo se usaron para diseñar los sprites.
 - Sin funciones de pago ni servicios por uso. Alojamiento en GitHub Pages (repos públicos).
 
 ## Fuera del alcance actual
@@ -95,5 +96,6 @@ Agacharse, doble salto, enemigos aéreos, niveles, personajes desbloqueables, mu
 | 0.2 | Música (RF-12), ranking local (RF-14), velocidad exponencial (RF-06), aparición aleatoria y cacas dobles (RF-03/15), aviso de velocidad (RF-16), controles grandes (RF-17). |
 | 0.3 | Reacción de asco con moscas y olor (RF-13); el fin de partida espera la reacción (RF-04). |
 | 0.4 | Personaje Rafa (RF-01), salto flatulento (RF-02), historia de intro con música de susto (RF-18), selección de personaje (RF-19), misión e historia en el objetivo. Vocabulario en pantalla: "popó". |
+| 0.5 | Seis personajes nuevos de la familia con sus caras de asco (RF-20); la selección se recuerda (RF-19). Acabado estilo 16 bits con doble resolución, contorno y sombreado (RF-09). |
 
 Todo cambio funcional debe actualizar este documento, el [historial de cambios](../CHANGELOG.md), las pruebas afectadas y la versión.
