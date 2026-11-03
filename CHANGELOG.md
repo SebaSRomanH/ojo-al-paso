@@ -1,5 +1,13 @@
 # Historial de cambios
 
+## 0.6 — 2026-11-03
+
+- **Se salta tocando la pantalla:** ya no hay botón de salto.
+- **Ejemplo antes de partir:** un dedo animado toca la pantalla mientras el personaje salta, con el texto "¡Toca la pantalla para saltar!". Se empieza tocando.
+- **Botón de sonido arriba a la izquierda**, lejos de donde se toca para jugar; los puntos se corrieron a su derecha.
+- **Pantalla completa:** botón nuevo junto al sonido (tecla F en computador). En iPhone se usa "Agregar a pantalla de inicio".
+- En la historia, el botón para pasarla ahora dice "OMITIR" (antes "SALTAR"), para no confundirlo con el salto.
+
 ## 0.5.1 — 2026-11-03
 
 - **Botón de salto circular:** semitransparente para no tapar el juego, con un ícono de flecha hacia arriba en vez del texto "SALTAR".

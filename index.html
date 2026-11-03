@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#120826">
+<!-- Al agregarlo a la pantalla de inicio (iPhone/Android) se abre sin barras del navegador. -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ojo al paso">
 <meta name="description" content="Corre, salta los popós y supera tu récord.">
 <title>¡Ojo al paso!</title>
 <style>
@@ -57,22 +62,48 @@
   button.secondary { background: var(--accent); }
   [hidden] { display: none !important; }
 
-  /* Botón de salto: círculo semitransparente con ícono, para no tapar el juego. */
-  #jump {
-    position: absolute; right: 3%; bottom: 4%;
-    width: max(60px, 24cqh); height: max(60px, 24cqh); padding: 0;
-    display: grid; place-items: center;
-    border-radius: 50%;
-    color: var(--ink);
-    background: rgba(255, 111, 97, 0.3);
-    border: 3px solid rgba(255, 246, 224, 0.8);
-    box-shadow: none;
-  }
-  #jump svg { width: 62%; height: 62%; }
-  #jump:active { transform: scale(0.92); box-shadow: none; background: rgba(255, 111, 97, 0.6); }
-  #topbar {
-    position: absolute; right: 2%; top: 3%; z-index: 3;
+  /* Sonido y pantalla completa arriba a la izquierda; pausa arriba a la derecha.
+     Lejos de donde se toca para saltar. */
+  #leftbar, #topbar {
+    position: absolute; top: 3%; z-index: 3;
     display: flex; gap: 2cqw;
+  }
+  #leftbar { left: 2%; }
+  #topbar { right: 2%; }
+  #fullscreen .exit { display: none; }
+  #fullscreen[aria-pressed="true"] .enter { display: none; }
+  #fullscreen[aria-pressed="true"] .exit { display: inline; }
+
+  /* Ejemplo antes de partir: un dedo toca la pantalla y el personaje salta. */
+  .tutorial {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2cqh; padding: 3% 3% 3% 22%;
+    background: rgba(10, 4, 24, 0.45); text-align: center; cursor: pointer;
+  }
+  .tutorial p { margin: 0; font-size: clamp(12px, 5.5cqh, 24px); }
+  .tutorial strong { color: var(--accent); text-shadow: 2px 2px 0 #ff4fd8; font-size: clamp(16px, 8cqh, 34px); }
+  .tutorial .small { opacity: 0.85; font-size: clamp(11px, 4.4cqh, 18px); }
+  .finger { position: relative; width: 24cqh; height: 26cqh; }
+  .finger .hand {
+    position: absolute; left: 50%; top: 0;
+    font-size: 17cqh; line-height: 1;
+    animation: tap 1.2s ease-in-out infinite;
+  }
+  .finger .ripple {
+    position: absolute; left: 50%; top: 4cqh;
+    width: 10cqh; height: 10cqh; margin-left: -5cqh;
+    border: 3px solid var(--accent); border-radius: 50%;
+    opacity: 0; animation: ripple 1.2s ease-out infinite;
+  }
+  @keyframes tap {
+    0%, 100% { transform: translate(-50%, 0); }
+    30%, 42% { transform: translate(-50%, 7cqh); }
+  }
+  @keyframes ripple {
+    0%, 32% { transform: scale(0.3); opacity: 0; }
+    36% { opacity: 1; }
+    75%, 100% { transform: scale(1.9); opacity: 0; }
   }
   .icon {
     width: max(52px, 17cqh); height: max(52px, 17cqh); padding: 0;
@@ -116,7 +147,7 @@
   .story {
     position: absolute; left: 0; right: 0; top: 0;
     display: flex; align-items: center; gap: 3cqw;
-    padding: 2.5cqh 3cqw; padding-right: calc(max(52px, 17cqh) + 5cqw);
+    padding: 2.5cqh 3cqw; padding-left: calc(2 * max(52px, 17cqh) + 6cqw);
     background: rgba(0, 0, 0, 0.8); border-bottom: 3px solid var(--accent);
   }
   .story p { flex: 1; margin: 0; font-size: clamp(11px, 4.8cqh, 20px); line-height: 1.35; }
@@ -182,7 +213,7 @@
 <div id="game">
   <canvas id="screen" width="800" height="300" aria-label="Zona de juego" role="img"></canvas>
 
-  <div id="topbar">
+  <div id="leftbar">
     <button id="sound" class="icon" type="button" aria-label="Sonido" aria-pressed="true">
       <svg viewBox="0 0 18 18" aria-hidden="true">
         <path d="M2 6h4l5-4v14l-5-4H2z" fill="currentColor"/>
@@ -190,17 +221,24 @@
         <g class="off" stroke="currentColor" stroke-width="2"><path d="M13 6l4 6M17 6l-4 6"/></g>
       </svg>
     </button>
+    <button id="fullscreen" class="icon" type="button" aria-label="Pantalla completa" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square">
+        <path class="enter" d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>
+        <path class="exit" d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/>
+      </svg>
+    </button>
+  </div>
+  <div id="topbar">
     <button id="pause" class="icon" type="button" aria-label="Pausar" hidden>
       <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 3h3v12H4zM11 3h3v12h-3z" fill="currentColor"/></svg>
     </button>
   </div>
-  <button id="jump" type="button" aria-label="Saltar" hidden>
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 17V4"/>
-      <path d="M6 10l6-6 6 6"/>
-      <path d="M5 21h14"/>
-    </svg>
-  </button>
+
+  <section id="tutorial" class="tutorial" aria-labelledby="tutorial-title" hidden>
+    <div class="finger" aria-hidden="true"><span class="ripple"></span><span class="hand">👆</span></div>
+    <p><strong id="tutorial-title">¡Toca la pantalla para saltar!</strong></p>
+    <p class="small">En computador: Espacio o ↑ · Toca para empezar</p>
+  </section>
 
   <section id="begin" class="overlay" aria-labelledby="begin-title" hidden>
     <h1 id="begin-title">¡Ojo al paso!</h1>
@@ -210,7 +248,7 @@
   <section id="story" class="story" aria-labelledby="story-text" hidden>
     <p id="story-text" aria-live="polite"></p>
     <div class="row">
-      <button id="story-skip" class="secondary" type="button">SALTAR</button>
+      <button id="story-skip" class="secondary" type="button">OMITIR</button>
       <button id="story-next" type="button">SIGUIENTE ▶</button>
     </div>
   </section>
@@ -298,7 +336,7 @@
   const $ = (id) => document.getElementById(id);
   const ui = {
     start: $('start'), paused: $('paused'), over: $('over'),
-    jump: $('jump'), pause: $('pause'),
+    pause: $('pause'), tutorial: $('tutorial'), leftbar: $('leftbar'),
     startBest: $('start-best'), overScore: $('over-score'), overTime: $('over-time'), overNew: $('over-new'),
     saveForm: $('save-form'), name: $('name'), rankList: $('ranking-list'),
     begin: $('begin'), story: $('story'), storyText: $('story-text'), storyNext: $('story-next'),
@@ -1108,20 +1146,20 @@
     let frame = kidFrames.runA;
     if (state === 'over') frame = kid.onGround ? kidFrames.sick : kidFrames.sickAir;
     else if (!kid.onGround) frame = kidFrames.air;
-    else if (state === 'running') frame = Math.floor(distance / 36) % 2 ? kidFrames.runB : kidFrames.runA;
+    else if (state === 'running' || state === 'tutorial') frame = Math.floor(distance / 36) % 2 ? kidFrames.runB : kidFrames.runA;
     blit(frame, KID_X, Math.round(kid.y));
     if (state === 'over') drawReaction();
 
-    if (state !== 'start' && state !== 'begin') {
+    if (state !== 'start' && state !== 'begin' && state !== 'tutorial') {
       const pad = (n) => String(n).padStart(5, '0');
       ctx.font = 'bold 18px "Courier New", monospace';
       ctx.textBaseline = 'top';
       const mult = (speed / SPEED_START).toFixed(1);
       const text = `PUNTOS ${pad(score())}   RÉCORD ${pad(Math.max(best, score()))}   VEL x${mult}`;
       ctx.fillStyle = '#000';
-      ctx.fillText(text, 18, 16);
+      ctx.fillText(text, hudX + 2, 16);
       ctx.fillStyle = '#fff6e0';
-      ctx.fillText(text, 16, 14);
+      ctx.fillText(text, hudX, 14);
 
       // Aviso parpadeante al subir de velocidad.
       if (bannerT > 0 && Math.floor(bannerT * 8) % 2 === 0) {
@@ -1157,6 +1195,18 @@
     }
   }
 
+  // Los puntos se escriben a la derecha de los botones de la izquierda.
+  let hudX = 16;
+  function measureHud() {
+    const g = canvas.getBoundingClientRect(), b = ui.leftbar.getBoundingClientRect();
+    if (g.width && b.width) hudX = Math.round(((b.right - g.left) / g.width) * W) + 12;
+  }
+  if ('ResizeObserver' in window) {
+    const ro = new ResizeObserver(measureHud);
+    ro.observe(canvas);
+    ro.observe(ui.leftbar);
+  }
+
   // ---- Bucle principal ----
   let last = performance.now();
   function loop(now) {
@@ -1165,6 +1215,8 @@
     if (state === 'running' && dt > 0) {
       const n = Math.ceil(dt / STEP), h = dt / n;
       for (let i = 0; i < n && state === 'running'; i++) update(h);
+    } else if (state === 'tutorial') {
+      tutorialUpdate(dt);
     } else if (state === 'story') {
       storyT += dt;
     } else if (state === 'over') {
@@ -1177,7 +1229,7 @@
 
   // ---- Transiciones ----
   function show(el, visible) { el.hidden = !visible; }
-  function controls(visible) { show(ui.jump, visible); show(ui.pause, visible); }
+  function controls(visible) { show(ui.pause, visible); }
   function announce(msg) { ui.live.textContent = msg; }
 
   // ---- Historia ----
@@ -1216,12 +1268,49 @@
     $('play').focus({ preventScroll: true });
   }
 
+  // ---- Ejemplo de cómo saltar (antes de cada partida desde el menú) ----
+  // El dedo de la animación CSS "toca" en el 30–42 % de cada ciclo de 1,2 s;
+  // el personaje salta en ese momento para que se vea la relación.
+  const TAP_CYCLE = 1.2, TAP_AT = 0.4;
+  let tutT = 0;
+  function showTutorial() {
+    if (portrait.matches) return;
+    reset();
+    state = 'tutorial';
+    tutT = 0;
+    show(ui.start, false); show(ui.over, false);
+    show(ui.tutorial, true);
+    controls(false);
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    announce('Toca la pantalla para saltar. Toca para empezar.');
+  }
+  function tutorialUpdate(dt) {
+    const before = Math.floor((tutT - TAP_AT) / TAP_CYCLE);
+    tutT += dt;
+    if (Math.floor((tutT - TAP_AT) / TAP_CYCLE) > before && kid.onGround) {
+      kid.vy = -JUMP_VELOCITY;
+      kid.onGround = false;
+      puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0 });
+    }
+    if (!kid.onGround) {
+      kid.vy += GRAVITY * dt;
+      kid.y += kid.vy * dt;
+      if (kid.y >= KID_GROUND_Y) { kid.y = KID_GROUND_Y; kid.vy = 0; kid.onGround = true; }
+    }
+    const dx = SPEED_START * dt;
+    distance += dx;
+    hillOff = (hillOff + dx * 0.15) % W;
+    groundOff = (groundOff + dx) % W;
+    for (const p of puffs) { p.x -= dx * 0.6; p.t += dt; }
+    puffs = puffs.filter((p) => p.t < 0.5);
+  }
+
   function start() {
     if (portrait.matches) return;
     reset();
     state = 'running';
     show(ui.start, false); show(ui.over, false); show(ui.paused, false);
-    show(ui.story, false); show(ui.begin, false);
+    show(ui.story, false); show(ui.begin, false); show(ui.tutorial, false);
     controls(true);
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     Music.play(true);
@@ -1337,7 +1426,7 @@
   }
 
   // ---- Entrada ----
-  $('play').addEventListener('click', start);
+  $('play').addEventListener('click', showTutorial);
   $('begin-btn').addEventListener('click', openStory);
   $('story-btn').addEventListener('click', openStory);
   ui.storyNext.addEventListener('click', nextStory);
@@ -1359,9 +1448,38 @@
   soundBtn.addEventListener('click', () => { toggleSound(); soundBtn.blur(); });
   syncSound();
 
-  ui.jump.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
-  ui.jump.addEventListener('click', (e) => { if (e.detail === 0) jump(); });
+  // Se salta tocando cualquier parte del juego (no hay botón de salto).
   canvas.addEventListener('pointerdown', (e) => { e.preventDefault(); jump(); });
+  ui.tutorial.addEventListener('pointerdown', (e) => { e.preventDefault(); start(); });
+
+  // ---- Pantalla completa ----
+  // iPhone no la permite en páginas web: ahí el botón se oculta y sirve
+  // "Agregar a pantalla de inicio" (ver metas apple-mobile-web-app-*).
+  const fsBtn = $('fullscreen');
+  const root = document.documentElement;
+  const isFullscreen = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+  if (!(root.requestFullscreen || root.webkitRequestFullscreen)) fsBtn.hidden = true;
+  async function toggleFullscreen() {
+    try {
+      if (isFullscreen()) {
+        await (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      } else {
+        await (root.requestFullscreen || root.webkitRequestFullscreen).call(root, { navigationUI: 'hide' });
+        // En Android, ya en pantalla completa, intenta dejarlo en horizontal.
+        try { await screen.orientation.lock('landscape'); } catch { /* no soportado: se ignora */ }
+      }
+    } catch {
+      toast('Este navegador no permite pantalla completa.');
+    }
+  }
+  function syncFullscreen() {
+    const on = isFullscreen();
+    fsBtn.setAttribute('aria-pressed', String(on));
+    fsBtn.setAttribute('aria-label', on ? 'Salir de pantalla completa' : 'Pantalla completa');
+  }
+  fsBtn.addEventListener('click', () => { toggleFullscreen(); fsBtn.blur(); });
+  document.addEventListener('fullscreenchange', syncFullscreen);
+  document.addEventListener('webkitfullscreenchange', syncFullscreen);
 
   const isJumpKey = (k) => k === ' ' || k === 'Spacebar' || k === 'ArrowUp';
   addEventListener('keydown', (e) => {
@@ -1373,13 +1491,16 @@
       else if (state === 'paused') resume();
       else if (state === 'begin') openStory();
       else if (state === 'story') nextStory();
-      else if (state === 'start') start();
+      else if (state === 'start') showTutorial();
+      else if (state === 'tutorial') start();
       else if (state === 'over' && overShown && performance.now() - overAt > 400) start();
     } else if (e.key === 'Escape') {
       if (state === 'story') endStory();
       else pause();
     } else if ((e.key === 'm' || e.key === 'M') && !e.repeat) {
       toggleSound();
+    } else if ((e.key === 'f' || e.key === 'F') && !e.repeat && !fsBtn.hidden) {
+      toggleFullscreen();
     }
   });
   addEventListener('keyup', (e) => {

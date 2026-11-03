@@ -1,6 +1,6 @@
-# Especificación de producto — v0.5
+# Especificación de producto — v0.6
 
-Estado: v0.5 publicada en producción (aprobada por el propietario en su teléfono). Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
+Estado: v0.5 en producción; v0.5.1 en pruebas; v0.6 en desarrollo local. Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
 
 Entornos:
 
@@ -27,7 +27,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | ID | Requisito y criterio de aceptación | Desde |
 |---|---|---|
 | RF-01 | **Rafa** corre de izquierda a derecha en un mundo que se desplaza. Su sprite (14×18 celdas) se inspira en el sobrino del propietario: jockey rojo con visera negra plana, pelo café largo, polerón negro con esqueletos y etiqueta naranja con su nombre, buzo gris. Comenzar requiere una acción explícita. | 0.1 · 0.4 |
-| RF-02 | Tocar SALTAR o el escenario libre inicia un salto si el personaje está en el suelo. Espacio/Flecha arriba funcionan en computador. No existe doble salto. Cada salto suena a **pedo** (tono y duración al azar) y deja una nubecita verde. El botón de salto es un **círculo semitransparente** (≥60 px CSS) abajo a la derecha, con un ícono de flecha hacia arriba sobre el suelo y nombre accesible "Saltar". | 0.1 · 0.4 · 0.5.1 |
+| RF-02 | **Tocar cualquier parte de la pantalla de juego** inicia un salto si el personaje está en el suelo; no hay botón de salto. Espacio/Flecha arriba funcionan en computador. No existe doble salto. Cada salto suena a **pedo** (tono y duración al azar) y deja una nubecita verde. | 0.1 · 0.4 · 0.6 |
 | RF-03 | Aparecen cacas con altura de 34–46 y ancho de 38–58 píxeles lógicos. No hay otro tipo de enemigo. Un 18 % de las apariciones son **cacas dobles** (dos pequeñas, 38–44 × 34–40, separadas 6–16 px) que se esquivan con un solo salto. | 0.1 · 0.2 |
 | RF-04 | Chocar termina la carrera y congela la puntuación. Primero se muestra la **reacción de asco** (RF-13) durante 1,4 s y luego la pantalla final, que ofrece reinicio sin recargar la página. La caja de colisión es menor que el dibujo para dar margen al jugador. | 0.1 · 0.3 |
 | RF-05 | Puntaje = piso(distancia / 12); aumenta solo corriendo. Se muestra récord local no decreciente entre partidas y recargas. Sin almacenamiento disponible, se puede seguir jugando. La pantalla final muestra puntos y segundos de duración. | 0.1 · 0.2 |
@@ -42,9 +42,11 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | RF-14 | **Ranking local:** top 10 guardado en el dispositivo. Si el puntaje entra, se piden iniciales (3 caracteres, letras o números, en mayúsculas) y se recuerdan para la próxima vez. La fila guardada se resalta. En teléfono el teclado no se abre automáticamente. | 0.2 |
 | RF-15 | **Aparición aleatoria de cacas:** tras cada caca simple, el siguiente intervalo es seguido (0,85–1,15 s) con 30 %, normal (1,15–2,2 s) con 55 % o respiro (2,2–3,0 s) con 15 %. Tras una doble, 1,2–2,2 s. El mínimo supera el tiempo de un salto (0,63 s). | 0.2 |
 | RF-16 | **Aviso de velocidad:** cada 5 s aparece parpadeando "¡MÁS RÁPIDO! x…" con un sonido y un anuncio accesible. El HUD muestra siempre `VEL x…`. | 0.2 |
-| RF-17 | **Controles de sonido y pausa** de al menos 52 px CSS, con íconos (parlante y dos barras). Silenciar se recuerda entre visitas; tecla M en computador. | 0.2 |
+| RF-17 | **Controles** de al menos 52 px CSS con íconos: **sonido y pantalla completa arriba a la izquierda**, **pausa arriba a la derecha**, lejos de la zona donde se toca para saltar; tocarlos no hace saltar. Los puntos se dibujan a la derecha de los botones de la izquierda. Silenciar se recuerda entre visitas; teclas M (sonido) y F (pantalla completa) en computador. | 0.2 · 0.6 |
 | RF-18 | **Historia de intro** en dos pantallas animadas, con texto y botones SIGUIENTE/SALTAR (Espacio avanza, Esc salta). (1) Don Cochino pasea a Bigote mirando el celular; Bigote hace caca y él sigue diciendo "…nadie me vio". (2) La vereda llena de cacas con moscas y olor; Rafa se asusta (!) y se presenta la misión. Música de susto en Mi menor armónica a 72 BPM (latido, trémolo, melodía lenta) y un golpe disonante en cada momento clave. Se muestra en la primera visita tras "TOCA PARA EMPEZAR" (el navegador exige un toque para sonar); después se puede repetir con el botón HISTORIA. | 0.4 |
 | RF-19 | **Selección de personaje** en la pantalla inicial: una tarjeta por personaje con su dibujo y nombre; la elegida se marca en amarillo y se recuerda entre visitas. Muestra la misión, el récord y los botones JUGAR, HISTORIA y COMPARTIR. | 0.4 · 0.5 |
+| RF-21 | **Ejemplo de cómo saltar:** al tocar JUGAR (o Espacio en el menú) aparece una pantalla con un dedo animado que toca la pantalla cada 1,2 s, con una onda en el punto de toque; el personaje corre y salta en sincronía, y se lee "¡Toca la pantalla para saltar!". La partida empieza al tocar la pantalla o con Espacio. "OTRA VEZ" reinicia directo, sin el ejemplo. | 0.6 |
+| RF-22 | **Pantalla completa:** botón con ícono de esquinas (cambia al salir), en navegadores que la permiten (Android, computador). Al entrar intenta fijar la orientación horizontal; si el navegador no lo permite, se ignora. En iPhone el botón se oculta (Safari no permite pantalla completa en páginas); al agregar el juego a la pantalla de inicio se abre sin barras del navegador. | 0.6 |
 | RF-20 | **Personajes de la familia** (inspirados en fotos del propietario; las fotos no se incluyen en el juego): **Rafa**; **Baby Rafa** (sombrero de paja con cinta turquesa, polerón a rayas, shorts rojos; más bajo: 42 px en vez de 54 y caja de colisión proporcional); **Seba 80s** (el propietario de niño: pelo negro, chaleco gris con cuello amarillo, jeans, botas); **Vicky** (pelo ondulado largo, lentes de sol rosados, polera tropical); **Pipe** (jockey naranjo, lentes espejados, barba, camisa con flamencos); **Angie** (embarazada: pelo largo, lentes, polera blanca con guatita, pantalón ancho gris); **Francisco** (metalero: jockey negro hacia atrás, lentes oscuros, polera negra con emblema dorado sin logos de bandas). Cada uno tiene su propia cara de asco (RF-13) con su gorro, pelo, lentes o barba. La historia (RF-18) siempre muestra a Rafa. | 0.5 |
 
 ## Historias de usuario
@@ -52,7 +54,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | ID | Historia | Aceptación relacionada |
 |---|---|---|
 | HU-01 | Como jugador, quiero entender qué hacer antes de comenzar para jugar sin instrucciones largas. | Portada con botón, objetivo y controles; RF-01/02. |
-| HU-02 | Como jugador móvil, quiero saltar con una mano para esquivar los obstáculos. | Botón visible ≥44 px CSS de alto; RF-02/08. |
+| HU-02 | Como jugador móvil, quiero saltar con una mano para esquivar los obstáculos, y que me muestren cómo antes de partir. | Toque en cualquier parte; RF-02/08/21. |
 | HU-03 | Como jugador, quiero una dificultad creciente y sorpresiva, con partidas cortas e intensas. | RF-03/06/15/16; saltabilidad comprobada con simulación. |
 | HU-04 | Como jugador, quiero conservar mi récord, ver un ranking y repetir rápidamente. | RF-04/05/14. |
 | HU-05 | Como jugador, quiero atender otra app sin perder la partida. | Pausa por interrupción, reanudación explícita; RF-07. |
@@ -98,5 +100,6 @@ Agacharse, doble salto, enemigos aéreos, niveles, personajes desbloqueables, mu
 | 0.4 | Personaje Rafa (RF-01), salto flatulento (RF-02), historia de intro con música de susto (RF-18), selección de personaje (RF-19), misión e historia en el objetivo. Vocabulario en pantalla: "popó". |
 | 0.5 | Seis personajes nuevos de la familia con sus caras de asco (RF-20); la selección se recuerda (RF-19). Acabado estilo 16 bits con doble resolución, contorno y sombreado (RF-09). |
 | 0.5.1 | Botón de salto circular y semitransparente con ícono (RF-02). |
+| 0.6 | Sin botón de salto: se toca la pantalla (RF-02); ejemplo animado antes de partir (RF-21); sonido y pantalla completa arriba a la izquierda (RF-17/22). |
 
 Todo cambio funcional debe actualizar este documento, el [historial de cambios](../CHANGELOG.md), las pruebas afectadas y la versión.
