@@ -1,4 +1,5 @@
 # ¡Ojo al paso!
+Juego creado para mi sobrino. 
 
 Juego de navegador para móvil (en horizontal): un niño corre y salta cacas. Supera tu récord y compártelo por WhatsApp.
 
