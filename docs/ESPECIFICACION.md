@@ -1,6 +1,6 @@
 # Especificación de producto — v1.2
 
-Estado: v0.9 en producción; v1.2 en desarrollo local (incluye la v1.0 y la v1.1). Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
+Estado: v1.2.1 publicada en producción (aprobada por el propietario en su teléfono; incluye de la v0.9.1 a la v1.2). Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
 
 Entornos:
 
