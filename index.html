@@ -13,6 +13,9 @@
 <title>¡Ojo al paso!</title>
 <style>
   :root {
+    /* Tamaño de los botones cuadrados (sonido, pantalla completa, pausa).
+       Nunca menos de 44 px, el mínimo cómodo para un dedo. */
+    --icon: max(44px, 14.5cqh);
     --bg: #120826;
     --panel: rgba(18, 8, 38, 0.88);
     --ink: #fff6e0;
@@ -53,16 +56,16 @@
     color: var(--btn-ink); background: var(--btn);
     border: 3px solid var(--ink); border-radius: 0;
     box-shadow: 4px 4px 0 #000;
-    min-height: 44px; padding: 0.4em 1.1em;
-    font-size: clamp(14px, 6cqh, 24px);
+    min-height: 44px; padding: 0.35em 0.95em;
+    font-size: clamp(12px, 5.1cqh, 20px);
     cursor: pointer; touch-action: manipulation;
   }
   button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
   button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
   button.secondary { background: var(--accent); }
   /* Jerarquía: un botón principal grande con pulso suave; los demás, chicos. */
-  button.primary { font-size: clamp(16px, 7.5cqh, 30px); padding: 0.35em 1.4em; animation: pulse 1.6s ease-in-out infinite; }
-  button.small { font-size: clamp(11px, 4.6cqh, 18px); padding: 0.3em 0.9em; }
+  button.primary { font-size: clamp(14px, 6.4cqh, 26px); padding: 0.3em 1.2em; animation: pulse 1.6s ease-in-out infinite; }
+  button.small { font-size: clamp(10px, 3.9cqh, 15px); padding: 0.25em 0.75em; }
   @keyframes pulse { 50% { transform: scale(1.06); } }
   button.primary:active { animation: none; }
   @media (hover: hover) { button:hover { filter: brightness(1.12); } }
@@ -112,7 +115,7 @@
     75%, 100% { transform: scale(1.9); opacity: 0; }
   }
   .icon {
-    width: max(52px, 17cqh); height: max(52px, 17cqh); padding: 0;
+    width: var(--icon); height: var(--icon); padding: 0;
     display: grid; place-items: center;
     background: var(--accent);
   }
@@ -140,11 +143,11 @@
   #start { gap: 2.5cqh; }
   .cards { display: flex; gap: 1.4cqw; width: 100%; justify-content: center; }
   .card {
-    flex: 1 1 0; max-width: 13cqw; min-width: 0; min-height: 0;
+    flex: 1 1 0; max-width: 11cqw; min-width: 0; min-height: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1cqh;
-    height: 31cqh; padding: 1.2cqh 0.5cqw;
+    height: 26.5cqh; padding: 1cqh 0.4cqw;
     color: var(--ink); background: #2a1650;
-    font-size: clamp(8px, 3.4cqh, 14px); letter-spacing: 0; line-height: 1.1;
+    font-size: clamp(8px, 2.9cqh, 12px); letter-spacing: 0; line-height: 1.1;
     box-shadow: 3px 3px 0 #000; border-width: 2px;
   }
   .card[aria-pressed="true"] { background: #4a1a70; outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -153,16 +156,16 @@
   .story {
     position: absolute; left: 0; right: 0; top: 0;
     display: flex; align-items: center; gap: 3cqw;
-    padding: 2.5cqh 3cqw; padding-left: calc(2 * max(52px, 17cqh) + 6cqw);
+    padding: 2.5cqh 3cqw; padding-left: calc(2 * var(--icon) + 6cqw);
     background: rgba(0, 0, 0, 0.8); border-bottom: 3px solid var(--accent);
   }
   .story p { flex: 1; margin: 0; font-size: clamp(11px, 4.8cqh, 20px); line-height: 1.35; }
   .story .row { flex-wrap: nowrap; gap: 2cqw; }
 
-  #over { padding-top: calc(max(52px, 17cqh) + 5cqh); padding-bottom: 2cqh; }
+  #over { padding-top: calc(var(--icon) + 5cqh); padding-bottom: 2cqh; }
   #over .over-main { gap: 1.6cqh; }
   #over h2 { font-size: clamp(18px, 9cqh, 44px); }
-  #over .primary { font-size: clamp(15px, 6.5cqh, 26px); }
+  #over .primary { font-size: clamp(13px, 5.5cqh, 22px); }
   #over-new { color: var(--accent); font-weight: bold; opacity: 1; animation: pulse 0.8s ease-in-out infinite; }
 
   /* Créditos finales: texto que sube como en el cine. */
@@ -204,7 +207,7 @@
   .over-main { display: flex; flex-direction: column; align-items: center; gap: 2.5cqh; }
   #save-form { display: flex; flex-direction: column; align-items: center; gap: 1.5cqh; }
   #name {
-    font: inherit; font-weight: bold; font-size: clamp(14px, 6cqh, 24px);
+    font: inherit; font-weight: bold; font-size: clamp(12px, 5.1cqh, 20px);
     width: 5ch; min-height: 44px; padding: 0.2em;
     text-align: center; text-transform: uppercase;
     color: var(--ink); background: #000; border: 3px solid var(--ink); border-radius: 0;
@@ -365,14 +368,14 @@
 
   // ---- Reglas (v0.2) ----
   const W = 800, H = 300, GROUND = 250;
-  // Velocidad exponencial: x6 a los 20 s (casi imposible). Tope para que el
+  // Velocidad exponencial: x6 a los 30 s (casi imposible). Tope para que el
   // paso de simulación no atraviese cacas.
-  const SPEED_START = 300, SPEED_GROWTH = Math.log(6) / 20, SPEED_MAX = 3000;
+  const SPEED_START = 300, SPEED_GROWTH = Math.log(6) / 30, SPEED_MAX = 3000;
   const LEVEL_EVERY = 5;                 // aviso de "más rápido" cada 5 s
   const PAIR_CHANCE = 0.18;              // cacas dobles: se saltan juntas
-  // Bolsa: aparece cada ~1 minuto de juego acumulado (entre partidas, porque
-  // una partida dura 10–20 s). La primera sale antes para que se descubra.
-  const BAG_FIRST = [25, 45], BAG_EVERY = [50, 70];
+  // Bolsa: aparece cada ~30 s de juego acumulado (entre partidas, porque
+  // una partida dura 15–25 s). La primera sale antes para que se descubra.
+  const BAG_FIRST = [12, 22], BAG_EVERY = [25, 35];
   const BAG_GRACE = 0.35;                // s sin chocar tras embolsar (cacas dobles)
   const GRAVITY = 3000, JUMP_VELOCITY = 950;
   const MAX_DT = 0.1, STEP = 1 / 120;
@@ -405,11 +408,13 @@
   const touch = matchMedia('(pointer: coarse)');
 
   // ---- Sprites pixel art originales, estilo 16 bits ----
-  // Cada dibujo se escribe a baja resolución y aquí se "mejora" como en Mario 3:
-  // 1) Scale2x: duplica la resolución redondeando las diagonales;
-  // 2) contorno oscuro alrededor de la silueta;
-  // 3) sombreado: luz desde arriba a la izquierda, sombra abajo a la derecha.
+  // Cada dibujo se escribe a baja resolución y aquí se "mejora":
+  // 1) Scale2x dos veces (4× de detalle): curvas y diagonales redondeadas;
+  // 2) contorno oscuro de 2 celdas alrededor de la silueta;
+  // 3) sombreado: luz arriba-izquierda, sombra abajo-derecha (2 celdas);
+  // 4) brillo blanco en los ojos ('e'), salvo en las caras de asco.
   const OUTLINE = '#140c1c';
+  const SCALE = 4;
   function scale2x(grid) {
     const h = grid.length, w = grid[0].length;
     const at = (x, y) => (x < 0 || y < 0 || x >= w || y >= h ? '.' : grid[y][x]);
@@ -425,55 +430,68 @@
     }
     return out;
   }
-  function addOutline(grid) {
-    const h = grid.length + 2, w = grid[0].length + 2;
-    const at = (x, y) => (x < 1 || y < 1 || x > w - 2 || y > h - 2 ? '.' : grid[y - 1][x - 1]);
+  // Contorno redondeado de grosor t alrededor de todo lo que no sea '.'.
+  function addOutline(grid, t) {
+    const gh = grid.length, gw = grid[0].length, h = gh + 2 * t, w = gw + 2 * t;
+    const solidAt = (x, y) => x >= t && y >= t && x < gw + t && y < gh + t && grid[y - t][x - t] !== '.';
     return Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => {
-      const p = at(x, y);
-      if (p !== '.') return p;
-      return [at(x - 1, y), at(x + 1, y), at(x, y - 1), at(x, y + 1)].some((n) => n !== '.' && n !== '@') ? '@' : '.';
+      if (solidAt(x, y)) return grid[y - t][x - t];
+      for (let dy = -t; dy <= t; dy++) {
+        for (let dx = -t; dx <= t; dx++) {
+          if (Math.abs(dx) + Math.abs(dy) <= t && solidAt(x + dx, y + dy)) return '@';
+        }
+      }
+      return '.';
     }));
   }
-  function shadeHex(hex, f) {
-    const n = parseInt(hex.slice(1), 16);
-    const ch = (v) => Math.max(0, Math.min(255, Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f)));
-    return `rgb(${ch(n >> 16)}, ${ch((n >> 8) & 255)}, ${ch(n & 255)})`;
-  }
-  // Mezcla un color con otro (a = 0..1) y devuelve #rrggbb.
-  function mixHex(hex, tint, a) {
-    const p = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-    const [r1, g1, b1] = p(hex), [r2, g2, b2] = p(tint);
-    const m = (u, v) => Math.round(u + (v - u) * a).toString(16).padStart(2, '0');
-    return `#${m(r1, r2)}${m(g1, g2)}${m(b1, b2)}`;
-  }
+  const hexRgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const shadeRgb = (c, f) => c.map((v) => Math.max(0, Math.min(255, Math.round(f < 0 ? v * (1 + f) : v + (255 - v) * f))));
+  const mixRgb = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+
   // fx (opcional): { tint, amount, outline } tiñe todo el sprite y cambia el contorno.
-  function makeSprite(rows, palette, cellW, cellH, fx = null) {
-    let grid = scale2x(rows.map((r) => [...r]));
-    grid = addOutline(grid);
-    cellW /= 2; cellH /= 2;
+  // sparkle: brillo blanco en los ojos (se apaga en las caras de asco, que van con ojos > <).
+  function makeSprite(rows, palette, cellW, cellH, fx = null, sparkle = true) {
+    let grid = rows.map((r) => [...r]);
+    for (let s = 1; s < SCALE; s *= 2) grid = scale2x(grid);
+    grid = addOutline(grid, 2);
+    cellW /= SCALE; cellH /= SCALE;
     const h = grid.length, w = grid[0].length;
-    const c = document.createElement('canvas');
-    c.width = Math.ceil(w * cellW * RES);
-    c.height = Math.ceil(h * cellH * RES);
-    const g = c.getContext('2d');
     const solid = (x, y) => y >= 0 && y < h && x >= 0 && x < w && grid[y][x] !== '.' && grid[y][x] !== '@';
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const k = grid[y][x];
-        if (k === '.') continue;
-        let color = k === '@' ? (fx ? fx.outline : OUTLINE) : palette[k];
-        if (k !== '@') {
-          if (fx) color = mixHex(color, fx.tint, fx.amount);
-          const same = (dx, dy) => solid(x + dx, y + dy) && grid[y + dy][x + dx] === k;
-          if (!same(1, 0) || !same(0, 1)) color = shadeHex(color, -0.22);
-          else if (!solid(x - 1, y) || !solid(x, y - 1)) color = shadeHex(color, 0.25);
-        }
-        g.fillStyle = color;
-        g.fillRect(Math.floor(x * cellW * RES), Math.floor(y * cellH * RES), Math.ceil(cellW * RES), Math.ceil(cellH * RES));
+    const key = (x, y) => (y >= 0 && y < h && x >= 0 && x < w ? grid[y][x] : '.');
+    const outline = hexRgb(fx ? fx.outline : OUTLINE);
+    const tint = fx ? hexRgb(fx.tint) : null;
+    // Color final de cada celda.
+    const colors = grid.map((row, y) => row.map((k, x) => {
+      if (k === '.') return null;
+      if (k === '@') return outline;
+      if (sparkle && k === 'e' && key(x, y - 1) !== 'e' && key(x - 1, y) !== 'e') return [255, 255, 255];
+      let c = hexRgb(palette[k]);
+      if (tint) c = mixRgb(c, tint, fx.amount);
+      const differs = (dx, dy) => key(x + dx, y + dy) !== k;
+      if (differs(1, 0) || differs(0, 1)) return shadeRgb(c, -0.24);
+      if (differs(2, 0) || differs(0, 2)) return shadeRgb(c, -0.1);
+      if (!solid(x - 1, y) || !solid(x, y - 1)) return shadeRgb(c, 0.28);
+      return c;
+    }));
+    // Se pinta pixel a pixel (ImageData): rápido aunque haya miles de celdas.
+    const c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * cellW * RES));
+    c.height = Math.max(1, Math.round(h * cellH * RES));
+    const g = c.getContext('2d');
+    const img = g.createImageData(c.width, c.height);
+    const sx = c.width / w, sy = c.height / h;
+    for (let py = 0; py < c.height; py++) {
+      const row = colors[Math.min(h - 1, Math.floor(py / sy))];
+      for (let px = 0; px < c.width; px++) {
+        const col = row[Math.min(w - 1, Math.floor(px / sx))];
+        if (!col) continue;
+        const i = (py * c.width + px) * 4;
+        img.data[i] = col[0]; img.data[i + 1] = col[1]; img.data[i + 2] = col[2]; img.data[i + 3] = 255;
       }
     }
-    // Tamaño y desplazamiento en coordenadas del juego (el contorno sobresale una celda).
-    c.lw = w * cellW; c.lh = h * cellH; c.ox = -cellW; c.oy = -cellH;
+    g.putImageData(img, 0, 0);
+    // Tamaño y desplazamiento en coordenadas del juego (el contorno sobresale 2 celdas).
+    c.lw = c.width / RES; c.lh = c.height / RES; c.ox = -2 * cellW; c.oy = -2 * cellH;
     return c;
   }
   const blit = (s, x, y) => ctx.drawImage(s, x + s.ox, y + s.oy, s.lw, s.lh);
@@ -490,6 +508,11 @@
     a:   ['...rrrrr......', '...ss..ss.....', '..ss....ss....', '..nn....nn....'],
     b:   ['...rrrrr......', '....ssss......', '....s.ss......', '...nn.nn......'],
     air: ['...rrrrr......', '..sss..ssnn...', '..nn..........', '..............'],
+  };
+  const THIN_LEGS = {  // piernas delgadas y poto hacia atrás (Angie)
+    a:   ['...ggggg......', '....g..g......', '...g....g.....', '..nn....nn....'],
+    b:   ['...ggggg......', '.....gg.......', '.....g.g......', '....nn.n......'],
+    air: ['...ggggg......', '...gg..ggn....', '..nn..........', '..............'],
   };
   const BASE_PAL = { s: '#f0c39a', e: '#2a1a10', k: '#151515', g: '#7d7f86', n: '#2a2a2a' };
 
@@ -517,14 +540,21 @@
       ],
       face: { top: ['...rrrrrrrrrr...', '..rrrrrrrrrrrr..', '.rrrrrrrrrrrrrr.', '.kkkkkkkkkkkkkk.'], side: 'h' } },
     { id: 'baby-rafa', name: 'BABY RAFA', legs: BABY_LEGS,
-      // Sombrero de paja con cinta turquesa, polerón a rayas, shorts rojos.
-      pal: { w: '#e8dcc0', T: '#3fa7a0', N: '#24345e', W: '#f2f2f2', r: '#d8323c', s: '#f3c9a5', m: '#c0505a', n: '#3fa7a0' },
+      // Bebé en vista de tres cuartos: pelito corto café claro, cara redonda con
+      // oreja, dos ojos oscuros con brillo, boquita chica; babero-bandana azul
+      // con puntitos blancos y chaleco tejido crema con bordes rojos y botones.
+      pal: {
+        h: '#8a5a34', s: '#f3c9a5', c: '#f2a5a0', m: '#c0606a',
+        D: '#2b4f9e', w: '#ffffff', C: '#f1ead8', B: '#cfc6b0', R: '#d8323c',
+        r: '#2b3550', n: '#f1ead8',
+      },
       body: [
-        '....wwwww.....', '...wwwwwww....', '...TTTTTTT....', '.wwwwwwwwwww..',
-        '...sssssss....', '...ssssess....', '...sssssms....', '..NNNNNNNs....',
-        '..WWWWWWW.....', '..NNNNNNN.....',
+        '.....hhhh.....', '...hhhhhhhh...', '..hhhhhhhhhhh.', '..hhhhsssssss.',
+        '.ssssseessees.', '.ssssseessees.', '..sssscssscss.', '...sssssmmsss.',
+        '....sssssss...', '...DDwDDwD....', '..RCCDwDCCRs..', '..RCCCDBCCR...',
+        '...RRRRRRR....',
       ],
-      face: { top: ['....wwwwwwww....', '...wwwwwwwwww...', '..TTTTTTTTTTTT..', 'wwwwwwwwwwwwwwww'], side: '.' } },
+      face: { top: ['......hhhh......', '....hhhhhhhh....', '..hhhhhhhhhhhh..', '..hhhhsssshhhh..'], side: '.' } },
     { id: 'seba', name: 'SEBA 80s',
       // Niño ochentero: pelo negro, chaleco gris con cuello amarillo, jeans y botas.
       pal: { h: '#1e1712', s: '#d9a77c', y: '#e8c547', x: '#a8a8a0', g: '#2f5fa8', n: '#3a2a20' },
@@ -555,14 +585,15 @@
         '..wwwwwwww....', '...wwFwww.....',
       ],
       face: { top: ['...oooooooooo...', '..oooooooooooo..', '.oooooooooooooo.', '.OOOOOOOOOOOOOO.'], side: '.', overlays: [SHADES, BEARD] } },
-    { id: 'angie', name: 'ANGIE',
-      // Pelo largo oscuro, lentes, polera blanca con guatita de embarazada, pantalón ancho.
+    { id: 'angie', name: 'ANGIE', legs: THIN_LEGS,
+      // Delgadita estilo Fido Dido: pelo largo oscuro, lentes, polera blanca con
+      // guatita de embarazada hacia adelante, piernas finas.
       pal: { h: '#2b1d16', f: '#c9a27a', w: '#f5f5f5', m: '#c0606a', g: '#5d6470', n: '#f2f2f2' },
       body: [
-        '...hhhhhh.....', '..hhhhhhhh....', '.hhhhhhhhhh...', '.hhhssssss....',
-        '.hhhsssfef....', '.hhhssssss....', '.hhhsssmss....', 'hhhh.ssss.....',
-        'hhhwwwwww.....', 'hh.wwwwwws....', '..wwwwwwww....', '..wwwwwwwww...',
-        '..wwwwwwwww...', '..gggggggg....',
+        '....hhhh......', '...hhhhhh.....', '...hhhhhh.....', '...hhssss.....',
+        '...hhsfef.....', '...hhssss.....', '...hhssms.....', '...hh.ss......',
+        '...hhwwww.....', '...h.wwws.....', '.....wwww.....', '.....wwwww....',
+        '.....wwwwww...', '..ggggggg.....',
       ],
       face: { top: ['...hhhhhhhhhh...', '..hhhhhhhhhhhh..', '.hhhhhhhhhhhhhh.', 'hhhhhhhhhhhhhhhh'], side: 'h', overlays: [CLEAR_GLASSES] } },
     { id: 'francisco', name: 'FRANCISCO',
@@ -639,7 +670,7 @@
       bagAir: makeSprite([...ch.body, ...legs.air], pal, PX, PX, BAG_FX),
     };
     const facePal = { ...pal, b: '#5a7bd8', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
-    ch.bubble = makeBubble(makeSprite(makeFace(ch.face), facePal, 5, 5));
+    ch.bubble = makeBubble(makeSprite(makeFace(ch.face), facePal, 5, 5, null, false));
   }
 
   // Personaje elegido: estos valores cambian al elegir otro en el menú.
@@ -869,6 +900,52 @@
       if (barPos === 0 || barPos === 2 || barPos === 8 || barPos === 10) tone(90, t, 0.18, 'sine', 0.55, 40);
     }
 
+    // Pedo: diente de sierra con "aleteo" (vibrato cuadrado) y filtro.
+    // pitch = [[fracción del tiempo, Hz], ...]
+    function fart(t, { pitch, dur, lfo = [32, 12], depth = 25, cutoff = 700, q = 5, gain = 0.9 }) {
+      const o = ac.createOscillator(), mod = ac.createOscillator(), d = ac.createGain();
+      const lp = ac.createBiquadFilter(), g = ac.createGain();
+      o.type = 'sawtooth';
+      pitch.forEach(([u, f], i) => (i === 0 ? o.frequency.setValueAtTime(f, t) : o.frequency.exponentialRampToValueAtTime(f, t + u * dur)));
+      mod.type = 'square';
+      mod.frequency.setValueAtTime(lfo[0], t);
+      mod.frequency.linearRampToValueAtTime(lfo[1], t + dur);
+      d.gain.value = depth;
+      mod.connect(d).connect(o.frequency);
+      lp.type = 'lowpass'; lp.frequency.value = cutoff; lp.Q.value = q;
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.02);
+      g.gain.setValueAtTime(gain, t + dur * 0.6);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(lp).connect(g).connect(master);
+      o.start(t); mod.start(t);
+      o.stop(t + dur + 0.02); mod.stop(t + dur + 0.02);
+    }
+
+    // Voz de 8 bits: diente de sierra por dos formantes (vocal), con vibrato opcional.
+    function voice(t, { pitch, dur, formants, gain = 1.2, vibrato = null }) {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sawtooth';
+      pitch.forEach(([u, f], i) => (i === 0 ? o.frequency.setValueAtTime(f, t) : o.frequency.linearRampToValueAtTime(f, t + u * dur)));
+      if (vibrato) {
+        const l = ac.createOscillator(), d = ac.createGain();
+        l.frequency.value = vibrato[0]; d.gain.value = vibrato[1];
+        l.connect(d).connect(o.frequency);
+        l.start(t); l.stop(t + dur + 0.02);
+      }
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.exponentialRampToValueAtTime(gain, t + 0.03);
+      g.gain.setValueAtTime(gain, t + dur * 0.7);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      for (const f of formants) {
+        const bp = ac.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = 6;
+        o.connect(bp).connect(g);
+      }
+      g.connect(master);
+      o.start(t); o.stop(t + dur + 0.02);
+    }
+
     const SONGS = {
       game: { step: SIXTEENTH, loop: LOOP, schedule },
       story: { step: STORY_SIXTEENTH, loop: STORY_CHORDS.length * 16, schedule: scheduleStory },
@@ -900,28 +977,47 @@
       play(fromStart) { run('game', fromStart); },
       playStory() { run('story', true); },
       stop() { playing = false; clearInterval(timer); },
-      // Salto: pedo con "aleteo" (vibrato cuadrado) que baja de tono.
-      jump() {
+      // Salto: un pedo distinto para cada personaje.
+      jump(kind) {
         if (!ensure()) return;
-        const t = ac.currentTime, dur = 0.22 + Math.random() * 0.12;
-        const o = ac.createOscillator(), lfo = ac.createOscillator(), depth = ac.createGain();
-        const lp = ac.createBiquadFilter(), g = ac.createGain();
-        o.type = 'sawtooth';
-        o.frequency.setValueAtTime(90 + Math.random() * 40, t);
-        o.frequency.exponentialRampToValueAtTime(50, t + dur);
-        lfo.type = 'square';
-        lfo.frequency.setValueAtTime(30 + Math.random() * 10, t);
-        lfo.frequency.linearRampToValueAtTime(12, t + dur);
-        depth.gain.value = 25;
-        lfo.connect(depth).connect(o.frequency);
-        lp.type = 'lowpass'; lp.frequency.value = 700; lp.Q.value = 5;
-        g.gain.setValueAtTime(0.001, t);
-        g.gain.exponentialRampToValueAtTime(0.9, t + 0.02);
-        g.gain.setValueAtTime(0.9, t + dur * 0.6);
-        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-        o.connect(lp).connect(g).connect(master);
-        o.start(t); lfo.start(t);
-        o.stop(t + dur + 0.02); lfo.stop(t + dur + 0.02);
+        const t = ac.currentTime, r = (a, b) => a + Math.random() * (b - a);
+        const normal = () => {
+          const dur = r(0.22, 0.34);
+          fart(t, { pitch: [[0, r(90, 130)], [1, 50]], dur, lfo: [r(30, 40), 12] });
+          return dur;
+        };
+        switch (kind) {
+          case 'baby-rafa':  // agudito y chistoso, con un "pío" al final
+            fart(t, { pitch: [[0, r(320, 380)], [0.6, 210], [1, r(400, 460)]], dur: r(0.16, 0.22), lfo: [55, 35], depth: 45, cutoff: 2400, q: 4, gain: 0.6 });
+            break;
+          case 'seba': {  // apretado: "pfft-t-t", angosto y agudo
+            let at = 0;
+            [0.05, 0.05, 0.04, 0.12].forEach((d, i) => {
+              fart(t + at, { pitch: [[0, r(190, 240) - i * 10], [1, 150]], dur: d, lfo: [60, 45], depth: 20, cutoff: 900, q: 12, gain: 0.7 });
+              at += d + 0.03;
+            });
+            break;
+          }
+          case 'angie': {  // pedo y después una guagua llorando "ueeee"
+            const d = normal();
+            voice(t + d + 0.05, { pitch: [[0, 430], [0.3, 620], [1, 420]], dur: 0.55, formants: [650, 1500], gain: 1.3, vibrato: [8, 25] });
+            break;
+          }
+          case 'pipe': {  // pedo y risa "ja ja ja ja"
+            const d = normal();
+            for (let i = 0; i < 4; i++) {
+              voice(t + d + 0.05 + i * 0.13, { pitch: [[0, 300 - i * 20], [1, 260 - i * 20]], dur: 0.09, formants: [750, 1150], gain: 1.4 });
+            }
+            break;
+          }
+          case 'francisco': {  // largo y variable: el tono sube y baja al azar
+            const pts = [[0, r(100, 150)]];
+            for (let k = 1; k <= 5; k++) pts.push([k / 5, r(55, 150)]);
+            fart(t, { pitch: pts, dur: r(0.6, 0.9), lfo: [r(20, 45), r(10, 40)], depth: 30, cutoff: 800, q: 6, gain: 0.9 });
+            break;
+          }
+          default: normal();  // Rafa y Vicky: el clásico
+        }
       },
       // Tomar la bolsa: arpegio alegre hacia arriba.
       bag() {
@@ -1616,7 +1712,7 @@
     kid.vy = -JUMP_VELOCITY;
     kid.onGround = false;
     puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0 });
-    Music.jump();
+    Music.jump(hero.id);
   }
 
   function pause() {
@@ -1917,7 +2013,7 @@
     const img = document.createElement('img');
     img.alt = '';
     img.src = ch.frames.runA.toDataURL();
-    img.style.height = `${(17 * ch.h / 54).toFixed(1)}cqh`;  // el bebé se ve más bajito
+    img.style.height = `${(14.5 * ch.h / 54).toFixed(1)}cqh`;  // el bebé se ve más bajito
     const label = document.createElement('span');
     label.textContent = ch.name;
     btn.append(img, label);

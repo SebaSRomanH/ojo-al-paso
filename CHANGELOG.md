@@ -1,5 +1,15 @@
 # Historial de cambios
 
+## 0.9 — 2026-11-03
+
+- **Botones 15 % más chicos:** sonido, pantalla completa, pausa, botones de texto y tarjetas de personajes (sin bajar de 44 px, el mínimo cómodo para un dedo).
+- **Un pedo para cada personaje:** Baby Rafa agudito con un "pío", Seba apretado, Angie con guagua llorando, Pipe con risa, Francisco largo y variable, y Rafa y Vicky el clásico.
+- **Baby Rafa redibujado** según una foto nueva: pelito corto café claro, cara redonda con oreja, ojos oscuros con brillo, babero-bandana azul y chaleco tejido crema con bordes rojos.
+- **El doble de bolsas:** ahora sale una cada ~30 s de juego (antes ~1 minuto).
+- **La velocidad sube más lento:** llega a ×6 a los 30 s (antes a los 20 s), así que las partidas duran más.
+- **Monitos en más alta resolución:** 4 veces más detalle que el dibujo original (antes 2), bordes más suaves, contorno más parejo, sombreado en dos tonos y un brillito en los ojos. También mejoran los popós, Don Cochino, Bigote y las caras de asco.
+- **Angie** más delgada, estilo Fido Dido, con su guatita de embarazada y más poto.
+
 ## 0.8 — 2026-11-03
 
 - **Créditos finales** estilo película, con todo el elenco en pixel art y la moraleja del juego. Botón CRÉDITOS en el menú y al terminar.
