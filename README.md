@@ -1,7 +1,11 @@
 # ¡Ojo al paso!
 Juego creado para mi sobrino. 
 
-Juego de navegador para móvil (en horizontal): Rafa corre y salta popós. Supera tu récord y compártelo por WhatsApp.
+**Creado por Seba, potenciado por Claude.**
+
+Juego de navegador para móvil (en horizontal): Rafa corre y salta popós hasta llegar a 9999 puntos y encontrar a Don Cochino. Supera tu récord y compártelo por WhatsApp.
+
+🎮 **Jugar:** https://sebasromanh.github.io/ojo-al-paso/
 
 Todo el juego está en `index.html`: gráficos pixel art y música chiptune generados con código, sin archivos externos.
 
@@ -17,9 +21,10 @@ y entra a http://localhost:8081.
 
 ## Controles
 
-- **Saltar:** botón SALTAR, tocar la pantalla, Espacio o ↑
+- **Saltar:** tocar la pantalla, Espacio o ↑
 - **Pausa:** botón II o Esc
-- **Sonido:** botón ♪ o M
+- **Sonido:** botón del parlante o M
+- **Pantalla completa:** botón de las esquinas o F
 
 ## Revisar que todo esté bien
 
@@ -37,3 +42,8 @@ Para probar el juego con herramientas extra, abre `index.html?prueba` (ver [CLAU
 ## Flujo de publicación
 
 local → repo de pruebas (`ojo-al-paso-pruebas`) → producción (`ojo-al-paso`), ambos con GitHub Pages.
+
+## Créditos
+
+Creado por **Seba** (el Tío Seba), potenciado por **Claude**.
+Protagonista: Rafa. Elenco: Baby Rafa, Tío Seba 80s, Vicky, Pipe, Angie y Francisco.

@@ -2103,13 +2103,15 @@
     };
     const title = el('h2', '¡Ojo al paso!', 'stripes');
     title.id = 'credits-title';
+    // En los créditos, Seba firma como "Tío Seba".
+    const castName = (c) => (c.id === 'seba' ? 'Tío Seba 80s' : c.name.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase()));
     ui.creditsRoll.replaceChildren(
       title,
       el('p', 'Un juego hecho con cariño para Rafa'),
-      block('IDEA Y DIRECCIÓN', el('p', 'Seba')),
-      block('PROGRAMACIÓN Y ARTE', el('p', 'Seba y Claude (Anthropic)')),
+      block('IDEA Y DIRECCIÓN', el('p', 'Tío Seba')),
+      block('PROGRAMACIÓN Y ARTE', el('p', 'Tío Seba y Claude (Anthropic)')),
       block('PROTAGONISTA', cast([[CHARACTERS[0].frames.runA, 'Rafa']])),
-      block('ELENCO', cast(CHARACTERS.slice(1).map((c) => [c.frames.runA, c.name.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase())]))),
+      block('ELENCO', cast(CHARACTERS.slice(1).map((c) => [c.frames.runA, castName(c)]))),
       block('VILLANOS', cast([[man[0], 'Don Cochino'], [dog.a, 'Bigote']])),
       block('MÚSICA', el('p', 'Tema original chiptune inspirado en el heavy metal de los 80')),
       block('EFECTOS DE SONIDO', el('p', 'Pedos, splats, "¡puaj!" y trompetas tristes, generados en vivo')),

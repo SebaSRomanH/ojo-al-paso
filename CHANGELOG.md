@@ -1,5 +1,10 @@
 # Historial de cambios
 
+## 1.2.1 — 2026-11-03
+
+- **Créditos:** en el juego, Seba aparece como **"Tío Seba"** (idea y dirección, programación y arte con Claude, y "Tío Seba 80s" en el elenco).
+- En GitHub, el proyecto dice **"Creado por Seba, potenciado por Claude"**, con un enlace para jugar y los controles al día.
+
 ## 1.2 — 2026-11-03
 
 - **Todas las pantallas con el estilo 70s + 2020s:** la pantalla final con el ranking, la pausa, la historia, el ejemplo del dedo, los créditos, "toca para empezar" y los avisos. El juego en sí mantiene su estilo pixel.

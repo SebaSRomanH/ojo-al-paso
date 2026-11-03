@@ -34,6 +34,8 @@ Antes de subir, `git fetch` del remote: Seba a veces edita en la web de GitHub (
 Commits en español, terminando con:
 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`
 
+**Créditos:** en GitHub (README u otros textos) el proyecto se firma **"Creado por Seba, potenciado por Claude"**. Dentro de los créditos del juego, Seba aparece como **"Tío Seba"** (idea y dirección; programación y arte con Claude; en el elenco, "Tío Seba 80s"). En el menú de personajes la tarjeta sigue diciendo "SEBA 80s".
+
 ## Herramientas
 - GitHub CLI: `"/c/Program Files/GitHub CLI/gh.exe"` (no está en el PATH del shell). Cuenta: `SebaSRomanH`.
 - Ver si GitHub Pages terminó de publicar:
