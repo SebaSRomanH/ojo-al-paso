@@ -1,6 +1,6 @@
-# Especificación de producto — v0.7
+# Especificación de producto — v0.8
 
-Estado: v0.7 publicada en producción (aprobada por el propietario en su teléfono). Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
+Estado: v0.7 en producción; v0.8 en desarrollo local. Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
 
 Entornos:
 
@@ -48,6 +48,9 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | RF-21 | **Ejemplo de cómo saltar:** al tocar JUGAR (o Espacio en el menú) aparece una pantalla con un dedo animado que toca la pantalla cada 1,2 s, con una onda en el punto de toque; el personaje corre y salta en sincronía, y se lee "¡Toca la pantalla para saltar!". La partida empieza al tocar la pantalla o con Espacio. "OTRA VEZ" reinicia directo, sin el ejemplo. | 0.6 |
 | RF-22 | **Pantalla completa:** botón con ícono de esquinas (cambia al salir), en navegadores que la permiten (Android, computador). Al entrar intenta fijar la orientación horizontal; si el navegador no lo permite, se ignora. En iPhone el botón se oculta (Safari no permite pantalla completa en páginas); al agregar el juego a la pantalla de inicio se abre sin barras del navegador. | 0.6 |
 | RF-23 | **Bolsa (escudo de un uso):** aparece una bolsa flotando en el camino (con destello) cada 50–70 s de **juego acumulado** entre partidas (la primera a los 25–45 s), porque una partida dura 10–20 s; no aparece encima de un popó recién salido. Al tocarla, el personaje se tiñe verde menta con contorno brillante, suena un arpegio, aparece "¡BOLSA!" y un ícono junto a los puntos. **El próximo popó que toque** no lo mata: se embolsa, vuela en arco a un basurero que aparece a la izquierda ("¡A LA BASURA!" y sonido de lanzamiento), el personaje recupera su color y sigue corriendo; 0,35 s de gracia (parpadeo) para no morir en la segunda caca de un par. Si salta los popós, conserva la bolsa; tomar otra bolsa no acumula. Se pierde al terminar la partida. Verificado: tomar bolsa → embolsar → morir en el popó siguiente. | 0.7 |
+| RF-24 | **Créditos finales:** botón CRÉDITOS en el menú y en la pantalla final. Rollo de texto que sube (~38 s) con la música del juego: título, dedicatoria a Rafa, idea y dirección (Seba), programación y arte (Seba y Claude), protagonista y elenco con sus sprites, villanos (Don Cochino y Bigote), música, efectos, agradecimientos, la moraleja "Si sacas a pasear a tu perro, ¡recoge su popó!" y "¡Gracias por jugar!". Al terminar, al tocar, con CERRAR, Espacio o Esc vuelve al menú. | 0.8 |
+| RF-25 | **Navegación:** botón MENÚ en la pausa y en la pantalla final (y Esc en la final) para volver a elegir personaje sin tener que perder. Jerarquía de botones: el principal (JUGAR, SEGUIR, OTRA VEZ) es más grande y late suavemente; los secundarios son más chicos. Clic sonoro en todos los botones. | 0.8 |
+| RF-26 | **Sensación de juego:** salto guardado de 0,13 s (si se toca justo antes de aterrizar, salta al tocar el suelo); "ding" y número flotante cada 100 puntos; sonido suave al aterrizar; al morir, temblor de pantalla, vibración en Android, "¡splat!" + "¡puaj!" con voz de 8 bits, y luego trompeta triste o, si hay récord, una fanfarria original. Las animaciones se desactivan si el teléfono pide reducir el movimiento. | 0.8 |
 | RF-20 | **Personajes de la familia** (inspirados en fotos del propietario; las fotos no se incluyen en el juego): **Rafa**; **Baby Rafa** (sombrero de paja con cinta turquesa, polerón a rayas, shorts rojos; más bajo: 42 px en vez de 54 y caja de colisión proporcional); **Seba 80s** (el propietario de niño: pelo negro, chaleco gris con cuello amarillo, jeans, botas); **Vicky** (pelo ondulado largo, lentes de sol rosados, polera tropical); **Pipe** (jockey naranjo, lentes espejados, barba, camisa con flamencos); **Angie** (embarazada: pelo largo, lentes, polera blanca con guatita, pantalón ancho gris); **Francisco** (metalero: jockey negro hacia atrás, lentes oscuros, polera negra con emblema dorado sin logos de bandas). Cada uno tiene su propia cara de asco (RF-13) con su gorro, pelo, lentes o barba. La historia (RF-18) siempre muestra a Rafa. | 0.5 |
 
 ## Historias de usuario
@@ -104,5 +107,6 @@ Agacharse, doble salto, enemigos aéreos, niveles, personajes desbloqueables, mu
 | 0.5.1 | Botón de salto circular y semitransparente con ícono (RF-02). |
 | 0.6 | Sin botón de salto: se toca la pantalla (RF-02); ejemplo animado antes de partir (RF-21); sonido y pantalla completa arriba a la izquierda (RF-17/22). |
 | 0.7 | Bolsa como escudo de un uso que manda el próximo popó a la basura (RF-23); pista en el ejemplo inicial. |
+| 0.8 | Créditos finales (RF-24); botón MENÚ y jerarquía de botones (RF-25); salto guardado, hitos de puntos y nuevos sonidos de muerte, récord, aterrizaje y clic (RF-26). |
 
 Todo cambio funcional debe actualizar este documento, el [historial de cambios](../CHANGELOG.md), las pruebas afectadas y la versión.

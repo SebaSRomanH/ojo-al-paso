@@ -60,6 +60,12 @@
   button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
   button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
   button.secondary { background: var(--accent); }
+  /* Jerarquía: un botón principal grande con pulso suave; los demás, chicos. */
+  button.primary { font-size: clamp(16px, 7.5cqh, 30px); padding: 0.35em 1.4em; animation: pulse 1.6s ease-in-out infinite; }
+  button.small { font-size: clamp(11px, 4.6cqh, 18px); padding: 0.3em 0.9em; }
+  @keyframes pulse { 50% { transform: scale(1.06); } }
+  button.primary:active { animation: none; }
+  @media (hover: hover) { button:hover { filter: brightness(1.12); } }
   [hidden] { display: none !important; }
 
   /* Sonido y pantalla completa arriba a la izquierda; pausa arriba a la derecha.
@@ -153,13 +159,49 @@
   .story p { flex: 1; margin: 0; font-size: clamp(11px, 4.8cqh, 20px); line-height: 1.35; }
   .story .row { flex-wrap: nowrap; gap: 2cqw; }
 
-  #over { padding-top: calc(max(52px, 17cqh) + 3cqh); }
+  #over { padding-top: calc(max(52px, 17cqh) + 5cqh); padding-bottom: 2cqh; }
+  #over .over-main { gap: 1.6cqh; }
+  #over h2 { font-size: clamp(18px, 9cqh, 44px); }
+  #over .primary { font-size: clamp(15px, 6.5cqh, 26px); }
+  #over-new { color: var(--accent); font-weight: bold; opacity: 1; animation: pulse 0.8s ease-in-out infinite; }
+
+  /* Créditos finales: texto que sube como en el cine. */
+  .credits {
+    position: absolute; inset: 0; z-index: 4; overflow: hidden;
+    background: #0b0618; cursor: pointer;
+  }
+  .credits-roll {
+    position: absolute; left: 0; right: 0; top: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 4cqh;
+    text-align: center; padding: 0 6%;
+    animation: roll 38s linear forwards;
+  }
+  .credits-roll h2 { margin: 0; color: var(--accent); font-size: clamp(22px, 13cqh, 60px); text-shadow: 3px 3px 0 #ff4fd8; }
+  .credits-roll h3 { margin: 0 0 1cqh; color: #ff6f61; font-size: clamp(12px, 5cqh, 22px); letter-spacing: 0.15em; }
+  .credits-roll p { margin: 0; font-size: clamp(12px, 5cqh, 22px); line-height: 1.4; }
+  .credits-roll .cast { display: flex; flex-wrap: wrap; justify-content: center; gap: 2cqh 4cqw; }
+  .credits-roll .cast figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1cqh; }
+  .credits-roll .cast img { height: 16cqh; image-rendering: pixelated; }
+  .credits-roll .cast figcaption { font-size: clamp(10px, 3.8cqh, 16px); }
+  .credits-roll .moral { color: #5dfcc0; font-weight: bold; }
+  #credits-close { position: absolute; right: 2%; bottom: 3%; }
+  @keyframes roll { to { transform: translateY(calc(-100% - 100cqh)); } }
+
+  /* Temblor de pantalla al pisar un popó. */
+  #screen.shake { animation: shake 0.35s linear; }
+  @keyframes shake {
+    20% { transform: translate(-6px, 3px); } 40% { transform: translate(5px, -4px); }
+    60% { transform: translate(-4px, 2px); } 80% { transform: translate(3px, -1px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    button.primary, #over-new, #screen.shake { animation: none; }
+    .finger .hand, .finger .ripple { animation-duration: 2.4s; }
+  }
   .over-grid {
     display: grid; grid-template-columns: 1.3fr 1fr; gap: 4cqw;
     align-items: center; width: 100%;
   }
   .over-main { display: flex; flex-direction: column; align-items: center; gap: 2.5cqh; }
-  #over h2 { font-size: clamp(20px, 10cqh, 48px); }
   #save-form { display: flex; flex-direction: column; align-items: center; gap: 1.5cqh; }
   #name {
     font: inherit; font-weight: bold; font-size: clamp(14px, 6cqh, 24px);
@@ -259,9 +301,10 @@
     <p class="small">Misión: junta la mayor cantidad de puntos sin pisar ni un popó.</p>
     <div class="cards" id="cards" role="group" aria-label="Elige tu personaje"></div>
     <div class="row">
-      <button id="play" type="button">JUGAR</button>
-      <button id="story-btn" class="secondary" type="button">HISTORIA</button>
-      <button class="secondary share" type="button">COMPARTIR</button>
+      <button id="play" class="primary" type="button">JUGAR</button>
+      <button id="story-btn" class="secondary small" type="button">HISTORIA</button>
+      <button class="secondary small credits-btn" type="button">CRÉDITOS</button>
+      <button class="secondary small share" type="button">COMPARTIR</button>
     </div>
     <p class="small">Récord: <span id="start-best">0</span> · Espacio/↑ saltar · Esc pausa · M sonido</p>
   </section>
@@ -269,7 +312,10 @@
   <section id="paused" class="overlay" aria-labelledby="paused-title" hidden>
     <h2 id="paused-title">Pausa</h2>
     <p class="small">Toca SEGUIR o presiona Espacio</p>
-    <button id="resume" type="button">SEGUIR</button>
+    <div class="row">
+      <button id="resume" class="primary" type="button">SEGUIR</button>
+      <button class="secondary small menu-btn" type="button">MENÚ</button>
+    </div>
   </section>
 
   <section id="over" class="overlay" aria-labelledby="over-title" hidden>
@@ -285,9 +331,11 @@
             <button type="submit">GUARDAR</button>
           </div>
         </form>
+        <button id="again" class="primary" type="button">OTRA VEZ</button>
         <div class="row">
-          <button id="again" type="button">OTRA VEZ</button>
-          <button class="secondary share" type="button">COMPARTIR</button>
+          <button class="secondary small menu-btn" type="button">MENÚ</button>
+          <button class="secondary small credits-btn" type="button">CRÉDITOS</button>
+          <button class="secondary small share" type="button">COMPARTIR</button>
         </div>
       </div>
       <div class="ranking">
@@ -295,6 +343,11 @@
         <ol id="ranking-list" aria-labelledby="ranking-title"></ol>
       </div>
     </div>
+  </section>
+
+  <section id="credits" class="credits" aria-labelledby="credits-title" hidden>
+    <div class="credits-roll" id="credits-roll"></div>
+    <button id="credits-close" class="secondary small" type="button">CERRAR</button>
   </section>
 
   <div id="toast" role="status" hidden></div>
@@ -342,6 +395,7 @@
   const ui = {
     start: $('start'), paused: $('paused'), over: $('over'),
     pause: $('pause'), tutorial: $('tutorial'), leftbar: $('leftbar'),
+    credits: $('credits'), creditsRoll: $('credits-roll'),
     startBest: $('start-best'), overScore: $('over-score'), overTime: $('over-time'), overNew: $('over-new'),
     saveForm: $('save-form'), name: $('name'), rankList: $('ranking-list'),
     begin: $('begin'), story: $('story'), storyText: $('story-text'), storyNext: $('story-next'),
@@ -896,12 +950,85 @@
         const t = ac.currentTime;
         ['E5', 'G5', 'B5', 'E6'].forEach((n, k) => tone(freq(n), t + k * 0.06, 0.08, 'square', 0.18));
       },
-      crash() {
+      // Muerte: "¡SPLAT!" blando y grave, y luego un "¡puaj!" con voz de 8 bits.
+      splat() {
         if (!ensure()) return;
         const t = ac.currentTime;
-        ['E4', 'C4', 'A3', 'E3'].forEach((n, k) => tone(freq(n), t + k * 0.11, 0.14, 'square', 0.25));
-        hiss(t, 0.2, 0.4, 400);
+        const src = ac.createBufferSource(), lp = ac.createBiquadFilter(), g = ac.createGain();
+        src.buffer = noise;
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(1800, t);
+        lp.frequency.exponentialRampToValueAtTime(200, t + 0.25);
+        g.gain.setValueAtTime(0.9, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+        src.connect(lp).connect(g).connect(master);
+        src.start(t); src.stop(t + 0.32);
+        tone(110, t, 0.25, 'sine', 0.9, 45);
+        // "¡Puaj!": voz con dos formantes que se abren (u → a) y se cae el tono.
+        const v = ac.createOscillator(), f1 = ac.createBiquadFilter(), f2 = ac.createBiquadFilter(), vg = ac.createGain();
+        const t2 = t + 0.22;
+        v.type = 'sawtooth';
+        v.frequency.setValueAtTime(260, t2);
+        v.frequency.exponentialRampToValueAtTime(150, t2 + 0.45);
+        f1.type = 'bandpass'; f1.Q.value = 6;
+        f1.frequency.setValueAtTime(350, t2); f1.frequency.linearRampToValueAtTime(800, t2 + 0.15);
+        f2.type = 'bandpass'; f2.Q.value = 6;
+        f2.frequency.setValueAtTime(700, t2); f2.frequency.linearRampToValueAtTime(1200, t2 + 0.15);
+        vg.gain.setValueAtTime(0.001, t2);
+        vg.gain.exponentialRampToValueAtTime(1.4, t2 + 0.04);
+        vg.gain.setValueAtTime(1.4, t2 + 0.3);
+        vg.gain.exponentialRampToValueAtTime(0.001, t2 + 0.5);
+        v.connect(f1).connect(vg);
+        v.connect(f2).connect(vg);
+        vg.connect(master);
+        v.start(t2); v.stop(t2 + 0.52);
       },
+      // Fin de partida sin récord: trompeta triste "wah wah wah waaah".
+      sadTrombone() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        ['G3', 'F#3', 'F3', 'E3'].forEach((n, k) => {
+          const st = t + k * 0.32, dur = k === 3 ? 1.0 : 0.3;
+          const o = ac.createOscillator(), lp = ac.createBiquadFilter(), g = ac.createGain();
+          o.type = 'sawtooth';
+          o.frequency.setValueAtTime(freq(n), st);
+          if (k === 3) {  // vibrato en la última nota
+            const lfo = ac.createOscillator(), d = ac.createGain();
+            lfo.frequency.value = 6; d.gain.value = 6;
+            lfo.connect(d).connect(o.frequency);
+            lfo.start(st); lfo.stop(st + dur);
+          }
+          lp.type = 'lowpass'; lp.Q.value = 4;
+          lp.frequency.setValueAtTime(400, st);
+          lp.frequency.linearRampToValueAtTime(1400, st + 0.08);  // "wah"
+          lp.frequency.linearRampToValueAtTime(600, st + dur);
+          g.gain.setValueAtTime(0.5, st);
+          g.gain.exponentialRampToValueAtTime(0.001, st + dur);
+          o.connect(lp).connect(g).connect(master);
+          o.start(st); o.stop(st + dur + 0.02);
+        });
+      },
+      // Nuevo récord: fanfarria.
+      fanfare() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        [['G4', 0, 0.1], ['C5', 0.11, 0.1], ['E5', 0.22, 0.1], ['G5', 0.33, 0.25], ['E5', 0.6, 0.1], ['G5', 0.72, 0.1], ['C6', 0.84, 0.7]]
+          .forEach(([n, at, d]) => {
+            tone(freq(n), t + at, d, 'square', 0.3);
+            tone(freq(n) / 2, t + at, d, 'triangle', 0.4);
+          });
+      },
+      // Cada 100 puntos.
+      ding() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        tone(freq('E6'), t, 0.08, 'triangle', 0.4);
+        tone(freq('B6'), t + 0.08, 0.18, 'triangle', 0.4);
+      },
+      // Aterrizaje suave.
+      land() { if (ensure()) tone(140, ac.currentTime, 0.07, 'sine', 0.35, 60); },
+      // Clic de botón.
+      click() { if (ensure()) tone(1200, ac.currentTime, 0.04, 'square', 0.12, 900); },
       setMuted(m) {
         muted = m;
         try { localStorage.setItem(MUTE_KEY, m ? '1' : '0'); } catch { /* sin almacenamiento */ }
@@ -918,6 +1045,9 @@
   let puffs = [];
   // Bolsa en pantalla, si el personaje la tiene, popós volando a la basura y textos flotantes.
   let bagItem = null, hasBag = false, graceT = 0, thrown = [], floaters = [];
+  // Salto "guardado": si se toca un poco antes de aterrizar, salta al tocar el suelo.
+  const JUMP_BUFFER = 0.13;
+  let jumpBufT = 0, milestone = 0;
   let bagClock = 0, nextBagAt = BAG_FIRST[0] + Math.random() * (BAG_FIRST[1] - BAG_FIRST[0]);  // juego acumulado
   let ranking = loadRanking();
   let best = Math.max(loadBest(), ranking[0] ? ranking[0].score : 0);
@@ -971,6 +1101,7 @@
     reactT = 0; overShown = false; hitPoop = null; flies = [];
     puffs = [];
     bagItem = null; hasBag = false; graceT = 0; thrown = []; floaters = [];
+    jumpBufT = 0; milestone = 0;
     spawnIn = 1.0;
     hillOff = 0; groundOff = 0;
   }
@@ -1016,10 +1147,22 @@
     hillOff = (hillOff + dx * 0.15) % W;
     groundOff = (groundOff + dx) % W;
 
+    // Cada 100 puntos: "ding" y el número flotando junto al marcador.
+    const m = Math.floor(score() / 100);
+    if (m > milestone) {
+      milestone = m;
+      Music.ding();
+      floaters.push({ text: `¡${m * 100}!`, x: hudX + 70, y: 34, t: 0, color: '#ffd23f' });
+    }
+
+    jumpBufT = Math.max(0, jumpBufT - dt);
     if (!kid.onGround) {
       kid.vy += GRAVITY * dt;
       kid.y += kid.vy * dt;
-      if (kid.y >= KID_GROUND_Y) { kid.y = KID_GROUND_Y; kid.vy = 0; kid.onGround = true; }
+      if (kid.y >= KID_GROUND_Y) {
+        kid.y = KID_GROUND_Y; kid.vy = 0; kid.onGround = true;
+        if (jumpBufT > 0) doJump(); else Music.land();
+      }
     }
 
     for (const o of obstacles) o.x -= dx;
@@ -1162,6 +1305,7 @@
         bagItem = null;
         hasBag = true;
         Music.bag();
+        buzz(30);
         floaters.push({ text: '¡BOLSA!', x: KID_X + 20, y: kid.y - 10, t: 0, color: '#5dfcc0' });
         announce('¡Tomaste una bolsa! El próximo popó va a la basura.');
       } else if (bagItem.x + BAG_SIZE < -10) {
@@ -1182,6 +1326,7 @@
     graceT = BAG_GRACE;
     thrown.push({ x0: KID_X + 14, y0: kid.y + 10, t: 0 });
     Music.toss();
+    buzz(60);
     floaters.push({ text: '¡A LA BASURA!', x: KID_X + 30, y: kid.y - 38, t: 0, color: '#ffd23f' });
     announce('¡Popó a la basura!');
   }
@@ -1462,7 +1607,12 @@
   }
 
   function jump() {
-    if (state !== 'running' || !kid.onGround) return;
+    if (state !== 'running') return;
+    if (kid.onGround) doJump();
+    else jumpBufT = JUMP_BUFFER;  // se guarda y salta al aterrizar
+  }
+  function doJump() {
+    jumpBufT = 0;
     kid.vy = -JUMP_VELOCITY;
     kid.onGround = false;
     puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0 });
@@ -1501,9 +1651,19 @@
       r: rand(16, 34),
     }));
     Music.stop();
-    Music.crash();
+    Music.splat();
     controls(false);
+    buzz([70, 40, 140]);
+    // Temblor de pantalla (se reinicia la animación CSS).
+    canvas.classList.remove('shake');
+    void canvas.offsetWidth;
+    canvas.classList.add('shake');
     announce('¡Puaj! Pisaste un popó.');
+  }
+
+  // Vibración (Android); en iPhone no existe y se ignora.
+  function buzz(pattern) {
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch { /* no soportado */ }
   }
 
   function showOverScreen() {
@@ -1513,6 +1673,7 @@
     lastScore = s;
     const isNew = s > best;
     if (isNew) { best = s; saveBest(); }
+    if (isNew) Music.fanfare(); else Music.sadTrombone();
     ui.overScore.textContent = s;
     ui.overTime.textContent = elapsed.toFixed(1);
     ui.startBest.textContent = best;
@@ -1541,6 +1702,81 @@
     renderRanking(pos);
     ui.again.focus({ preventScroll: true });
     announce(`Guardado en el puesto ${pos + 1} del ranking.`);
+  }
+
+  // ---- Volver al menú (desde la pausa o el fin de partida) ----
+  function goMenu() {
+    Music.stop();
+    reset();
+    state = 'start';
+    for (const el of [ui.paused, ui.over, ui.tutorial, ui.credits, ui.story]) show(el, false);
+    show(ui.start, true);
+    controls(false);
+    ui.startBest.textContent = best;
+    $('play').focus({ preventScroll: true });
+    announce('Menú principal');
+  }
+
+  // ---- Créditos finales ----
+  function buildCredits() {
+    const el = (tag, text, cls) => {
+      const n = document.createElement(tag);
+      if (text) n.textContent = text;
+      if (cls) n.className = cls;
+      return n;
+    };
+    const figure = (sprite, name) => {
+      const f = el('figure');
+      const img = el('img');
+      img.src = sprite.toDataURL();
+      img.alt = '';
+      f.append(img, el('figcaption', name));
+      return f;
+    };
+    const block = (title, ...content) => {
+      const d = el('div');
+      d.append(el('h3', title), ...content);
+      return d;
+    };
+    const cast = (items) => {
+      const c = el('div', null, 'cast');
+      c.append(...items.map(([s, n]) => figure(s, n)));
+      return c;
+    };
+    const title = el('h2', '¡Ojo al paso!');
+    title.id = 'credits-title';
+    ui.creditsRoll.replaceChildren(
+      title,
+      el('p', 'Un juego hecho con cariño para Rafa'),
+      block('IDEA Y DIRECCIÓN', el('p', 'Seba')),
+      block('PROGRAMACIÓN Y ARTE', el('p', 'Seba y Claude (Anthropic)')),
+      block('PROTAGONISTA', cast([[CHARACTERS[0].frames.runA, 'Rafa']])),
+      block('ELENCO', cast(CHARACTERS.slice(1).map((c) => [c.frames.runA, c.name.toLowerCase().replace(/(^|\s)\S/g, (x) => x.toUpperCase())]))),
+      block('VILLANOS', cast([[man[0], 'Don Cochino'], [dog.a, 'Bigote']])),
+      block('MÚSICA', el('p', 'Tema original chiptune inspirado en el heavy metal de los 80')),
+      block('EFECTOS DE SONIDO', el('p', 'Pedos, splats, "¡puaj!" y trompetas tristes, generados en vivo')),
+      block('AGRADECIMIENTOS', el('p', 'A toda la familia, por prestar sus caras (y sus jockeys)')),
+      el('p', 'Si sacas a pasear a tu perro, ¡recoge su popó!', 'moral'),
+      el('h2', '¡Gracias por jugar!'),
+    );
+  }
+  function openCredits() {
+    buildCredits();
+    state = 'credits';
+    for (const el of [ui.paused, ui.over, ui.start, ui.tutorial]) show(el, false);
+    controls(false);
+    show(ui.credits, true);
+    // Reinicia la animación para que el rollo parta desde abajo.
+    ui.creditsRoll.style.animation = 'none';
+    void ui.creditsRoll.offsetHeight;
+    ui.creditsRoll.style.animation = '';
+    Music.play(true);
+    $('credits-close').focus({ preventScroll: true });
+    announce('Créditos');
+  }
+  function closeCredits() {
+    if (state !== 'credits') return;
+    goMenu();
   }
 
   // ---- Compartir ----
@@ -1579,6 +1815,13 @@
   ui.saveForm.addEventListener('submit', saveScore);
   ui.name.addEventListener('input', () => { ui.name.value = cleanName(ui.name.value); });
   $('resume').addEventListener('click', resume);
+  document.querySelectorAll('.menu-btn').forEach((b) => b.addEventListener('click', goMenu));
+  document.querySelectorAll('.credits-btn').forEach((b) => b.addEventListener('click', openCredits));
+  $('credits-close').addEventListener('click', (e) => { e.stopPropagation(); closeCredits(); });
+  ui.credits.addEventListener('pointerdown', (e) => { if (e.target === ui.credits || e.target.closest('.credits-roll')) closeCredits(); });
+  ui.creditsRoll.addEventListener('animationend', closeCredits);
+  // Clic sonoro en todos los botones.
+  $('game').addEventListener('pointerdown', (e) => { if (e.target.closest('button')) Music.click(); });
   ui.pause.addEventListener('click', pause);
   document.querySelectorAll('.share').forEach((b) => b.addEventListener('click', share));
 
@@ -1635,11 +1878,14 @@
       else if (state === 'paused') resume();
       else if (state === 'begin') openStory();
       else if (state === 'story') nextStory();
+      else if (state === 'credits') closeCredits();
       else if (state === 'start') showTutorial();
       else if (state === 'tutorial') start();
       else if (state === 'over' && overShown && performance.now() - overAt > 400) start();
     } else if (e.key === 'Escape') {
       if (state === 'story') endStory();
+      else if (state === 'credits') closeCredits();
+      else if (state === 'over' && overShown) goMenu();
       else pause();
     } else if ((e.key === 'm' || e.key === 'M') && !e.repeat) {
       toggleSound();
@@ -1653,8 +1899,9 @@
 
   addEventListener('blur', pause);
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { pause(); if (state === 'story') Music.stop(); }
+    if (document.hidden) { pause(); if (state === 'story' || state === 'credits') Music.stop(); }
     else if (state === 'story') Music.playStory();
+    else if (state === 'credits') Music.play(false);
   });
   portrait.addEventListener('change', () => { if (portrait.matches) pause(); });
 

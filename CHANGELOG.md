@@ -1,5 +1,15 @@
 # Historial de cambios
 
+## 0.8 — 2026-11-03
+
+- **Créditos finales** estilo película, con todo el elenco en pixel art y la moraleja del juego. Botón CRÉDITOS en el menú y al terminar.
+- **Botón MENÚ** en la pausa y al terminar, para cambiar de personaje sin tener que perder.
+- **Botones más claros:** el principal (JUGAR, SEGUIR, OTRA VEZ) es más grande y late; los demás son más chicos.
+- **Salto guardado:** si tocas justo antes de caer, el salto sale apenas tocas el suelo.
+- **Cada 100 puntos**, un "ding" y el número flotando.
+- **Muerte más dramática:** temblor de pantalla, vibración (Android), "¡splat!", un "¡puaj!" con voz de 8 bits y una trompeta triste. Si hay récord, suena una fanfarria.
+- Sonidos de aterrizaje y de clic en los botones.
+
 ## 0.7 — 2026-11-03
 
 - **Bolsa salvadora:** más o menos cada minuto de juego aparece una bolsa. Al tomarla, el personaje se pone verde menta brillante y el próximo popó que toque lo mete en la bolsa y lo lanza a un basurero, en vez de morir. Después sigue corriendo normal.
