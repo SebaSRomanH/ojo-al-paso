@@ -1,0 +1,5 @@
+# Configuración local de herramientas
+.claude/
+.vscode/
+Thumbs.db
+desktop.ini
