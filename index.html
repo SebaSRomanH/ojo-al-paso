@@ -62,17 +62,20 @@
     min-width: 22%; height: max(44px, 14%); padding: 0 1em;
     opacity: 0.92;
   }
-  #pause {
-    position: absolute; right: 2%; top: 4%;
-    min-width: 44px; padding: 0 0.6em;
+  #topbar {
+    position: absolute; right: 2%; top: 3%; z-index: 3;
+    display: flex; gap: 2cqw;
+  }
+  .icon {
+    width: max(52px, 17cqh); height: max(52px, 17cqh); padding: 0;
+    display: grid; place-items: center;
     background: var(--accent);
   }
-  #sound {
-    position: absolute; right: calc(2% + 64px); top: 4%; z-index: 3;
-    min-width: 44px; padding: 0 0.6em;
-    background: var(--accent);
-  }
-  #sound[aria-pressed="false"] { background: #8a7fa8; text-decoration: line-through; }
+  .icon svg { width: 68%; height: 68%; }
+  #sound .off { display: none; }
+  #sound[aria-pressed="false"] { background: #8a7fa8; }
+  #sound[aria-pressed="false"] .on { display: none; }
+  #sound[aria-pressed="false"] .off { display: inline; }
 
   .overlay {
     position: absolute; inset: 0;
@@ -88,6 +91,33 @@
   .overlay p { margin: 0; font-size: clamp(12px, 5.2cqh, 22px); line-height: 1.35; }
   .overlay .small { opacity: 0.8; font-size: clamp(11px, 4.4cqh, 18px); }
   .row { display: flex; gap: 4cqw; flex-wrap: wrap; justify-content: center; }
+
+  #over { padding-top: calc(max(52px, 17cqh) + 3cqh); }
+  .over-grid {
+    display: grid; grid-template-columns: 1.3fr 1fr; gap: 4cqw;
+    align-items: center; width: 100%;
+  }
+  .over-main { display: flex; flex-direction: column; align-items: center; gap: 2.5cqh; }
+  #over h2 { font-size: clamp(20px, 10cqh, 48px); }
+  #save-form { display: flex; flex-direction: column; align-items: center; gap: 1.5cqh; }
+  #name {
+    font: inherit; font-weight: bold; font-size: clamp(14px, 6cqh, 24px);
+    width: 5ch; min-height: 44px; padding: 0.2em;
+    text-align: center; text-transform: uppercase;
+    color: var(--ink); background: #000; border: 3px solid var(--ink); border-radius: 0;
+    -webkit-user-select: text; user-select: text;
+  }
+  #name:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .ranking h3 {
+    margin: 0 0 1.5cqh; color: var(--accent);
+    font-size: clamp(12px, 5.5cqh, 22px); letter-spacing: 0.1em;
+  }
+  .ranking ol {
+    margin: 0; padding: 0; list-style: none;
+    font-size: clamp(10px, 4.4cqh, 17px); line-height: 1.3; text-align: left;
+  }
+  .ranking li { white-space: pre; }
+  .ranking li.me { color: var(--accent); font-weight: bold; }
 
   #rotate {
     position: fixed; inset: 0; z-index: 10;
@@ -122,8 +152,18 @@
 <div id="game">
   <canvas id="screen" width="800" height="300" aria-label="Zona de juego" role="img"></canvas>
 
-  <button id="pause" type="button" aria-label="Pausar" hidden>II</button>
-  <button id="sound" type="button" aria-label="Sonido" aria-pressed="true">♪</button>
+  <div id="topbar">
+    <button id="sound" class="icon" type="button" aria-label="Sonido" aria-pressed="true">
+      <svg viewBox="0 0 18 18" aria-hidden="true">
+        <path d="M2 6h4l5-4v14l-5-4H2z" fill="currentColor"/>
+        <g class="on" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 6.5c1 1.5 1 3.5 0 5"/><path d="M15 4c2 3 2 7 0 10"/></g>
+        <g class="off" stroke="currentColor" stroke-width="2"><path d="M13 6l4 6M17 6l-4 6"/></g>
+      </svg>
+    </button>
+    <button id="pause" class="icon" type="button" aria-label="Pausar" hidden>
+      <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 3h3v12H4zM11 3h3v12h-3z" fill="currentColor"/></svg>
+    </button>
+  </div>
   <button id="jump" type="button" hidden>SALTAR</button>
 
   <section id="start" class="overlay" aria-labelledby="start-title">
@@ -144,12 +184,27 @@
   </section>
 
   <section id="over" class="overlay" aria-labelledby="over-title" hidden>
-    <h2 id="over-title">¡Plop! La pisaste</h2>
-    <p>Puntos: <span id="over-score">0</span> · Récord: <span id="over-best">0</span></p>
-    <p class="small" id="over-new" hidden>¡Nuevo récord!</p>
-    <div class="row">
-      <button id="again" type="button">OTRA VEZ</button>
-      <button class="secondary share" type="button">COMPARTIR</button>
+    <div class="over-grid">
+      <div class="over-main">
+        <h2 id="over-title">¡Plop! La pisaste</h2>
+        <p>Puntos: <span id="over-score">0</span> · Duraste <span id="over-time">0</span> s</p>
+        <p class="small" id="over-new" hidden>¡Nuevo récord!</p>
+        <form id="save-form" hidden>
+          <label class="small" for="name">¡Entraste al ranking! Tus iniciales:</label>
+          <div class="row">
+            <input id="name" maxlength="3" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
+            <button type="submit">GUARDAR</button>
+          </div>
+        </form>
+        <div class="row">
+          <button id="again" type="button">OTRA VEZ</button>
+          <button class="secondary share" type="button">COMPARTIR</button>
+        </div>
+      </div>
+      <div class="ranking">
+        <h3 id="ranking-title">RANKING</h3>
+        <ol id="ranking-list" aria-labelledby="ranking-title"></ol>
+      </div>
     </div>
   </section>
 
@@ -166,14 +221,19 @@
 (() => {
   'use strict';
 
-  // ---- Reglas (spec MVP 0.1) ----
+  // ---- Reglas (v0.2) ----
   const W = 800, H = 300, GROUND = 250;
-  const SPEED_START = 300, SPEED_ACCEL = 3, SPEED_MAX = 520;  // px/s, px/s², px/s
-  const GAP_MIN = 1.35, GAP_MAX = 1.90;                        // segundos entre cacas
+  // Velocidad exponencial: x6 a los 20 s (casi imposible). Tope para que el
+  // paso de simulación no atraviese cacas.
+  const SPEED_START = 300, SPEED_GROWTH = Math.log(6) / 20, SPEED_MAX = 3000;
+  const LEVEL_EVERY = 5;                 // aviso de "más rápido" cada 5 s
+  const PAIR_CHANCE = 0.18;              // cacas dobles: se saltan juntas
   const GRAVITY = 3000, JUMP_VELOCITY = 950;
   const MAX_DT = 0.1, STEP = 1 / 120;
+  const REACT_TIME = 1.4;                // segundos de "¡puaj!" antes del fin de partida
   const SCORE_DIVISOR = 12;
   const BEST_KEY = 'ojo-al-paso:record';
+  const RANK_KEY = 'ojo-al-paso:ranking', NAME_KEY = 'ojo-al-paso:nombre', RANK_SIZE = 10;
 
   const canvas = document.getElementById('screen');
   const ctx = canvas.getContext('2d');
@@ -183,10 +243,12 @@
   const ui = {
     start: $('start'), paused: $('paused'), over: $('over'),
     jump: $('jump'), pause: $('pause'),
-    startBest: $('start-best'), overScore: $('over-score'), overBest: $('over-best'), overNew: $('over-new'),
+    startBest: $('start-best'), overScore: $('over-score'), overTime: $('over-time'), overNew: $('over-new'),
+    saveForm: $('save-form'), name: $('name'), rankList: $('ranking-list'),
     toast: $('toast'), live: $('live'), again: $('again'),
   };
   const portrait = matchMedia('(orientation: portrait) and (max-width: 900px)');
+  const touch = matchMedia('(pointer: coarse)');
 
   // ---- Sprites pixel art originales ----
   function makeSprite(rows, palette, cellW, cellH) {
@@ -227,6 +289,44 @@
     air:  makeSprite([...KID_TOP, ...KID_AIR],  KID_PAL, PX, PX),
   };
   const KID_X = 90, KID_FEET = 15 * PX, KID_GROUND_Y = GROUND - KID_FEET;
+
+  // Reacción al pisar: el niño se pone verde y aparece una viñeta con cara de asco
+  // estilo manhwa (ojos > <, rayas azules en la frente, lengua afuera).
+  const SICK_PAL = { ...KID_PAL, s: '#b9d99a' };
+  kidFrames.sick = makeSprite([...KID_TOP, ...KID_RUN_A], SICK_PAL, PX, PX);
+  kidFrames.sickAir = makeSprite([...KID_TOP, ...KID_AIR], SICK_PAL, PX, PX);
+  const FACE_PAL = { k: '#2d6cdf', h: '#4a2a12', s: '#f2b38a', b: '#5a7bd8', e: '#111111', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
+  const FACE = [
+    '....kkkkkkkk....',
+    '..kkkkkkkkkkkk..',
+    '.kkkkkkkkkkkkkkk',
+    '.hsbsbsbsbsbsbh.',
+    '.hsbsbsbsbsbsbh.',
+    '.hssssssssssssh.',
+    '.hsessssssssesh.',
+    '.hssessssssessh.',
+    '.hsessssssssesh.',
+    '.hggssssssssggh.',
+    '.hsssmmmmmmsssh.',
+    '.hssmsmsmmsmssh.',
+    '..sssmttmsssss..',
+    '..ssssttssssss..',
+    '...ssssssssss...',
+    '....ssssssss....',
+  ];
+  const bubble = (() => {
+    const c = document.createElement('canvas');
+    c.width = 100; c.height = 112;
+    const g = c.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, 100, 100);
+    g.fillStyle = '#fff6e0'; g.fillRect(4, 4, 92, 92);
+    g.fillStyle = '#000';
+    g.fillRect(8, 96, 16, 4); g.fillRect(8, 100, 12, 4); g.fillRect(8, 104, 8, 4); g.fillRect(8, 108, 4, 4);
+    g.fillStyle = '#fff6e0';
+    g.fillRect(12, 96, 8, 4); g.fillRect(12, 100, 4, 4);
+    g.drawImage(makeSprite(FACE, FACE_PAL, 5, 5), 10, 10);
+    return c;
+  })();
 
   const POOP_PAL = { d: '#7a4a1e', h: '#b0743a', w: '#ffffff', k: '#111111', m: '#3b200b' };
   const POOP = [
@@ -440,6 +540,11 @@
       },
       stop() { playing = false; clearInterval(timer); },
       jump() { if (ensure()) tone(330, ac.currentTime, 0.14, 'square', 0.25, 880); },
+      speedUp() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        ['E5', 'G5', 'B5', 'E6'].forEach((n, k) => tone(freq(n), t + k * 0.06, 0.08, 'square', 0.18));
+      },
       crash() {
         if (!ensure()) return;
         const t = ac.currentTime;
@@ -456,8 +561,11 @@
 
   // ---- Estado ----
   let state = 'start';
-  let kid, obstacles, speed, distance, spawnIn, hillOff, groundOff, overAt = 0;
-  let best = loadBest();
+  let kid, obstacles, speed, distance, elapsed, level, bannerT, spawnIn, hillOff, groundOff, overAt = 0;
+  let lastScore = 0;
+  let reactT = 0, overShown = false, hitPoop = null, flies = [];
+  let ranking = loadRanking();
+  let best = Math.max(loadBest(), ranking[0] ? ranking[0].score : 0);
 
   function loadBest() {
     try { return Math.max(0, parseInt(localStorage.getItem(BEST_KEY), 10) || 0); } catch { return 0; }
@@ -468,18 +576,64 @@
   const score = () => Math.floor(distance / SCORE_DIVISOR);
   const rand = (a, b) => a + Math.random() * (b - a);
 
+  // ---- Ranking local (top 10 en este dispositivo) ----
+  function loadRanking() {
+    try {
+      const list = JSON.parse(localStorage.getItem(RANK_KEY));
+      if (!Array.isArray(list)) return [];
+      return list
+        .filter((r) => r && typeof r.name === 'string' && Number.isFinite(r.score))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, RANK_SIZE);
+    } catch { return []; }
+  }
+  const qualifies = (s) => s > 0 && (ranking.length < RANK_SIZE || s > ranking[ranking.length - 1].score);
+  function addToRanking(name, s) {
+    const entry = { name, score: s };
+    ranking = [...ranking, entry].sort((a, b) => b.score - a.score).slice(0, RANK_SIZE);
+    try { localStorage.setItem(RANK_KEY, JSON.stringify(ranking)); } catch { /* queda solo en esta sesión */ }
+    return ranking.indexOf(entry);
+  }
+  function renderRanking(highlight = -1) {
+    ui.rankList.replaceChildren(...Array.from({ length: RANK_SIZE }, (_, i) => {
+      const r = ranking[i];
+      const li = document.createElement('li');
+      li.textContent = `${String(i + 1).padStart(2)}. ${r ? r.name.padEnd(3) : '---'}  ${r ? String(r.score).padStart(5, '0') : '-----'}`;
+      if (i === highlight) li.className = 'me';
+      return li;
+    }));
+  }
+  const cleanName = (v) => v.toUpperCase().replace(/[^A-Z0-9ÑÁÉÍÓÚÜ]/g, '').slice(0, 3);
+  function loadName() { try { return localStorage.getItem(NAME_KEY) || ''; } catch { return ''; } }
+  function saveName(n) { try { localStorage.setItem(NAME_KEY, n); } catch { /* sin almacenamiento */ } }
+
   function reset() {
     kid = { y: KID_GROUND_Y, vy: 0, onGround: true };
     obstacles = [];
     speed = SPEED_START;
     distance = 0;
+    elapsed = 0; level = 0; bannerT = 0;
+    reactT = 0; overShown = false; hitPoop = null; flies = [];
     spawnIn = 1.0;
     hillOff = 0; groundOff = 0;
   }
 
-  function spawnPoop() {
-    const w = Math.round(rand(38, 58)), h = Math.round(rand(34, 46));
-    obstacles.push({ x: W + 10, w, h, sprite: makeSprite(POOP, POOP_PAL, w / 10, h / 9) });
+  const makePoop = (x, w, h) => ({ x, w, h, sprite: makeSprite(POOP, POOP_PAL, w / 10, h / 9) });
+
+  // Devuelve los segundos hasta la siguiente aparición. Mezcla tramos
+  // seguidos, normales y respiros; nunca menos que el tiempo de un salto (0,63 s).
+  function spawn() {
+    if (Math.random() < PAIR_CHANCE) {
+      const w1 = Math.round(rand(38, 44)), w2 = Math.round(rand(38, 44));
+      obstacles.push(makePoop(W + 10, w1, Math.round(rand(34, 40))));
+      obstacles.push(makePoop(W + 10 + w1 + Math.round(rand(6, 16)), w2, Math.round(rand(34, 40))));
+      return rand(1.2, 2.2);
+    }
+    obstacles.push(makePoop(W + 10, Math.round(rand(38, 58)), Math.round(rand(34, 46))));
+    const r = Math.random();
+    if (r < 0.3) return rand(0.85, 1.15);
+    if (r < 0.85) return rand(1.15, 2.2);
+    return rand(2.2, 3.0);
   }
 
   function hits(o) {
@@ -490,7 +644,16 @@
   }
 
   function update(dt) {
-    speed = Math.min(SPEED_MAX, speed + SPEED_ACCEL * dt);
+    elapsed += dt;
+    speed = Math.min(SPEED_MAX, SPEED_START * Math.exp(SPEED_GROWTH * elapsed));
+    const lv = Math.floor(elapsed / LEVEL_EVERY);
+    if (lv > level) {
+      level = lv;
+      bannerT = 1.6;
+      Music.speedUp();
+      announce(`¡Más rápido! Velocidad por ${(speed / SPEED_START).toFixed(1)}`);
+    }
+    bannerT = Math.max(0, bannerT - dt);
     const dx = speed * dt;
     distance += dx;
     hillOff = (hillOff + dx * 0.15) % W;
@@ -506,9 +669,10 @@
     obstacles = obstacles.filter((o) => o.x + o.w > -10);
 
     spawnIn -= dt;
-    if (spawnIn <= 0) { spawnPoop(); spawnIn = rand(GAP_MIN, GAP_MAX); }
+    if (spawnIn <= 0) spawnIn = spawn();
 
-    if (obstacles.some(hits)) gameOver();
+    const hit = obstacles.find(hits);
+    if (hit) gameOver(hit);
   }
 
   // ---- Dibujo ----
@@ -534,19 +698,76 @@
     for (const o of obstacles) ctx.drawImage(o.sprite, Math.round(o.x), GROUND + 2 - o.h);
 
     let frame = kidFrames.runA;
-    if (!kid.onGround) frame = kidFrames.air;
+    if (state === 'over') frame = kid.onGround ? kidFrames.sick : kidFrames.sickAir;
+    else if (!kid.onGround) frame = kidFrames.air;
     else if (state === 'running') frame = Math.floor(distance / 36) % 2 ? kidFrames.runB : kidFrames.runA;
     ctx.drawImage(frame, KID_X, Math.round(kid.y));
+    if (state === 'over') drawReaction();
 
     if (state !== 'start') {
       const pad = (n) => String(n).padStart(5, '0');
       ctx.font = 'bold 18px "Courier New", monospace';
       ctx.textBaseline = 'top';
-      const text = `PUNTOS ${pad(score())}   RÉCORD ${pad(Math.max(best, score()))}`;
+      const mult = (speed / SPEED_START).toFixed(1);
+      const text = `PUNTOS ${pad(score())}   RÉCORD ${pad(Math.max(best, score()))}   VEL x${mult}`;
       ctx.fillStyle = '#000';
       ctx.fillText(text, 18, 16);
       ctx.fillStyle = '#fff6e0';
       ctx.fillText(text, 16, 14);
+
+      // Aviso parpadeante al subir de velocidad.
+      if (bannerT > 0 && Math.floor(bannerT * 8) % 2 === 0) {
+        ctx.font = 'bold 34px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        const msg = `¡MÁS RÁPIDO! x${mult}`;
+        ctx.fillStyle = '#ff4fd8';
+        ctx.fillText(msg, W / 2 + 3, 73);
+        ctx.fillStyle = '#ffd23f';
+        ctx.fillText(msg, W / 2, 70);
+        ctx.textAlign = 'start';
+      }
+    }
+  }
+
+  function drawReaction() {
+    const t = reactT;
+    // Líneas de olor que suben ondulando desde la caca pisada.
+    if (hitPoop) {
+      ctx.fillStyle = '#8fd16a';
+      for (let k = 0; k < 3; k++) {
+        const baseX = hitPoop.x + hitPoop.w * (0.25 + k * 0.25);
+        for (let j = 0; j < 6; j++) {
+          const rise = (t * 40 + j * 9 + k * 13) % 54;
+          const y = GROUND - hitPoop.h - 4 - rise;
+          const x = baseX + Math.sin((y + t * 60) / 6) * 3;
+          ctx.fillRect(Math.round(x), Math.round(y), 3, 3);
+        }
+      }
+    }
+    // Moscas zumbando alrededor del niño.
+    for (const f of flies) {
+      const a = f.phase + t * f.speed;
+      const x = Math.round(KID_X + 18 + Math.cos(a) * f.r + Math.sin(t * 23 + f.phase) * 2);
+      const y = Math.round(GROUND - 28 + Math.sin(a * 1.3) * f.r * 0.6);
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(x, y, 3, 3);
+      ctx.fillStyle = Math.floor(t * 30 + f.phase) % 2 ? '#dfe8ff' : '#9fb0d0';
+      ctx.fillRect(x - 2, y - 2, 2, 2);
+      ctx.fillRect(x + 3, y - 2, 2, 2);
+    }
+    // Viñeta con la cara de asco: aparece con un "pop" desde la cola.
+    const s = Math.min(1, t / 0.15);
+    const w = Math.round(bubble.width * s), h = Math.round(bubble.height * s);
+    if (w < 4) return;
+    const bottom = KID_GROUND_Y - 2, left = KID_X + 22;
+    ctx.drawImage(bubble, left, bottom - h, w, h);
+    if (s === 1) {
+      ctx.font = 'bold 30px "Courier New", monospace';
+      const jx = Math.round(Math.sin(t * 40) * 2);
+      ctx.fillStyle = '#000';
+      ctx.fillText('¡PUAJ!', left + 112 + jx, bottom - 82);
+      ctx.fillStyle = '#8fd16a';
+      ctx.fillText('¡PUAJ!', left + 110 + jx, bottom - 84);
     }
   }
 
@@ -558,6 +779,9 @@
     if (state === 'running' && dt > 0) {
       const n = Math.ceil(dt / STEP), h = dt / n;
       for (let i = 0; i < n && state === 'running'; i++) update(h);
+    } else if (state === 'over') {
+      reactT += dt;
+      if (!overShown && reactT >= REACT_TIME) showOverScreen();
     }
     render();
     requestAnimationFrame(loop);
@@ -606,22 +830,58 @@
     announce('Seguimos');
   }
 
-  function gameOver() {
+  // Choque: primero la reacción (cara de asco, moscas, olor) y luego la pantalla final.
+  function gameOver(poop) {
     state = 'over';
-    overAt = performance.now();
+    overShown = false;
+    reactT = 0;
+    hitPoop = poop;
+    flies = Array.from({ length: 4 }, () => ({
+      phase: rand(0, Math.PI * 2),
+      speed: rand(4, 7) * (Math.random() < 0.5 ? -1 : 1),
+      r: rand(16, 34),
+    }));
     Music.stop();
     Music.crash();
+    controls(false);
+    announce('¡Puaj! Pisaste una caca.');
+  }
+
+  function showOverScreen() {
+    overShown = true;
+    overAt = performance.now();
     const s = score();
+    lastScore = s;
     const isNew = s > best;
     if (isNew) { best = s; saveBest(); }
     ui.overScore.textContent = s;
-    ui.overBest.textContent = best;
+    ui.overTime.textContent = elapsed.toFixed(1);
     ui.startBest.textContent = best;
     show(ui.overNew, isNew);
-    controls(false);
+    const canSave = qualifies(s);
+    show(ui.saveForm, canSave);
+    renderRanking();
     show(ui.over, true);
+    if (canSave) {
+      ui.name.value = loadName();
+      // En teléfono no abrimos el teclado solo: tapa la pantalla.
+      if (!touch.matches) ui.name.focus({ preventScroll: true });
+    } else {
+      ui.again.focus({ preventScroll: true });
+    }
+    announce(`Fin de la carrera. ${s} puntos.${isNew ? ' ¡Nuevo récord!' : ''}${canSave ? ' Entraste al ranking.' : ''}`);
+  }
+
+  function saveScore(e) {
+    e.preventDefault();
+    if (ui.saveForm.hidden) return;
+    const name = cleanName(ui.name.value) || '???';
+    saveName(name);
+    const pos = addToRanking(name, lastScore);
+    show(ui.saveForm, false);
+    renderRanking(pos);
     ui.again.focus({ preventScroll: true });
-    announce(`Fin de la carrera. ${s} puntos.${isNew ? ' ¡Nuevo récord!' : ''}`);
+    announce(`Guardado en el puesto ${pos + 1} del ranking.`);
   }
 
   // ---- Compartir ----
@@ -653,6 +913,8 @@
   // ---- Entrada ----
   $('play').addEventListener('click', start);
   ui.again.addEventListener('click', start);
+  ui.saveForm.addEventListener('submit', saveScore);
+  ui.name.addEventListener('input', () => { ui.name.value = cleanName(ui.name.value); });
   $('resume').addEventListener('click', resume);
   ui.pause.addEventListener('click', pause);
   document.querySelectorAll('.share').forEach((b) => b.addEventListener('click', share));
@@ -673,20 +935,23 @@
 
   const isJumpKey = (k) => k === ' ' || k === 'Spacebar' || k === 'ArrowUp';
   addEventListener('keydown', (e) => {
+    if (e.target instanceof HTMLInputElement) return;  // escribiendo iniciales
     if (isJumpKey(e.key)) {
       e.preventDefault();
       if (state === 'running') jump();
       else if (e.repeat) return;
       else if (state === 'paused') resume();
       else if (state === 'start') start();
-      else if (state === 'over' && performance.now() - overAt > 400) start();
+      else if (state === 'over' && overShown && performance.now() - overAt > 400) start();
     } else if (e.key === 'Escape') {
       pause();
     } else if ((e.key === 'm' || e.key === 'M') && !e.repeat) {
       toggleSound();
     }
   });
-  addEventListener('keyup', (e) => { if (isJumpKey(e.key)) e.preventDefault(); });
+  addEventListener('keyup', (e) => {
+    if (isJumpKey(e.key) && !(e.target instanceof HTMLInputElement)) e.preventDefault();
+  });
 
   addEventListener('blur', pause);
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });

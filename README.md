@@ -10,16 +10,21 @@ Todo el juego está en `index.html`: gráficos pixel art y música chiptune gene
 Abre `index.html` en el navegador, o levanta un servidor local:
 
 ```bash
-python -m http.server 8080
+python -m http.server 8081
 ```
 
-y entra a http://localhost:8080.
+y entra a http://localhost:8081.
 
 ## Controles
 
 - **Saltar:** botón SALTAR, tocar la pantalla, Espacio o ↑
 - **Pausa:** botón II o Esc
 - **Sonido:** botón ♪ o M
+
+## Documentación
+
+- [Especificación de producto](docs/ESPECIFICACION.md)
+- [Historial de cambios](CHANGELOG.md)
 
 ## Flujo de publicación
 
