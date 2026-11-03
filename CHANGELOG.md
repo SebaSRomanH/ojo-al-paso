@@ -1,5 +1,13 @@
 # Historial de cambios
 
+## 0.4 — 2026-11-03
+
+- **Rafa:** nuevo personaje pixel art (jockey rojo, pelo largo, polerón negro con esqueletos), también en la viñeta de asco.
+- **Selección de personaje** en la pantalla inicial: Rafa y dos personajes bloqueados.
+- **Salto flatulento:** cada salto suena a pedo (distinto cada vez) y deja una nubecita verde.
+- **Historia de intro** en dos pantallas: Don Cochino y su perro Bigote dejan las cacas sin recoger. Con música de susto en escala menor y golpes de terror. Se ve en la primera visita y se repite con el botón HISTORIA.
+- **Misión** visible: juntar la mayor cantidad de puntos.
+
 ## 0.3 — 2026-11-03
 
 - **Reacción de asco al pisar una caca:** el niño se pone verde, aparece una viñeta con su cara de asco estilo manhwa y el texto "¡PUAJ!", con moscas y líneas de olor. La pantalla final aparece 1,4 s después.

@@ -92,6 +92,29 @@
   .overlay .small { opacity: 0.8; font-size: clamp(11px, 4.4cqh, 18px); }
   .row { display: flex; gap: 4cqw; flex-wrap: wrap; justify-content: center; }
 
+  #start { gap: 2.5cqh; }
+  .cards { display: flex; gap: 3cqw; }
+  .card {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1cqh;
+    min-width: 15cqw; height: 32cqh; padding: 1.5cqh 2cqw;
+    color: var(--ink); background: #2a1650;
+    font-size: clamp(11px, 4.5cqh, 18px);
+  }
+  .card[aria-pressed="true"] { background: #4a1a70; outline: 3px solid var(--accent); outline-offset: 2px; }
+  .card img { height: 19cqh; width: auto; image-rendering: pixelated; }
+  .card.locked { opacity: 0.5; cursor: not-allowed; }
+  .card.locked:active { transform: none; box-shadow: 4px 4px 0 #000; }
+  .card .q { font-size: 14cqh; line-height: 19cqh; color: #8a7fa8; }
+
+  .story {
+    position: absolute; left: 0; right: 0; top: 0;
+    display: flex; align-items: center; gap: 3cqw;
+    padding: 2.5cqh 3cqw; padding-right: calc(max(52px, 17cqh) + 5cqw);
+    background: rgba(0, 0, 0, 0.8); border-bottom: 3px solid var(--accent);
+  }
+  .story p { flex: 1; margin: 0; font-size: clamp(11px, 4.8cqh, 20px); line-height: 1.35; }
+  .story .row { flex-wrap: nowrap; gap: 2cqw; }
+
   #over { padding-top: calc(max(52px, 17cqh) + 3cqh); }
   .over-grid {
     display: grid; grid-template-columns: 1.3fr 1fr; gap: 4cqw;
@@ -166,15 +189,36 @@
   </div>
   <button id="jump" type="button" hidden>SALTAR</button>
 
-  <section id="start" class="overlay" aria-labelledby="start-title">
+  <section id="begin" class="overlay" aria-labelledby="begin-title" hidden>
+    <h1 id="begin-title">¡Ojo al paso!</h1>
+    <button id="begin-btn" type="button">TOCA PARA EMPEZAR</button>
+  </section>
+
+  <section id="story" class="story" aria-labelledby="story-text" hidden>
+    <p id="story-text" aria-live="polite"></p>
+    <div class="row">
+      <button id="story-skip" class="secondary" type="button">SALTAR</button>
+      <button id="story-next" type="button">SIGUIENTE ▶</button>
+    </div>
+  </section>
+
+  <section id="start" class="overlay" aria-labelledby="start-title" hidden>
     <h1 id="start-title">¡Ojo al paso!</h1>
-    <p>Corre, salta las cacas y supera tu récord.</p>
-    <p class="small">Toca SALTAR o la pantalla · Computador: Espacio o ↑ · Esc pausa · M sonido</p>
-    <p class="small">Récord: <span id="start-best">0</span></p>
+    <p class="small">Misión: junta la mayor cantidad de puntos sin pisar ni una caca.</p>
+    <div class="cards" role="group" aria-label="Elige tu personaje">
+      <button class="card" type="button" aria-pressed="true" aria-label="Rafa">
+        <img id="rafa-portrait" alt="">
+        <span>RAFA</span>
+      </button>
+      <button class="card locked" type="button" disabled aria-label="Personaje bloqueado"><span class="q">?</span><span>???</span></button>
+      <button class="card locked" type="button" disabled aria-label="Personaje bloqueado"><span class="q">?</span><span>???</span></button>
+    </div>
     <div class="row">
       <button id="play" type="button">JUGAR</button>
+      <button id="story-btn" class="secondary" type="button">HISTORIA</button>
       <button class="secondary share" type="button">COMPARTIR</button>
     </div>
+    <p class="small">Récord: <span id="start-best">0</span> · Espacio/↑ saltar · Esc pausa · M sonido</p>
   </section>
 
   <section id="paused" class="overlay" aria-labelledby="paused-title" hidden>
@@ -245,6 +289,7 @@
     jump: $('jump'), pause: $('pause'),
     startBest: $('start-best'), overScore: $('over-score'), overTime: $('over-time'), overNew: $('over-new'),
     saveForm: $('save-form'), name: $('name'), rankList: $('ranking-list'),
+    begin: $('begin'), story: $('story'), storyText: $('story-text'), storyNext: $('story-next'),
     toast: $('toast'), live: $('live'), again: $('again'),
   };
   const portrait = matchMedia('(orientation: portrait) and (max-width: 900px)');
@@ -266,53 +311,62 @@
     return c;
   }
 
-  const KID_PAL = { k: '#2d6cdf', h: '#4a2a12', s: '#f2b38a', e: '#111111', r: '#e83f3f', b: '#2b3a8f', w: '#f5f5f5' };
+  // Rafa: jockey rojo de visera negra plana, pelo café largo, polerón negro con
+  // esqueletos y etiqueta naranja con su nombre, buzo gris.
+  const KID_PAL = {
+    r: '#d8323c', k: '#151515', h: '#6b4528', s: '#f0c39a', e: '#2a1a10',
+    d: '#1d1d22', w: '#f2f2f2', o: '#f39a3c', g: '#7d7f86', n: '#2a2a2a',
+  };
   const KID_TOP = [
-    '....kkkkk...',
-    '...kkkkkkkk.',
-    '...hhsssss..',
-    '...hsssess..',
-    '...hssssss..',
-    '....ssss....',
-    '...rrrrrr...',
-    '..rrrrrrrs..',
-    '..srrrrrr...',
-    '....rrrr....',
+    '....rrrrr.....',
+    '...rrrrrrr....',
+    '..rrrrrrrrr...',
+    '..hhkkkkkkkkk.',
+    '..hhhsssss....',
+    '.hhhssssess...',
+    '.hhhsssssss...',
+    '.hhhhssssss...',
+    '.hhhh.ssss....',
+    '.hhddddddd....',
+    '..ddwdwddds...',
+    '..dddowoodd...',
+    '..ddwdwdd.....',
+    '...dddddd.....',
   ];
-  const KID_RUN_A = ['....bbbb....', '...bb..bb...', '..bb....bb..', '..b......b..', '.ww......ww.', '............'];
-  const KID_RUN_B = ['....bbbb....', '....bbbb....', '....b.bb....', '....b.b.....', '...ww.ww....', '............'];
-  const KID_AIR   = ['....bbbb....', '...bbbbbb...', '..bb...bbww.', '..ww........', '............', '............'];
+  const KID_RUN_A = ['...gggggg.....', '..gg....gg....', '.gg......gg...', '.nn......nn...'];
+  const KID_RUN_B = ['...gggggg.....', '....gggg......', '....g.gg......', '...nn.nn......'];
+  const KID_AIR   = ['...gggggg.....', '..ggg..ggnn...', '..nn..........', '..............'];
   const PX = 3;
   const kidFrames = {
     runA: makeSprite([...KID_TOP, ...KID_RUN_A], KID_PAL, PX, PX),
     runB: makeSprite([...KID_TOP, ...KID_RUN_B], KID_PAL, PX, PX),
     air:  makeSprite([...KID_TOP, ...KID_AIR],  KID_PAL, PX, PX),
   };
-  const KID_X = 90, KID_FEET = 15 * PX, KID_GROUND_Y = GROUND - KID_FEET;
+  const KID_X = 90, KID_FEET = 18 * PX, KID_GROUND_Y = GROUND - KID_FEET;
 
-  // Reacción al pisar: el niño se pone verde y aparece una viñeta con cara de asco
+  // Reacción al pisar: Rafa se pone verde y aparece una viñeta con cara de asco
   // estilo manhwa (ojos > <, rayas azules en la frente, lengua afuera).
   const SICK_PAL = { ...KID_PAL, s: '#b9d99a' };
   kidFrames.sick = makeSprite([...KID_TOP, ...KID_RUN_A], SICK_PAL, PX, PX);
   kidFrames.sickAir = makeSprite([...KID_TOP, ...KID_AIR], SICK_PAL, PX, PX);
-  const FACE_PAL = { k: '#2d6cdf', h: '#4a2a12', s: '#f2b38a', b: '#5a7bd8', e: '#111111', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
+  const FACE_PAL = { r: '#d8323c', k: '#151515', h: '#6b4528', s: '#f0c39a', b: '#5a7bd8', e: '#2a1a10', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
   const FACE = [
-    '....kkkkkkkk....',
-    '..kkkkkkkkkkkk..',
-    '.kkkkkkkkkkkkkkk',
-    '.hsbsbsbsbsbsbh.',
-    '.hsbsbsbsbsbsbh.',
-    '.hssssssssssssh.',
-    '.hsessssssssesh.',
-    '.hssessssssessh.',
-    '.hsessssssssesh.',
-    '.hggssssssssggh.',
-    '.hsssmmmmmmsssh.',
-    '.hssmsmsmmsmssh.',
-    '..sssmttmsssss..',
-    '..ssssttssssss..',
-    '...ssssssssss...',
-    '....ssssssss....',
+    '...rrrrrrrrrr...',
+    '..rrrrrrrrrrrr..',
+    '.rrrrrrrrrrrrrr.',
+    '.kkkkkkkkkkkkkk.',
+    'hhsbsbsbsbsbsbhh',
+    'hhsbsbsbsbsbsbhh',
+    'hhsssssssssssshh',
+    'hhsesssssssseshh',
+    'hhssessssssesshh',
+    'hhsesssssssseshh',
+    'hhggssssssssgghh',
+    'hhsssmmmmmmssshh',
+    'hhssmsmsmmsmsshh',
+    'hh.sssmttmsss.hh',
+    'hh..ssssttss..hh',
+    'hh...ssssss...hh',
   ];
   const bubble = (() => {
     const c = document.createElement('canvas');
@@ -442,7 +496,21 @@
       }
     }
 
+    // Tema de la historia: lento y de susto, Mi menor armónica (el Re# da el escalofrío).
+    const STORY_SIXTEENTH = 60 / 72 / 4;
+    const STORY_MELODY = [
+      ['E4', 4], ['G4', 4], ['F#4', 4], ['D#4', 4],
+      ['E4', 8], ['B3', 8],
+      ['C4', 4], ['E4', 4], ['D#4', 4], ['C4', 4],
+      ['B3', 12], ['D#4', 4],
+    ];
+    const STORY_CHORDS = [['E3', 'G3', 'B3'], ['E3', 'G3', 'B3'], ['C3', 'E3', 'G3'], ['B2', 'D#3', 'F#3']];
+    const storyAt = new Map();
+    s = 0;
+    for (const [n, d] of STORY_MELODY) { storyAt.set(s, { f: freq(n), dur: d * STORY_SIXTEENTH }); s += d; }
+
     let ac = null, master = null, noise = null, timer = 0, step = 0, nextTime = 0, playing = false;
+    let mode = 'game';
     let leadAmp, harmAmp, rhythmAmp;
     let muted = false;
     try { muted = localStorage.getItem(MUTE_KEY) === '1'; } catch { /* sin almacenamiento */ }
@@ -518,28 +586,79 @@
       else if (i % 2 === 0) hiss(t, 0.03, 0.08, 7000);
     }
 
+    function scheduleStory(i, t) {
+      const bar = Math.floor(i / 16), barPos = i % 16, chord = STORY_CHORDS[bar].map(freq);
+      const note = storyAt.get(i);
+      if (note) tone(note.f, t, note.dur * 0.9, 'square', 0.1);
+      // Trémolo nervioso entre dos notas del acorde.
+      tone(chord[i % 2 ? 2 : 1], t, STORY_SIXTEENTH * 0.8, 'triangle', 0.12);
+      if (barPos === 0) tone(chord[0] / 2, t, STORY_SIXTEENTH * 15, 'triangle', 0.45);
+      // Latido: pum-pum.
+      if (barPos === 0 || barPos === 2 || barPos === 8 || barPos === 10) tone(90, t, 0.18, 'sine', 0.55, 40);
+    }
+
+    const SONGS = {
+      game: { step: SIXTEENTH, loop: LOOP, schedule },
+      story: { step: STORY_SIXTEENTH, loop: STORY_CHORDS.length * 16, schedule: scheduleStory },
+    };
+
     function tick() {
+      const song = SONGS[mode];
       while (nextTime < ac.currentTime + 0.12) {
-        schedule(step, nextTime);
-        nextTime += SIXTEENTH;
-        step = (step + 1) % LOOP;
+        song.schedule(step, nextTime);
+        nextTime += song.step;
+        step = (step + 1) % song.loop;
       }
+    }
+
+    function run(newMode, fromStart) {
+      if (!ensure()) return;
+      if (ac.state === 'suspended') ac.resume();
+      if (newMode !== mode) { mode = newMode; step = 0; }
+      if (fromStart) step = 0;
+      if (playing) return;
+      playing = true;
+      nextTime = ac.currentTime + 0.05;
+      timer = setInterval(tick, 25);
+      tick();
     }
 
     return {
       get muted() { return muted; },
-      play(fromStart) {
-        if (!ensure()) return;
-        if (ac.state === 'suspended') ac.resume();
-        if (fromStart) step = 0;
-        if (playing) return;
-        playing = true;
-        nextTime = ac.currentTime + 0.05;
-        timer = setInterval(tick, 25);
-        tick();
-      },
+      play(fromStart) { run('game', fromStart); },
+      playStory() { run('story', true); },
       stop() { playing = false; clearInterval(timer); },
-      jump() { if (ensure()) tone(330, ac.currentTime, 0.14, 'square', 0.25, 880); },
+      // Salto: pedo con "aleteo" (vibrato cuadrado) que baja de tono.
+      jump() {
+        if (!ensure()) return;
+        const t = ac.currentTime, dur = 0.22 + Math.random() * 0.12;
+        const o = ac.createOscillator(), lfo = ac.createOscillator(), depth = ac.createGain();
+        const lp = ac.createBiquadFilter(), g = ac.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(90 + Math.random() * 40, t);
+        o.frequency.exponentialRampToValueAtTime(50, t + dur);
+        lfo.type = 'square';
+        lfo.frequency.setValueAtTime(30 + Math.random() * 10, t);
+        lfo.frequency.linearRampToValueAtTime(12, t + dur);
+        depth.gain.value = 25;
+        lfo.connect(depth).connect(o.frequency);
+        lp.type = 'lowpass'; lp.frequency.value = 700; lp.Q.value = 5;
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime(0.9, t + 0.02);
+        g.gain.setValueAtTime(0.9, t + dur * 0.6);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(lp).connect(g).connect(master);
+        o.start(t); lfo.start(t);
+        o.stop(t + dur + 0.02); lfo.stop(t + dur + 0.02);
+      },
+      // Golpe de susto: acorde disonante (tritono) + bombo grave.
+      stinger() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        ['E3', 'F3', 'A#3'].forEach((n) => tone(freq(n), t, 0.9, 'sawtooth', 0.3, 0, rhythmAmp));
+        tone(70, t, 0.6, 'sine', 0.9, 28);
+        hiss(t, 0.5, 0.3, 300);
+      },
       speedUp() {
         if (!ensure()) return;
         const t = ac.currentTime;
@@ -564,6 +683,7 @@
   let kid, obstacles, speed, distance, elapsed, level, bannerT, spawnIn, hillOff, groundOff, overAt = 0;
   let lastScore = 0;
   let reactT = 0, overShown = false, hitPoop = null, flies = [];
+  let puffs = [];
   let ranking = loadRanking();
   let best = Math.max(loadBest(), ranking[0] ? ranking[0].score : 0);
 
@@ -614,6 +734,7 @@
     distance = 0;
     elapsed = 0; level = 0; bannerT = 0;
     reactT = 0; overShown = false; hitPoop = null; flies = [];
+    puffs = [];
     spawnIn = 1.0;
     hillOff = 0; groundOff = 0;
   }
@@ -637,7 +758,7 @@
   }
 
   function hits(o) {
-    const kx = KID_X + 9, ky = kid.y + 6, kw = 18, kh = 36;
+    const kx = KID_X + 10, ky = kid.y + 9, kw = 18, kh = 42;
     const oy = GROUND + 2 - o.h;
     const ox = o.x + o.w * 0.18, oyy = oy + o.h * 0.25, ow = o.w * 0.64, oh = o.h * 0.75;
     return kx < ox + ow && kx + kw > ox && ky < oyy + oh && ky + kh > oyy;
@@ -667,6 +788,8 @@
 
     for (const o of obstacles) o.x -= dx;
     obstacles = obstacles.filter((o) => o.x + o.w > -10);
+    for (const p of puffs) { p.x -= dx * 0.6; p.t += dt; }
+    puffs = puffs.filter((p) => p.t < 0.5);
 
     spawnIn -= dt;
     if (spawnIn <= 0) spawnIn = spawn();
@@ -675,7 +798,134 @@
     if (hit) gameOver(hit);
   }
 
+  // ---- Historia de intro: Don Cochino pasea a su perro Bigote ----
+  const MAN_PAL = { h: '#2b2b2b', s: '#e0a87c', e: '#111111', j: '#8a5a2b', p: '#3b4a7a', n: '#1a1a1a', f: '#7fd4ff' };
+  const MAN_TOP = [
+    '...hhhh...',
+    '..hhhhhh..',
+    '..hsssss..',
+    '..hsssess.',
+    '..hsssss..',
+    '...ssss...',
+    '..jjjjjj..',
+    '.jjjjjjjj.',
+    '.jjjjjjjsf',
+    '.jjjjjjj..',
+    '.jjjjjjjs.',
+    '..jjjjjj..',
+  ];
+  const MAN_A = ['..pppppp..', '..pp..pp..', '.pp....pp.', '.pp....pp.', 'pp......pp', 'nn......nn'];
+  const MAN_B = ['..pppppp..', '...pppp...', '...pp.p...', '...pp.p...', '...pp.pp..', '..nnn.nn..'];
+  const MAN_CELL = 4;
+  const man = [MAN_A, MAN_B].map((legs) => makeSprite([...MAN_TOP, ...legs], MAN_PAL, MAN_CELL, MAN_CELL));
+  const MAN_H = 18 * MAN_CELL;
+
+  const DOG_PAL = { b: '#c98b4a', t: '#c98b4a', e: '#111111', k: '#111111', c: '#d8323c' };
+  const DOG_TOP = ['.........bb.', '........bbbb', 't.......bebk', '.t.....cbbb.', '..bbbbbbbb..', '..bbbbbbbb..'];
+  const DOG_CELL = 4;
+  const dog = {
+    a: makeSprite([...DOG_TOP, '..b.b..b.b..', '..b.b..b.b..'], DOG_PAL, DOG_CELL, DOG_CELL),
+    b: makeSprite([...DOG_TOP, '...b.b..b.b.', '...b.b..b.b.'], DOG_PAL, DOG_CELL, DOG_CELL),
+    squat: makeSprite([...DOG_TOP, '..bb....b.b.', '............'], DOG_PAL, DOG_CELL, DOG_CELL),
+  };
+  const DOG_H = 8 * DOG_CELL;
+
+  const STORY = [
+    'Cada noche, Don Cochino sale a pasear a su perro Bigote… sin despegar los ojos del celular. Bigote hace caca en la vereda y Don Cochino NUNCA la recoge.',
+    'Ahora el barrio está lleno de cacas. Rafa tiene que cruzarlo corriendo sin pisar ninguna. Tu misión: ¡junta la mayor cantidad de puntos!',
+  ];
+  const storyPoop = makePoop(0, 30, 27);
+  const scenePoops = [[230, 44, 38], [340, 38, 34], [460, 52, 42], [520, 40, 36], [650, 46, 40], [745, 40, 36]]
+    .map(([x, w, h]) => makePoop(x, w, h));
+  let storyPage = 0, storyT = 0, stingerDone = false;
+
+  function drawStory() {
+    const t = storyT;
+    ctx.fillStyle = 'rgba(8, 0, 28, 0.5)';  // es de noche
+    ctx.fillRect(0, 0, W, H);
+    if (storyPage === 0) {
+      // Caminan, se detienen, Bigote hace caca y siguen como si nada.
+      const WALK = 140, STOP = 2.6, GO = 4.0;
+      const manX = -60 + WALK * (t < STOP ? t : t < GO ? STOP : t - (GO - STOP));
+      const dogX = manX + 78;
+      const walking = t < STOP || t >= GO;
+      const squat = t >= 2.8 && t < 3.8;
+      const poopX = -60 + WALK * STOP + 78 - 10;
+      if (t >= 3.3) {
+        if (!stingerDone) { stingerDone = true; Music.stinger(); }
+        storyPoop.x = poopX;
+        ctx.drawImage(storyPoop.sprite, poopX, GROUND + 2 - storyPoop.h);
+        drawStink(storyPoop, t);
+      }
+      const step = walking ? Math.floor(t * 6) % 2 : 0;
+      const manY = GROUND - MAN_H, dogY = GROUND - DOG_H;
+      // Correa: de la mano del hombre al collar del perro.
+      ctx.fillStyle = '#d8323c';
+      const hx = manX + 8 * MAN_CELL + 2, hy = manY + 10 * MAN_CELL + 2;
+      const cx = dogX + 7 * DOG_CELL, cy = dogY + 3 * DOG_CELL + (squat ? 3 : 0);
+      for (let k = 0; k <= 12; k++) {
+        const u = k / 12;
+        ctx.fillRect(Math.round(hx + (cx - hx) * u), Math.round(hy + (cy - hy) * u + Math.sin(u * Math.PI) * 6), 2, 2);
+      }
+      ctx.drawImage(man[step], Math.round(manX), manY);
+      ctx.drawImage(squat ? dog.squat : step ? dog.b : dog.a, Math.round(dogX), dogY + (squat ? 3 : 0));
+      if (t >= 4.0 && t < 6.5) {
+        ctx.font = 'bold 16px "Courier New", monospace';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#000';
+        ctx.fillText('…nadie me vio', manX - 8 + 2, manY - 22 + 2);
+        ctx.fillStyle = '#fff6e0';
+        ctx.fillText('…nadie me vio', manX - 8, manY - 22);
+      }
+    } else {
+      // La vereda minada y Rafa que se da cuenta.
+      if (t >= 0.2 && !stingerDone) { stingerDone = true; Music.stinger(); }
+      scenePoops.forEach((p, k) => {
+        ctx.drawImage(p.sprite, p.x, GROUND + 2 - p.h);
+        if (k % 2 === 0) drawStink(p, t + k);
+      });
+      drawFlies(scenePoops[2].x + 26, GROUND - 60, sceneFlies, t);
+      drawFlies(scenePoops[4].x + 23, GROUND - 58, sceneFlies, t + 1.7);
+      ctx.drawImage(kidFrames.runA, KID_X, KID_GROUND_Y);
+      if (t >= 0.5 && Math.floor(t * 4) % 2 === 0) {
+        ctx.font = 'bold 40px "Courier New", monospace';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#000';
+        ctx.fillText('!', KID_X + 16 + 2, KID_GROUND_Y - 46 + 2);
+        ctx.fillStyle = '#ffd23f';
+        ctx.fillText('!', KID_X + 16, KID_GROUND_Y - 46);
+      }
+    }
+  }
+  const sceneFlies = Array.from({ length: 3 }, (_, k) => ({ phase: k * 2.1, speed: 5 + k, r: 14 + k * 6 }));
+
   // ---- Dibujo ----
+  function drawStink(poop, t) {
+    ctx.fillStyle = '#8fd16a';
+    for (let k = 0; k < 3; k++) {
+      const baseX = poop.x + poop.w * (0.25 + k * 0.25);
+      for (let j = 0; j < 6; j++) {
+        const rise = (t * 40 + j * 9 + k * 13) % 54;
+        const y = GROUND - poop.h - 4 - rise;
+        const x = baseX + Math.sin((y + t * 60) / 6) * 3;
+        ctx.fillRect(Math.round(x), Math.round(y), 3, 3);
+      }
+    }
+  }
+
+  function drawFlies(cx, cy, list, t) {
+    for (const f of list) {
+      const a = f.phase + t * f.speed;
+      const x = Math.round(cx + Math.cos(a) * f.r + Math.sin(t * 23 + f.phase) * 2);
+      const y = Math.round(cy + Math.sin(a * 1.3) * f.r * 0.6);
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(x, y, 3, 3);
+      ctx.fillStyle = Math.floor(t * 30 + f.phase) % 2 ? '#dfe8ff' : '#9fb0d0';
+      ctx.fillRect(x - 2, y - 2, 2, 2);
+      ctx.fillRect(x + 3, y - 2, 2, 2);
+    }
+  }
+
   function render() {
     ctx.drawImage(sky, 0, 0);
 
@@ -695,7 +945,17 @@
       ctx.fillRect(Math.floor(x), p.y, 6, 3);
     }
 
+    if (state === 'story') { drawStory(); return; }
+
     for (const o of obstacles) ctx.drawImage(o.sprite, Math.round(o.x), GROUND + 2 - o.h);
+
+    // Nubecitas del pedo al saltar.
+    for (const p of puffs) {
+      const k = p.t / 0.5, r = Math.round(4 + k * 10);
+      ctx.fillStyle = `rgba(170, 200, 120, ${(1 - k) * 0.8})`;
+      ctx.fillRect(Math.round(p.x - r), Math.round(p.y - r / 2), r * 2, r);
+      ctx.fillRect(Math.round(p.x - r / 2), Math.round(p.y - r), r, r * 2);
+    }
 
     let frame = kidFrames.runA;
     if (state === 'over') frame = kid.onGround ? kidFrames.sick : kidFrames.sickAir;
@@ -704,7 +964,7 @@
     ctx.drawImage(frame, KID_X, Math.round(kid.y));
     if (state === 'over') drawReaction();
 
-    if (state !== 'start') {
+    if (state !== 'start' && state !== 'begin') {
       const pad = (n) => String(n).padStart(5, '0');
       ctx.font = 'bold 18px "Courier New", monospace';
       ctx.textBaseline = 'top';
@@ -731,30 +991,8 @@
 
   function drawReaction() {
     const t = reactT;
-    // Líneas de olor que suben ondulando desde la caca pisada.
-    if (hitPoop) {
-      ctx.fillStyle = '#8fd16a';
-      for (let k = 0; k < 3; k++) {
-        const baseX = hitPoop.x + hitPoop.w * (0.25 + k * 0.25);
-        for (let j = 0; j < 6; j++) {
-          const rise = (t * 40 + j * 9 + k * 13) % 54;
-          const y = GROUND - hitPoop.h - 4 - rise;
-          const x = baseX + Math.sin((y + t * 60) / 6) * 3;
-          ctx.fillRect(Math.round(x), Math.round(y), 3, 3);
-        }
-      }
-    }
-    // Moscas zumbando alrededor del niño.
-    for (const f of flies) {
-      const a = f.phase + t * f.speed;
-      const x = Math.round(KID_X + 18 + Math.cos(a) * f.r + Math.sin(t * 23 + f.phase) * 2);
-      const y = Math.round(GROUND - 28 + Math.sin(a * 1.3) * f.r * 0.6);
-      ctx.fillStyle = '#111111';
-      ctx.fillRect(x, y, 3, 3);
-      ctx.fillStyle = Math.floor(t * 30 + f.phase) % 2 ? '#dfe8ff' : '#9fb0d0';
-      ctx.fillRect(x - 2, y - 2, 2, 2);
-      ctx.fillRect(x + 3, y - 2, 2, 2);
-    }
+    if (hitPoop) drawStink(hitPoop, t);  // olor que sube desde la caca pisada
+    drawFlies(KID_X + 21, GROUND - 30, flies, t);  // moscas alrededor de Rafa
     // Viñeta con la cara de asco: aparece con un "pop" desde la cola.
     const s = Math.min(1, t / 0.15);
     const w = Math.round(bubble.width * s), h = Math.round(bubble.height * s);
@@ -779,6 +1017,8 @@
     if (state === 'running' && dt > 0) {
       const n = Math.ceil(dt / STEP), h = dt / n;
       for (let i = 0; i < n && state === 'running'; i++) update(h);
+    } else if (state === 'story') {
+      storyT += dt;
     } else if (state === 'over') {
       reactT += dt;
       if (!overShown && reactT >= REACT_TIME) showOverScreen();
@@ -792,11 +1032,48 @@
   function controls(visible) { show(ui.jump, visible); show(ui.pause, visible); }
   function announce(msg) { ui.live.textContent = msg; }
 
+  // ---- Historia ----
+  const STORY_KEY = 'ojo-al-paso:historia-vista';
+  function openStory() {
+    reset();
+    state = 'story';
+    storyPage = 0; storyT = 0; stingerDone = false;
+    show(ui.begin, false); show(ui.start, false); show(ui.over, false);
+    show(ui.story, true);
+    controls(false);
+    showStoryPage();
+    Music.playStory();
+  }
+  function showStoryPage() {
+    ui.storyText.textContent = STORY[storyPage];
+    ui.storyNext.textContent = storyPage < STORY.length - 1 ? 'SIGUIENTE ▶' : '¡VAMOS! ▶';
+    ui.storyNext.focus({ preventScroll: true });
+  }
+  function nextStory() {
+    if (storyPage < STORY.length - 1) {
+      storyPage++; storyT = 0; stingerDone = false;
+      showStoryPage();
+    } else {
+      endStory();
+    }
+  }
+  function endStory() {
+    if (state !== 'story') return;
+    Music.stop();
+    try { localStorage.setItem(STORY_KEY, '1'); } catch { /* sin almacenamiento */ }
+    reset();
+    state = 'start';
+    show(ui.story, false);
+    show(ui.start, true);
+    $('play').focus({ preventScroll: true });
+  }
+
   function start() {
     if (portrait.matches) return;
     reset();
     state = 'running';
     show(ui.start, false); show(ui.over, false); show(ui.paused, false);
+    show(ui.story, false); show(ui.begin, false);
     controls(true);
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     Music.play(true);
@@ -807,6 +1084,7 @@
     if (state !== 'running' || !kid.onGround) return;
     kid.vy = -JUMP_VELOCITY;
     kid.onGround = false;
+    puffs.push({ x: KID_X + 2, y: kid.y + 38, t: 0 });
     Music.jump();
   }
 
@@ -912,6 +1190,10 @@
 
   // ---- Entrada ----
   $('play').addEventListener('click', start);
+  $('begin-btn').addEventListener('click', openStory);
+  $('story-btn').addEventListener('click', openStory);
+  ui.storyNext.addEventListener('click', nextStory);
+  $('story-skip').addEventListener('click', endStory);
   ui.again.addEventListener('click', start);
   ui.saveForm.addEventListener('submit', saveScore);
   ui.name.addEventListener('input', () => { ui.name.value = cleanName(ui.name.value); });
@@ -941,10 +1223,13 @@
       if (state === 'running') jump();
       else if (e.repeat) return;
       else if (state === 'paused') resume();
+      else if (state === 'begin') openStory();
+      else if (state === 'story') nextStory();
       else if (state === 'start') start();
       else if (state === 'over' && overShown && performance.now() - overAt > 400) start();
     } else if (e.key === 'Escape') {
-      pause();
+      if (state === 'story') endStory();
+      else pause();
     } else if ((e.key === 'm' || e.key === 'M') && !e.repeat) {
       toggleSound();
     }
@@ -954,11 +1239,19 @@
   });
 
   addEventListener('blur', pause);
-  document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { pause(); if (state === 'story') Music.stop(); }
+    else if (state === 'story') Music.playStory();
+  });
   portrait.addEventListener('change', () => { if (portrait.matches) pause(); });
 
   reset();
   ui.startBest.textContent = best;
+  $('rafa-portrait').src = kidFrames.runA.toDataURL();
+  // Primera visita: la historia (necesita un toque para poder sonar). Después, directo al menú.
+  let storySeen = false;
+  try { storySeen = localStorage.getItem(STORY_KEY) === '1'; } catch { /* sin almacenamiento */ }
+  if (storySeen) { show(ui.start, true); } else { state = 'begin'; show(ui.begin, true); }
   requestAnimationFrame(loop);
 })();
 </script>
