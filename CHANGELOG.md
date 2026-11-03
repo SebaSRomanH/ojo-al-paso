@@ -1,5 +1,11 @@
 # Historial de cambios
 
+## 0.7 — 2026-11-03
+
+- **Bolsa salvadora:** más o menos cada minuto de juego aparece una bolsa. Al tomarla, el personaje se pone verde menta brillante y el próximo popó que toque lo mete en la bolsa y lo lanza a un basurero, en vez de morir. Después sigue corriendo normal.
+- Sonidos nuevos al tomar la bolsa y al lanzarla a la basura.
+- El ejemplo inicial avisa: "¿Ves una bolsa? Tómala: el próximo popó va a la basura."
+
 ## 0.6 — 2026-11-03
 
 - **Se salta tocando la pantalla:** ya no hay botón de salto.

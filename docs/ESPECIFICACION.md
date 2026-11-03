@@ -1,6 +1,6 @@
-# Especificación de producto — v0.6
+# Especificación de producto — v0.7
 
-Estado: v0.6 publicada en producción (aprobada por el propietario en su teléfono). Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
+Estado: v0.6 en producción; v0.7 en desarrollo local. Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
 
 Entornos:
 
@@ -47,6 +47,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | RF-19 | **Selección de personaje** en la pantalla inicial: una tarjeta por personaje con su dibujo y nombre; la elegida se marca en amarillo y se recuerda entre visitas. Muestra la misión, el récord y los botones JUGAR, HISTORIA y COMPARTIR. | 0.4 · 0.5 |
 | RF-21 | **Ejemplo de cómo saltar:** al tocar JUGAR (o Espacio en el menú) aparece una pantalla con un dedo animado que toca la pantalla cada 1,2 s, con una onda en el punto de toque; el personaje corre y salta en sincronía, y se lee "¡Toca la pantalla para saltar!". La partida empieza al tocar la pantalla o con Espacio. "OTRA VEZ" reinicia directo, sin el ejemplo. | 0.6 |
 | RF-22 | **Pantalla completa:** botón con ícono de esquinas (cambia al salir), en navegadores que la permiten (Android, computador). Al entrar intenta fijar la orientación horizontal; si el navegador no lo permite, se ignora. En iPhone el botón se oculta (Safari no permite pantalla completa en páginas); al agregar el juego a la pantalla de inicio se abre sin barras del navegador. | 0.6 |
+| RF-23 | **Bolsa (escudo de un uso):** aparece una bolsa flotando en el camino (con destello) cada 50–70 s de **juego acumulado** entre partidas (la primera a los 25–45 s), porque una partida dura 10–20 s; no aparece encima de un popó recién salido. Al tocarla, el personaje se tiñe verde menta con contorno brillante, suena un arpegio, aparece "¡BOLSA!" y un ícono junto a los puntos. **El próximo popó que toque** no lo mata: se embolsa, vuela en arco a un basurero que aparece a la izquierda ("¡A LA BASURA!" y sonido de lanzamiento), el personaje recupera su color y sigue corriendo; 0,35 s de gracia (parpadeo) para no morir en la segunda caca de un par. Si salta los popós, conserva la bolsa; tomar otra bolsa no acumula. Se pierde al terminar la partida. Verificado: tomar bolsa → embolsar → morir en el popó siguiente. | 0.7 |
 | RF-20 | **Personajes de la familia** (inspirados en fotos del propietario; las fotos no se incluyen en el juego): **Rafa**; **Baby Rafa** (sombrero de paja con cinta turquesa, polerón a rayas, shorts rojos; más bajo: 42 px en vez de 54 y caja de colisión proporcional); **Seba 80s** (el propietario de niño: pelo negro, chaleco gris con cuello amarillo, jeans, botas); **Vicky** (pelo ondulado largo, lentes de sol rosados, polera tropical); **Pipe** (jockey naranjo, lentes espejados, barba, camisa con flamencos); **Angie** (embarazada: pelo largo, lentes, polera blanca con guatita, pantalón ancho gris); **Francisco** (metalero: jockey negro hacia atrás, lentes oscuros, polera negra con emblema dorado sin logos de bandas). Cada uno tiene su propia cara de asco (RF-13) con su gorro, pelo, lentes o barba. La historia (RF-18) siempre muestra a Rafa. | 0.5 |
 
 ## Historias de usuario
@@ -64,6 +65,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | HU-09 | Como jugador, quiero que pisar una caca sea gracioso y no solo un "game over". | RF-13. |
 | HU-10 | Como jugador, quiero entender por qué hay cacas en la calle y cuál es mi misión. | RF-18. |
 | HU-11 | Como jugador, quiero elegir con quién juego entre los personajes de mi familia. | RF-19/20. |
+| HU-12 | Como jugador, quiero de vez en cuando una ayuda que me salve de un popó, y que se vea cómo lo recojo y lo boto. | RF-23. |
 
 ## Verificación
 
@@ -101,5 +103,6 @@ Agacharse, doble salto, enemigos aéreos, niveles, personajes desbloqueables, mu
 | 0.5 | Seis personajes nuevos de la familia con sus caras de asco (RF-20); la selección se recuerda (RF-19). Acabado estilo 16 bits con doble resolución, contorno y sombreado (RF-09). |
 | 0.5.1 | Botón de salto circular y semitransparente con ícono (RF-02). |
 | 0.6 | Sin botón de salto: se toca la pantalla (RF-02); ejemplo animado antes de partir (RF-21); sonido y pantalla completa arriba a la izquierda (RF-17/22). |
+| 0.7 | Bolsa como escudo de un uso que manda el próximo popó a la basura (RF-23); pista en el ejemplo inicial. |
 
 Todo cambio funcional debe actualizar este documento, el [historial de cambios](../CHANGELOG.md), las pruebas afectadas y la versión.
