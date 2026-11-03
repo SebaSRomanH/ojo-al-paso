@@ -1,6 +1,6 @@
 # Especificación de producto — v0.4
 
-Estado: v0.3 en producción; v0.4 en desarrollo local. Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
+Estado: v0.4 publicada en producción (aprobada por el propietario en su teléfono). Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
 
 Entornos:
 
