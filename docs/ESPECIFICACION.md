@@ -16,7 +16,9 @@ Flujo: local → pruebas (se verifica en teléfono) → producción.
 
 Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizontal: saltar obstáculos, superar el récord propio y compartir el enlace por WhatsApp. Inspirarse en la mecánica del dinosaurio de Chrome sin copiar su código o sus recursos.
 
-**Misión del jugador:** juntar la mayor cantidad de puntos sin pisar ninguna caca.
+**Misión del jugador:** juntar la mayor cantidad de puntos sin pisar ningún popó.
+
+**Vocabulario en pantalla:** todos los textos que ve o escucha el jugador dicen **"popó"** (masculino: "el popó", "lo pisaste"), nunca "caca". Este documento usa "caca" como término técnico interno.
 
 **Historia:** cada noche, Don Cochino pasea a su perro Bigote mirando el celular y nunca recoge sus cacas. El barrio quedó minado y Rafa tiene que cruzarlo corriendo.
 
@@ -92,6 +94,6 @@ Agacharse, doble salto, enemigos aéreos, niveles, personajes desbloqueables, mu
 | 0.1 | MVP inicial (documento original). |
 | 0.2 | Música (RF-12), ranking local (RF-14), velocidad exponencial (RF-06), aparición aleatoria y cacas dobles (RF-03/15), aviso de velocidad (RF-16), controles grandes (RF-17). |
 | 0.3 | Reacción de asco con moscas y olor (RF-13); el fin de partida espera la reacción (RF-04). |
-| 0.4 | Personaje Rafa (RF-01), salto flatulento (RF-02), historia de intro con música de susto (RF-18), selección de personaje (RF-19), misión e historia en el objetivo. |
+| 0.4 | Personaje Rafa (RF-01), salto flatulento (RF-02), historia de intro con música de susto (RF-18), selección de personaje (RF-19), misión e historia en el objetivo. Vocabulario en pantalla: "popó". |
 
 Todo cambio funcional debe actualizar este documento, el [historial de cambios](../CHANGELOG.md), las pruebas afectadas y la versión.

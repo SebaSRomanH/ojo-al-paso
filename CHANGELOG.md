@@ -7,6 +7,7 @@
 - **Salto flatulento:** cada salto suena a pedo (distinto cada vez) y deja una nubecita verde.
 - **Historia de intro** en dos pantallas: Don Cochino y su perro Bigote dejan las cacas sin recoger. Con música de susto en escala menor y golpes de terror. Se ve en la primera visita y se repite con el botón HISTORIA.
 - **Misión** visible: juntar la mayor cantidad de puntos.
+- **"Popó" en vez de "caca"** en todos los textos del juego (pantallas, historia, anuncios y mensaje al compartir).
 
 ## 0.3 — 2026-11-03
 

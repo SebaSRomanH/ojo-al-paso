@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#120826">
-<meta name="description" content="Corre, salta las cacas y supera tu récord.">
+<meta name="description" content="Corre, salta los popós y supera tu récord.">
 <title>¡Ojo al paso!</title>
 <style>
   :root {
@@ -204,7 +204,7 @@
 
   <section id="start" class="overlay" aria-labelledby="start-title" hidden>
     <h1 id="start-title">¡Ojo al paso!</h1>
-    <p class="small">Misión: junta la mayor cantidad de puntos sin pisar ni una caca.</p>
+    <p class="small">Misión: junta la mayor cantidad de puntos sin pisar ni un popó.</p>
     <div class="cards" role="group" aria-label="Elige tu personaje">
       <button class="card" type="button" aria-pressed="true" aria-label="Rafa">
         <img id="rafa-portrait" alt="">
@@ -230,7 +230,7 @@
   <section id="over" class="overlay" aria-labelledby="over-title" hidden>
     <div class="over-grid">
       <div class="over-main">
-        <h2 id="over-title">¡Plop! La pisaste</h2>
+        <h2 id="over-title">¡Plop! Lo pisaste</h2>
         <p>Puntos: <span id="over-score">0</span> · Duraste <span id="over-time">0</span> s</p>
         <p class="small" id="over-new" hidden>¡Nuevo récord!</p>
         <form id="save-form" hidden>
@@ -831,8 +831,8 @@
   const DOG_H = 8 * DOG_CELL;
 
   const STORY = [
-    'Cada noche, Don Cochino sale a pasear a su perro Bigote… sin despegar los ojos del celular. Bigote hace caca en la vereda y Don Cochino NUNCA la recoge.',
-    'Ahora el barrio está lleno de cacas. Rafa tiene que cruzarlo corriendo sin pisar ninguna. Tu misión: ¡junta la mayor cantidad de puntos!',
+    'Cada noche, Don Cochino sale a pasear a su perro Bigote… sin despegar los ojos del celular. Bigote hace popó en la vereda y Don Cochino NUNCA lo recoge.',
+    'Ahora el barrio está lleno de popós. Rafa tiene que cruzarlo corriendo sin pisar ninguno. Tu misión: ¡junta la mayor cantidad de puntos!',
   ];
   const storyPoop = makePoop(0, 30, 27);
   const scenePoops = [[230, 44, 38], [340, 38, 34], [460, 52, 42], [520, 40, 36], [650, 46, 40], [745, 40, 36]]
@@ -1122,7 +1122,7 @@
     Music.stop();
     Music.crash();
     controls(false);
-    announce('¡Puaj! Pisaste una caca.');
+    announce('¡Puaj! Pisaste un popó.');
   }
 
   function showOverScreen() {
@@ -1179,7 +1179,7 @@
     const url = location.href.split('#')[0];
     const text = state === 'over'
       ? `Hice ${score()} puntos en ¡Ojo al paso! ¿Me ganas?`
-      : '¡Salta las cacas y supera mi récord en ¡Ojo al paso!';
+      : '¡Salta los popós y supera mi récord en ¡Ojo al paso!';
     if (navigator.share) {
       try { await navigator.share({ title: '¡Ojo al paso!', text, url }); } catch { /* cancelado */ }
       return;

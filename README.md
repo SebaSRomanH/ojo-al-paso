@@ -1,7 +1,7 @@
 # ¡Ojo al paso!
 Juego creado para mi sobrino. 
 
-Juego de navegador para móvil (en horizontal): un niño corre y salta cacas. Supera tu récord y compártelo por WhatsApp.
+Juego de navegador para móvil (en horizontal): Rafa corre y salta popós. Supera tu récord y compártelo por WhatsApp.
 
 Todo el juego está en `index.html`: gráficos pixel art y música chiptune generados con código, sin archivos externos.
 
