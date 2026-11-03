@@ -1,6 +1,6 @@
 # Especificación de producto — v0.3
 
-Estado: implementado y publicado en el entorno de pruebas. Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
+Estado: publicado en producción. Fecha: 2026-11-03. Propietario de producto: Sebastián. Nombre de trabajo: **¡Ojo al paso!**.
 
 Entornos:
 
@@ -8,7 +8,7 @@ Entornos:
 |---|---|---|
 | Local | `C:\Users\Usuario\ojo-al-paso` | http://localhost:8081 |
 | Pruebas | repo `SebaSRomanH/ojo-al-paso-pruebas` + GitHub Pages | https://sebasromanh.github.io/ojo-al-paso-pruebas/ |
-| Producción | repo `SebaSRomanH/ojo-al-paso` + GitHub Pages | https://sebasromanh.github.io/ojo-al-paso/ (pendiente de primera publicación) |
+| Producción | repo `SebaSRomanH/ojo-al-paso` + GitHub Pages | https://sebasromanh.github.io/ojo-al-paso/ |
 
 Flujo: local → pruebas (se verifica en teléfono) → producción.
 
@@ -55,7 +55,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 ## Verificación
 
 - Saltabilidad de la caca doble en el peor caso (44 + 16 + 44 px, alto 40): la ventana para saltar es de ≈450 ms a 300 px/s, ≈230 ms a 1200 px/s, ≈140 ms a 1800 px/s y ≈76 ms a 3000 px/s. Siempre es posible; a alta velocidad, humanamente muy difícil (intencional).
-- Probado en navegador de computador con vista horizontal de teléfono (780×360) y vertical (375×812). **Pendiente:** prueba en teléfonos físicos (Android e iPhone).
+- Probado en navegador de computador con vista horizontal de teléfono (780×360) y vertical (375×812), y aprobado por el propietario en su teléfono antes de pasar a producción (2026-11-03). **Pendiente:** probar en más modelos (Android e iPhone).
 
 ## Requisitos no funcionales
 
