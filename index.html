@@ -57,11 +57,19 @@
   button.secondary { background: var(--accent); }
   [hidden] { display: none !important; }
 
+  /* Botón de salto: círculo semitransparente con ícono, para no tapar el juego. */
   #jump {
-    position: absolute; right: 2.5%; bottom: 1.5%;
-    min-width: 22%; height: max(44px, 14%); padding: 0 1em;
-    opacity: 0.92;
+    position: absolute; right: 3%; bottom: 4%;
+    width: max(60px, 24cqh); height: max(60px, 24cqh); padding: 0;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    color: var(--ink);
+    background: rgba(255, 111, 97, 0.3);
+    border: 3px solid rgba(255, 246, 224, 0.8);
+    box-shadow: none;
   }
+  #jump svg { width: 62%; height: 62%; }
+  #jump:active { transform: scale(0.92); box-shadow: none; background: rgba(255, 111, 97, 0.6); }
   #topbar {
     position: absolute; right: 2%; top: 3%; z-index: 3;
     display: flex; gap: 2cqw;
@@ -186,7 +194,13 @@
       <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 3h3v12H4zM11 3h3v12h-3z" fill="currentColor"/></svg>
     </button>
   </div>
-  <button id="jump" type="button" hidden>SALTAR</button>
+  <button id="jump" type="button" aria-label="Saltar" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 17V4"/>
+      <path d="M6 10l6-6 6 6"/>
+      <path d="M5 21h14"/>
+    </svg>
+  </button>
 
   <section id="begin" class="overlay" aria-labelledby="begin-title" hidden>
     <h1 id="begin-title">¡Ojo al paso!</h1>

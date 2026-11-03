@@ -1,5 +1,9 @@
 # Historial de cambios
 
+## 0.5.1 — 2026-11-03
+
+- **Botón de salto circular:** semitransparente para no tapar el juego, con un ícono de flecha hacia arriba en vez del texto "SALTAR".
+
 ## 0.5 — 2026-11-03
 
 - **Seis personajes nuevos de la familia:** Baby Rafa, Seba 80s, Vicky, Pipe, Angie y Francisco, cada uno con su cara de asco propia.

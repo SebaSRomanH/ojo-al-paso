@@ -27,7 +27,7 @@ Ofrecer una partida corta, inmediata y rejugable en el navegador móvil horizont
 | ID | Requisito y criterio de aceptación | Desde |
 |---|---|---|
 | RF-01 | **Rafa** corre de izquierda a derecha en un mundo que se desplaza. Su sprite (14×18 celdas) se inspira en el sobrino del propietario: jockey rojo con visera negra plana, pelo café largo, polerón negro con esqueletos y etiqueta naranja con su nombre, buzo gris. Comenzar requiere una acción explícita. | 0.1 · 0.4 |
-| RF-02 | Tocar SALTAR o el escenario libre inicia un salto si el personaje está en el suelo. Espacio/Flecha arriba funcionan en computador. No existe doble salto. Cada salto suena a **pedo** (tono y duración al azar) y deja una nubecita verde. | 0.1 · 0.4 |
+| RF-02 | Tocar SALTAR o el escenario libre inicia un salto si el personaje está en el suelo. Espacio/Flecha arriba funcionan en computador. No existe doble salto. Cada salto suena a **pedo** (tono y duración al azar) y deja una nubecita verde. El botón de salto es un **círculo semitransparente** (≥60 px CSS) abajo a la derecha, con un ícono de flecha hacia arriba sobre el suelo y nombre accesible "Saltar". | 0.1 · 0.4 · 0.5.1 |
 | RF-03 | Aparecen cacas con altura de 34–46 y ancho de 38–58 píxeles lógicos. No hay otro tipo de enemigo. Un 18 % de las apariciones son **cacas dobles** (dos pequeñas, 38–44 × 34–40, separadas 6–16 px) que se esquivan con un solo salto. | 0.1 · 0.2 |
 | RF-04 | Chocar termina la carrera y congela la puntuación. Primero se muestra la **reacción de asco** (RF-13) durante 1,4 s y luego la pantalla final, que ofrece reinicio sin recargar la página. La caja de colisión es menor que el dibujo para dar margen al jugador. | 0.1 · 0.3 |
 | RF-05 | Puntaje = piso(distancia / 12); aumenta solo corriendo. Se muestra récord local no decreciente entre partidas y recargas. Sin almacenamiento disponible, se puede seguir jugando. La pantalla final muestra puntos y segundos de duración. | 0.1 · 0.2 |
@@ -97,5 +97,6 @@ Agacharse, doble salto, enemigos aéreos, niveles, personajes desbloqueables, mu
 | 0.3 | Reacción de asco con moscas y olor (RF-13); el fin de partida espera la reacción (RF-04). |
 | 0.4 | Personaje Rafa (RF-01), salto flatulento (RF-02), historia de intro con música de susto (RF-18), selección de personaje (RF-19), misión e historia en el objetivo. Vocabulario en pantalla: "popó". |
 | 0.5 | Seis personajes nuevos de la familia con sus caras de asco (RF-20); la selección se recuerda (RF-19). Acabado estilo 16 bits con doble resolución, contorno y sombreado (RF-09). |
+| 0.5.1 | Botón de salto circular y semitransparente con ícono (RF-02). |
 
 Todo cambio funcional debe actualizar este documento, el [historial de cambios](../CHANGELOG.md), las pruebas afectadas y la versión.
