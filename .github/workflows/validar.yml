@@ -1,0 +1,22 @@
+# Cada vez que llega código a GitHub, corre tests/validar.mjs.
+# En la pestaña "Actions" del repo aparece ✅ si todo está bien o ❌ si algo falló.
+name: Validar juego
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Revisar dibujos, saltos, textos y recursos
+        run: node tests/validar.mjs

@@ -56,16 +56,16 @@
     color: var(--btn-ink); background: var(--btn);
     border: 3px solid var(--ink); border-radius: 0;
     box-shadow: 4px 4px 0 #000;
-    min-height: 44px; padding: 0.35em 0.95em;
-    font-size: clamp(12px, 5.1cqh, 20px);
+    min-height: 40px; padding: 0.3em 0.85em;
+    font-size: clamp(11px, 4.3cqh, 17px);
     cursor: pointer; touch-action: manipulation;
   }
   button:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
   button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
   button.secondary { background: var(--accent); }
   /* Jerarquía: un botón principal grande con pulso suave; los demás, chicos. */
-  button.primary { font-size: clamp(14px, 6.4cqh, 26px); padding: 0.3em 1.2em; animation: pulse 1.6s ease-in-out infinite; }
-  button.small { font-size: clamp(10px, 3.9cqh, 15px); padding: 0.25em 0.75em; }
+  button.primary { min-height: 44px; font-size: clamp(13px, 5.5cqh, 22px); padding: 0.25em 1.1em; animation: pulse 1.6s ease-in-out infinite; }
+  button.small { min-height: 34px; font-size: clamp(9px, 3.3cqh, 13px); padding: 0.2em 0.7em; }
   @keyframes pulse { 50% { transform: scale(1.06); } }
   button.primary:active { animation: none; }
   @media (hover: hover) { button:hover { filter: brightness(1.12); } }
@@ -91,7 +91,12 @@
     background: rgba(10, 4, 24, 0.45); text-align: center; cursor: pointer;
   }
   .tutorial p { margin: 0; font-size: clamp(12px, 5.5cqh, 24px); }
-  .tutorial strong { color: var(--accent); text-shadow: 2px 2px 0 #ff4fd8; font-size: clamp(16px, 8cqh, 34px); }
+  .tutorial strong {
+    font-family: "Arial Black", "Trebuchet MS", system-ui, sans-serif; font-style: italic;
+    color: var(--cream); text-shadow: 0.05em 0.05em 0 var(--rust), 0.1em 0.1em 0 var(--cocoa);
+    font-size: clamp(15px, 7cqh, 30px);
+  }
+  .tutorial { background: linear-gradient(180deg, rgba(24, 10, 40, 0.15), rgba(24, 10, 40, 0.6)); }
   .tutorial .small { opacity: 0.85; font-size: clamp(11px, 4.4cqh, 18px); }
   .finger { position: relative; width: 24cqh; height: 26cqh; }
   .finger .hand {
@@ -140,7 +145,56 @@
   .overlay .small { opacity: 0.8; font-size: clamp(11px, 4.4cqh, 18px); }
   .row { display: flex; gap: 4cqw; flex-wrap: wrap; justify-content: center; }
 
-  #start { gap: 2.5cqh; }
+  /* ---- Pantallas (menú, final, pausa, historia, ejemplo, créditos): 70s + 2020s ----
+     Paleta setentera cálida (crema, mostaza, naranjo, óxido) y franjas detrás de los
+     títulos, sobre vidrio esmerilado, con esquinas redondeadas, botones tipo píldora
+     y sombras suaves. Se activa con la clase "ui". El juego en sí (y sus botones de
+     sonido, pantalla completa y pausa) mantiene el estilo pixel. */
+  :root { --cream: #fbeedd; --mustard: #f2c14e; --orange: #f28c28; --rust: #c4512b; --cocoa: #3a1a10; }
+  .ui { font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif; color: var(--cream); }
+  .ui.overlay {
+    background: linear-gradient(180deg, rgba(24, 10, 40, 0.45), rgba(24, 10, 40, 0.82));
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  }
+  .ui h1, .ui h2 {
+    font-family: "Arial Black", "Trebuchet MS", system-ui, sans-serif;
+    font-weight: 900; font-style: italic; letter-spacing: 0.01em; line-height: 1.15;
+    color: var(--cream);
+    text-shadow: 0.05em 0.05em 0 var(--rust), 0.1em 0.1em 0 var(--cocoa);
+  }
+  .ui .stripes {  /* las tres franjas setenteras detrás de un título */
+    align-self: stretch;
+    background: linear-gradient(to bottom,
+      transparent 24%, var(--mustard) 24% 40%, var(--orange) 40% 56%, var(--rust) 56% 72%, transparent 72%);
+  }
+  .ui p { letter-spacing: 0.02em; }
+  .ui .small { font-size: clamp(10px, 3.8cqh, 15px); opacity: 0.85; }
+  .ui button:not(.card) {
+    font-family: inherit; letter-spacing: 0.08em; color: var(--cream);
+    border: 0; border-radius: 999px;
+    background: linear-gradient(90deg, var(--orange), var(--rust));
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  }
+  .ui button.secondary { background: rgba(251, 238, 221, 0.08); border: 1.5px solid rgba(251, 238, 221, 0.55); }
+  .ui button:active { transform: translateY(1px); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
+  .ui button:focus-visible { outline: 2px solid var(--mustard); outline-offset: 3px; }
+
+  #start { gap: 2.2cqh; }
+  #start h1 { font-size: clamp(22px, 12cqh, 56px); }
+  #start .card {
+    font-family: inherit; font-weight: 700; letter-spacing: 0.05em;
+    color: var(--cream);
+    background: rgba(251, 238, 221, 0.07);
+    border: 1px solid rgba(251, 238, 221, 0.22); border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  #start .card[aria-pressed="true"] {
+    background: linear-gradient(160deg, rgba(242, 193, 78, 0.3), rgba(196, 81, 43, 0.3));
+    outline: 2px solid var(--mustard); outline-offset: 2px;
+    transform: translateY(-2px);
+  }
+  @media (hover: hover) { #start .card:hover { transform: translateY(-2px); filter: none; } }
   .cards { display: flex; gap: 1.4cqw; width: 100%; justify-content: center; }
   .card {
     flex: 1 1 0; max-width: 11cqw; min-width: 0; min-height: 0;
@@ -157,7 +211,9 @@
     position: absolute; left: 0; right: 0; top: 0;
     display: flex; align-items: center; gap: 3cqw;
     padding: 2.5cqh 3cqw; padding-left: calc(2 * var(--icon) + 6cqw);
-    background: rgba(0, 0, 0, 0.8); border-bottom: 3px solid var(--accent);
+    background: rgba(24, 10, 40, 0.72);
+    -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    border-bottom: 4px solid; border-image: linear-gradient(90deg, var(--mustard), var(--orange), var(--rust)) 1;
   }
   .story p { flex: 1; margin: 0; font-size: clamp(11px, 4.8cqh, 20px); line-height: 1.35; }
   .story .row { flex-wrap: nowrap; gap: 2cqw; }
@@ -165,13 +221,14 @@
   #over { padding-top: calc(var(--icon) + 5cqh); padding-bottom: 2cqh; }
   #over .over-main { gap: 1.6cqh; }
   #over h2 { font-size: clamp(18px, 9cqh, 44px); }
-  #over .primary { font-size: clamp(13px, 5.5cqh, 22px); }
-  #over-new { color: var(--accent); font-weight: bold; opacity: 1; animation: pulse 0.8s ease-in-out infinite; }
+  #over .primary { font-size: clamp(12px, 4.8cqh, 19px); }
+  #over-new { color: var(--mustard); font-weight: bold; opacity: 1; animation: pulse 0.8s ease-in-out infinite; }
+  #over-win { color: var(--mustard); opacity: 1; }
 
   /* Créditos finales: texto que sube como en el cine. */
   .credits {
     position: absolute; inset: 0; z-index: 4; overflow: hidden;
-    background: #0b0618; cursor: pointer;
+    background: linear-gradient(180deg, #1a0b2e, #2a1020 70%, #3a1a10); cursor: pointer;
   }
   .credits-roll {
     position: absolute; left: 0; right: 0; top: 100%;
@@ -179,8 +236,8 @@
     text-align: center; padding: 0 6%;
     animation: roll 38s linear forwards;
   }
-  .credits-roll h2 { margin: 0; color: var(--accent); font-size: clamp(22px, 13cqh, 60px); text-shadow: 3px 3px 0 #ff4fd8; }
-  .credits-roll h3 { margin: 0 0 1cqh; color: #ff6f61; font-size: clamp(12px, 5cqh, 22px); letter-spacing: 0.15em; }
+  .credits-roll h2 { margin: 0; font-size: clamp(22px, 12cqh, 56px); }
+  .credits-roll h3 { margin: 0 0 1cqh; color: var(--mustard); font-size: clamp(11px, 4.4cqh, 19px); letter-spacing: 0.22em; }
   .credits-roll p { margin: 0; font-size: clamp(12px, 5cqh, 22px); line-height: 1.4; }
   .credits-roll .cast { display: flex; flex-wrap: wrap; justify-content: center; gap: 2cqh 4cqw; }
   .credits-roll .cast figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 1cqh; }
@@ -206,33 +263,46 @@
   }
   .over-main { display: flex; flex-direction: column; align-items: center; gap: 2.5cqh; }
   #save-form { display: flex; flex-direction: column; align-items: center; gap: 1.5cqh; }
+  /* Nombre estilo máquina arcade: 5 caracteres amarillos espaciados sobre negro. */
   #name {
-    font: inherit; font-weight: bold; font-size: clamp(12px, 5.1cqh, 20px);
-    width: 5ch; min-height: 44px; padding: 0.2em;
-    text-align: center; text-transform: uppercase;
-    color: var(--ink); background: #000; border: 3px solid var(--ink); border-radius: 0;
+    font: bold clamp(12px, 5.1cqh, 20px) "Courier New", ui-monospace, monospace;
+    width: 9.5ch; min-height: 40px; padding: 0.2em 0.2em 0.2em 0.5em;
+    text-align: center; text-transform: uppercase; letter-spacing: 0.35em;
+    color: var(--accent); background: #000; border: 2px solid var(--mustard); border-radius: 10px;
+    box-shadow: inset 0 0 12px rgba(242, 193, 78, 0.25);
+    caret-color: var(--accent);
     -webkit-user-select: text; user-select: text;
   }
+  #name::placeholder { color: rgba(255, 210, 63, 0.35); }
   #name:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  /* Ranking: tarjeta de vidrio; la fila recién guardada, en una píldora mostaza. */
+  .ranking {
+    justify-self: center;
+    padding: 2cqh 2.5cqw;
+    background: rgba(251, 238, 221, 0.06);
+    border: 1px solid rgba(251, 238, 221, 0.2); border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  }
   .ranking h3 {
-    margin: 0 0 1.5cqh; color: var(--accent);
-    font-size: clamp(12px, 5.5cqh, 22px); letter-spacing: 0.1em;
+    margin: 0 0 1.2cqh; color: var(--mustard);
+    font-size: clamp(11px, 4.6cqh, 19px); letter-spacing: 0.25em;
   }
   .ranking ol {
     margin: 0; padding: 0; list-style: none;
-    font-size: clamp(10px, 4.4cqh, 17px); line-height: 1.3; text-align: left;
+    font: bold clamp(10px, 4cqh, 16px)/1.35 "Courier New", ui-monospace, monospace; text-align: left;
   }
-  .ranking li { white-space: pre; }
-  .ranking li.me { color: var(--accent); font-weight: bold; }
+  .ranking li { white-space: pre; padding: 0 0.5em; border-radius: 6px; }
+  .ranking li:nth-child(-n + 3) { color: var(--mustard); }
+  .ranking li.me { color: var(--cocoa); background: var(--mustard); }
 
   #rotate {
     position: fixed; inset: 0; z-index: 10;
     display: none; flex-direction: column; align-items: center; justify-content: center;
     gap: 16px; padding: 24px; text-align: center;
-    background: var(--bg);
+    background: linear-gradient(180deg, #1a0b2e, #3a1a10);
   }
   #rotate .phone {
-    width: 48px; height: 80px; border: 4px solid var(--accent);
+    width: 48px; height: 80px; border: 4px solid var(--mustard); border-radius: 10px;
     animation: spin 2s steps(4) infinite;
   }
   @keyframes spin { 50% { transform: rotate(90deg); } }
@@ -243,9 +313,11 @@
 
   #toast {
     position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%);
-    max-width: 90%; padding: 0.5em 1em;
-    background: #000; color: var(--ink); border: 2px solid var(--accent);
-    font-size: clamp(12px, 4.6cqh, 18px); text-align: center;
+    max-width: 90%; padding: 0.5em 1.2em;
+    background: rgba(24, 10, 40, 0.9); color: var(--cream);
+    border: 1.5px solid var(--mustard); border-radius: 999px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    font: clamp(11px, 4.2cqh, 16px) "Trebuchet MS", "Segoe UI", system-ui, sans-serif; text-align: center;
     z-index: 5;
   }
   .sr-only {
@@ -279,19 +351,19 @@
     </button>
   </div>
 
-  <section id="tutorial" class="tutorial" aria-labelledby="tutorial-title" hidden>
+  <section id="tutorial" class="tutorial ui" aria-labelledby="tutorial-title" hidden>
     <div class="finger" aria-hidden="true"><span class="ripple"></span><span class="hand">👆</span></div>
     <p><strong id="tutorial-title">¡Toca la pantalla para saltar!</strong></p>
     <p class="small">¿Ves una bolsa? Tómala: el próximo popó va a la basura.</p>
     <p class="small">En computador: Espacio o ↑ · Toca para empezar</p>
   </section>
 
-  <section id="begin" class="overlay" aria-labelledby="begin-title" hidden>
-    <h1 id="begin-title">¡Ojo al paso!</h1>
+  <section id="begin" class="overlay ui" aria-labelledby="begin-title" hidden>
+    <h1 id="begin-title" class="stripes">¡Ojo al paso!</h1>
     <button id="begin-btn" type="button">TOCA PARA EMPEZAR</button>
   </section>
 
-  <section id="story" class="story" aria-labelledby="story-text" hidden>
+  <section id="story" class="story ui" aria-labelledby="story-text" hidden>
     <p id="story-text" aria-live="polite"></p>
     <div class="row">
       <button id="story-skip" class="secondary" type="button">OMITIR</button>
@@ -299,9 +371,9 @@
     </div>
   </section>
 
-  <section id="start" class="overlay" aria-labelledby="start-title" hidden>
-    <h1 id="start-title">¡Ojo al paso!</h1>
-    <p class="small">Misión: junta la mayor cantidad de puntos sin pisar ni un popó.</p>
+  <section id="start" class="overlay ui" aria-labelledby="start-title" hidden>
+    <h1 id="start-title" class="stripes">¡Ojo al paso!</h1>
+    <p class="small">Misión: llega a 9999 puntos sin pisar ni un popó… y dale su merecido a Don Cochino.</p>
     <div class="cards" id="cards" role="group" aria-label="Elige tu personaje"></div>
     <div class="row">
       <button id="play" class="primary" type="button">JUGAR</button>
@@ -312,8 +384,8 @@
     <p class="small">Récord: <span id="start-best">0</span> · Espacio/↑ saltar · Esc pausa · M sonido</p>
   </section>
 
-  <section id="paused" class="overlay" aria-labelledby="paused-title" hidden>
-    <h2 id="paused-title">Pausa</h2>
+  <section id="paused" class="overlay ui" aria-labelledby="paused-title" hidden>
+    <h2 id="paused-title" class="stripes">Pausa</h2>
     <p class="small">Toca SEGUIR o presiona Espacio</p>
     <div class="row">
       <button id="resume" class="primary" type="button">SEGUIR</button>
@@ -321,16 +393,17 @@
     </div>
   </section>
 
-  <section id="over" class="overlay" aria-labelledby="over-title" hidden>
+  <section id="over" class="overlay ui" aria-labelledby="over-title" hidden>
     <div class="over-grid">
       <div class="over-main">
-        <h2 id="over-title">¡Plop! Lo pisaste</h2>
+        <h2 id="over-title" class="stripes">¡Plop! Lo pisaste</h2>
+        <p class="small" id="over-win" hidden>Don Cochino aprendió la lección: ¡el popó se recoge!</p>
         <p>Puntos: <span id="over-score">0</span> · Duraste <span id="over-time">0</span> s</p>
         <p class="small" id="over-new" hidden>¡Nuevo récord!</p>
         <form id="save-form" hidden>
-          <label class="small" for="name">¡Entraste al ranking! Tus iniciales:</label>
+          <label class="small" for="name" title="Hasta 5 letras, números o símbolos: . - ! ? &amp; + * ♥ ★">¡Entraste al ranking! Tu nombre:</label>
           <div class="row">
-            <input id="name" maxlength="3" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
+            <input id="name" maxlength="5" placeholder="_____" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="done">
             <button type="submit">GUARDAR</button>
           </div>
         </form>
@@ -348,7 +421,7 @@
     </div>
   </section>
 
-  <section id="credits" class="credits" aria-labelledby="credits-title" hidden>
+  <section id="credits" class="credits ui" aria-labelledby="credits-title" hidden>
     <div class="credits-roll" id="credits-roll"></div>
     <button id="credits-close" class="secondary small" type="button">CERRAR</button>
   </section>
@@ -357,7 +430,7 @@
   <div id="live" class="sr-only" aria-live="polite"></div>
 </div>
 
-<div id="rotate" role="alert">
+<div id="rotate" class="ui" role="alert">
   <div class="phone" aria-hidden="true"></div>
   <p>Gira tu teléfono para jugar</p>
 </div>
@@ -368,9 +441,15 @@
 
   // ---- Reglas (v0.2) ----
   const W = 800, H = 300, GROUND = 250;
-  // Velocidad exponencial: x6 a los 30 s (casi imposible). Tope para que el
-  // paso de simulación no atraviese cacas.
-  const SPEED_START = 300, SPEED_GROWTH = Math.log(6) / 30, SPEED_MAX = 3000;
+  // Modo prueba (?prueba en la dirección; ver CLAUDE.md): el bucle corre con un
+  // temporizador (sigue aunque la pestaña esté oculta), se salta la historia y
+  // se expone window.juego para leer y controlar el estado. ?bolsa=ya la hace salir al tiro.
+  const PARAMS = new URLSearchParams(location.search);
+  const PRUEBA = PARAMS.has('prueba');
+  const nextFrame = PRUEBA ? (cb) => setTimeout(() => cb(performance.now()), 16) : (cb) => requestAnimationFrame(cb);
+  // Velocidad exponencial (x6 a los 30 s), con tope x5 a los ~27 s para que la
+  // meta de 9999 sea difícil pero alcanzable (~34 s de juego).
+  const SPEED_START = 300, SPEED_GROWTH = Math.log(6) / 30, SPEED_MAX = 1500;
   const LEVEL_EVERY = 5;                 // aviso de "más rápido" cada 5 s
   const PAIR_CHANCE = 0.18;              // cacas dobles: se saltan juntas
   // Bolsa: aparece cada ~30 s de juego acumulado (entre partidas, porque
@@ -380,7 +459,7 @@
   const GRAVITY = 3000, JUMP_VELOCITY = 950;
   const MAX_DT = 0.1, STEP = 1 / 120;
   const REACT_TIME = 1.4;                // segundos de "¡puaj!" antes del fin de partida
-  const SCORE_DIVISOR = 12;
+  const SCORE_DIVISOR = 3;  // 1 punto cada 3 px recorridos (hasta v0.9 eran 12)
   const BEST_KEY = 'ojo-al-paso:record';
   const RANK_KEY = 'ojo-al-paso:ranking', NAME_KEY = 'ojo-al-paso:nombre', RANK_SIZE = 10;
 
@@ -672,6 +751,17 @@
     const facePal = { ...pal, b: '#5a7bd8', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
     ch.bubble = makeBubble(makeSprite(makeFace(ch.face), facePal, 5, 5, null, false));
   }
+
+  // Nubecita del pedo de cada personaje: color (r, g, b), tamaño y duración (s).
+  const PUFFS = {
+    rafa:        { color: '170, 200, 120', size: 1,    life: 0.5 },   // verde clásico
+    'baby-rafa': { color: '255, 170, 205', size: 0.8,  life: 0.45 },  // rosadita y chica
+    seba:        { color: '225, 200, 90',  size: 0.75, life: 0.4 },   // mostaza, apretado
+    vicky:       { color: '150, 225, 175', size: 1,    life: 0.5 },   // menta
+    pipe:        { color: '255, 165, 80',  size: 1.1,  life: 0.55 },  // naranjo, como su jockey
+    angie:       { color: '195, 160, 245', size: 1,    life: 0.5 },   // lavanda
+    francisco:   { color: '190, 178, 205', size: 1.5,  life: 0.9 },   // humo gris metalero, grande y largo
+  };
 
   // Personaje elegido: estos valores cambian al elegir otro en el menú.
   const KID_X = 90;
@@ -1114,7 +1204,32 @@
             tone(freq(n) / 2, t + at, d, 'triangle', 0.4);
           });
       },
-      // Cada 100 puntos.
+      // Final: la bolsa vuela ("fiuuu"), "¡PLAF!" en la cara y "¡puaj!" a coro.
+      whoosh() { if (ensure()) tone(700, ac.currentTime, 0.6, 'square', 0.12, 260); },
+      plaf() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        const src = ac.createBufferSource(), lp = ac.createBiquadFilter(), g = ac.createGain();
+        src.buffer = noise;
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(2200, t);
+        lp.frequency.exponentialRampToValueAtTime(250, t + 0.3);
+        g.gain.setValueAtTime(1, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+        src.connect(lp).connect(g).connect(master);
+        src.start(t); src.stop(t + 0.37);
+        tone(120, t, 0.3, 'sine', 1, 40);
+      },
+      puajCoro() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        // Bigote: "¡guau-guau!" agudo; Don Cochino: grave; el personaje: medio.
+        voice(t, { pitch: [[0, 620], [1, 380]], dur: 0.16, formants: [700, 1300], gain: 1.4 });
+        voice(t + 0.2, { pitch: [[0, 560], [1, 360]], dur: 0.16, formants: [700, 1300], gain: 1.4 });
+        voice(t + 0.38, { pitch: [[0, 150], [1, 85]], dur: 0.55, formants: [400, 900], gain: 1.6 });
+        voice(t + 0.6, { pitch: [[0, 280], [1, 160]], dur: 0.45, formants: [550, 1100], gain: 1.4 });
+      },
+      // Cada 1000 puntos.
       ding() {
         if (!ensure()) return;
         const t = ac.currentTime;
@@ -1143,7 +1258,7 @@
   let bagItem = null, hasBag = false, graceT = 0, thrown = [], floaters = [];
   // Salto "guardado": si se toca un poco antes de aterrizar, salta al tocar el suelo.
   const JUMP_BUFFER = 0.13;
-  let jumpBufT = 0, milestone = 0;
+  let jumpBufT = 0, milestone = 0, maxShown = false;
   let bagClock = 0, nextBagAt = BAG_FIRST[0] + Math.random() * (BAG_FIRST[1] - BAG_FIRST[0]);  // juego acumulado
   let ranking = loadRanking();
   let best = Math.max(loadBest(), ranking[0] ? ranking[0].score : 0);
@@ -1154,7 +1269,9 @@
   function saveBest() {
     try { localStorage.setItem(BEST_KEY, String(best)); } catch { /* sin almacenamiento: se sigue jugando */ }
   }
-  const score = () => Math.floor(distance / SCORE_DIVISOR);
+  // Meta: al llegar, escena final con Don Cochino. En modo prueba, ?meta=300 la acerca.
+  const GOAL = PRUEBA && Number(PARAMS.get('meta')) > 0 ? Number(PARAMS.get('meta')) : 9999;
+  const score = () => Math.min(GOAL, Math.floor(distance / SCORE_DIVISOR));
   const rand = (a, b) => a + Math.random() * (b - a);
 
   // ---- Ranking local (top 10 en este dispositivo) ----
@@ -1179,12 +1296,16 @@
     ui.rankList.replaceChildren(...Array.from({ length: RANK_SIZE }, (_, i) => {
       const r = ranking[i];
       const li = document.createElement('li');
-      li.textContent = `${String(i + 1).padStart(2)}. ${r ? r.name.padEnd(3) : '---'}  ${r ? String(r.score).padStart(5, '0') : '-----'}`;
+      li.textContent = `${String(i + 1).padStart(2)}. ${r ? r.name.padEnd(5) : '-----'}  ${r ? String(r.score).padStart(4, '0') : '----'}`;
       if (i === highlight) li.className = 'me';
       return li;
     }));
   }
-  const cleanName = (v) => v.toUpperCase().replace(/[^A-Z0-9ÑÁÉÍÓÚÜ]/g, '').slice(0, 3);
+  // Nombre arcade: hasta 5 caracteres entre A–Z, Ñ, 0–9 y algunos símbolos
+  // (. - ! ? & + * ♥ ★). Las tildes se quitan, como en las máquinas.
+  const cleanName = (v) => [...v.toUpperCase().replace(/Ñ/g, '\u0000').normalize('NFD')
+    .replace(/[̀-ͯ]/g, '').replace(/\u0000/g, 'Ñ')]
+    .filter((c) => /[A-Z0-9Ñ.\-!?&+*♥★]/.test(c)).slice(0, 5).join('');
   function loadName() { try { return localStorage.getItem(NAME_KEY) || ''; } catch { return ''; } }
   function saveName(n) { try { localStorage.setItem(NAME_KEY, n); } catch { /* sin almacenamiento */ } }
 
@@ -1197,7 +1318,8 @@
     reactT = 0; overShown = false; hitPoop = null; flies = [];
     puffs = [];
     bagItem = null; hasBag = false; graceT = 0; thrown = []; floaters = [];
-    jumpBufT = 0; milestone = 0;
+    jumpBufT = 0; milestone = 0; maxShown = false;
+    endT = 0; endSpeed = 0; endFired = {}; droplets = [];
     spawnIn = 1.0;
     hillOff = 0; groundOff = 0;
   }
@@ -1233,9 +1355,13 @@
     const lv = Math.floor(elapsed / LEVEL_EVERY);
     if (lv > level) {
       level = lv;
-      bannerT = 1.6;
-      Music.speedUp();
-      announce(`¡Más rápido! Velocidad por ${(speed / SPEED_START).toFixed(1)}`);
+      // Ya en el tope no hay aviso: la velocidad no sigue subiendo.
+      if (speed < SPEED_MAX || bannerT === 0 && !maxShown) {
+        maxShown = speed >= SPEED_MAX;
+        bannerT = 1.6;
+        Music.speedUp();
+        announce(`¡Más rápido! Velocidad por ${(speed / SPEED_START).toFixed(1)}`);
+      }
     }
     bannerT = Math.max(0, bannerT - dt);
     const dx = speed * dt;
@@ -1243,13 +1369,14 @@
     hillOff = (hillOff + dx * 0.15) % W;
     groundOff = (groundOff + dx) % W;
 
-    // Cada 100 puntos: "ding" y el número flotando junto al marcador.
-    const m = Math.floor(score() / 100);
+    // Cada 1000 puntos: "ding" y el número flotando junto al marcador.
+    const m = Math.floor(score() / 1000);
     if (m > milestone) {
       milestone = m;
       Music.ding();
-      floaters.push({ text: `¡${m * 100}!`, x: hudX + 70, y: 34, t: 0, color: '#ffd23f' });
+      floaters.push({ text: `¡${m * 1000}!`, x: hudX + 70, y: 34, t: 0, color: '#ffd23f' });
     }
+    if (score() >= GOAL) { startEnding(); return; }
 
     jumpBufT = Math.max(0, jumpBufT - dt);
     if (!kid.onGround) {
@@ -1264,7 +1391,7 @@
     for (const o of obstacles) o.x -= dx;
     obstacles = obstacles.filter((o) => o.x + o.w > -10);
     for (const p of puffs) { p.x -= dx * 0.6; p.t += dt; }
-    puffs = puffs.filter((p) => p.t < 0.5);
+    puffs = puffs.filter((p) => p.t < p.life);
 
     spawnIn -= dt;
     if (spawnIn <= 0) spawnIn = spawn();
@@ -1311,7 +1438,7 @@
 
   const STORY = [
     'Cada noche, Don Cochino sale a pasear a su perro Bigote… sin despegar los ojos del celular. Bigote hace popó en la vereda y Don Cochino NUNCA lo recoge.',
-    'Ahora el barrio está lleno de popós. Rafa tiene que cruzarlo corriendo sin pisar ninguno. Tu misión: ¡junta la mayor cantidad de puntos!',
+    'Ahora el barrio está lleno de popós. Rafa tiene que cruzarlo corriendo sin pisar ninguno. Tu misión: ¡llega a 9999 puntos y encuentra a Don Cochino!',
   ];
   const storyPoop = makePoop(0, 30, 27);
   const scenePoops = [[230, 44, 38], [340, 38, 34], [460, 52, 42], [520, 40, 36], [650, 46, 40], [745, 40, 36]]
@@ -1379,6 +1506,133 @@
     }
   }
   const sceneFlies = Array.from({ length: 3 }, (_, k) => ({ phase: k * 2.1, speed: 5 + k, r: 14 + k * 6 }));
+
+  // ---- Final: a los 9999 puntos aparece Don Cochino y recibe su merecido ----
+  // Línea de tiempo (s): frena el mundo → llegan Don Cochino y Bigote → se lanza
+  // la bolsa → ¡PLAF! en la cara y salpica al perro → "¡PUAJ!" a coro → ¡GANASTE!
+  const END = { stop: 1.2, walkIn: [0.6, 2.2], throwAt: 2.6, hitAt: 3.3, puajAt: 3.5, winAt: 6.4 };
+  const MAN_STOP = 520;
+  let endT = 0, endSpeed = 0, endFired = {}, droplets = [];
+
+  function startEnding() {
+    state = 'ending';
+    endT = 0; endSpeed = speed; endFired = {}; droplets = [];
+    obstacles = []; bagItem = null; puffs = []; floaters = []; bannerT = 0;
+    Music.stop();
+    Music.speedUp();
+    controls(false);
+    announce(`¡Llegaste a los ${GOAL} puntos! Ahí viene Don Cochino…`);
+  }
+
+  const endManX = () => {
+    const [a, b] = END.walkIn, u = Math.min(1, Math.max(0, (endT - a) / (b - a)));
+    return W + 30 + (MAN_STOP - W - 30) * u;
+  };
+  const once = (key, at, fn) => { if (endT >= at && !endFired[key]) { endFired[key] = true; fn(); } };
+
+  function endingUpdate(dt) {
+    endT += dt;
+    // El mundo frena hasta detenerse.
+    endSpeed = Math.max(0, speed * (1 - endT / END.stop));
+    const dx = endSpeed * dt;
+    hillOff = (hillOff + dx * 0.15) % W;
+    groundOff = (groundOff + dx) % W;
+    distance += dx;
+    if (!kid.onGround) {
+      kid.vy += GRAVITY * dt;
+      kid.y += kid.vy * dt;
+      if (kid.y >= KID_GROUND_Y) { kid.y = KID_GROUND_Y; kid.vy = 0; kid.onGround = true; }
+    }
+    once('throw', END.throwAt, () => Music.whoosh());
+    once('hit', END.hitAt, () => {
+      Music.plaf();
+      buzz([40, 30, 80]);
+      const fx = endManX() + 14, fy = GROUND - MAN_H + 14;
+      droplets = Array.from({ length: 18 }, () => ({
+        x: fx, y: fy, vx: rand(-280, -40), vy: rand(-240, -40), stuck: false,
+      }));
+    });
+    once('puaj', END.puajAt, () => { Music.puajCoro(); announce('¡PUAJ!'); });
+    // Gotas de popó: caen y se pegan al perro o al suelo.
+    const dogX = endManX() - 58, dogTop = GROUND - DOG_H;
+    for (const d of droplets) {
+      if (d.stuck) continue;
+      d.vy += 900 * dt;
+      d.x += d.vx * dt;
+      d.y += d.vy * dt;
+      const onDog = d.x > dogX + 2 && d.x < dogX + 46 && d.y > dogTop + 4;
+      if (onDog || d.y >= GROUND - 2) { d.stuck = true; if (!onDog) d.y = GROUND - 2; }
+    }
+    if (endT >= END.winAt) showOverScreen(true);
+  }
+
+  function blitFlip(s, x, y) {  // dibuja mirando a la izquierda
+    ctx.save();
+    ctx.scale(-1, 1);
+    ctx.drawImage(s, -(x + s.ox + s.lw), y + s.oy, s.lw, s.lh);
+    ctx.restore();
+  }
+
+  function speech(x, y, text, t) {
+    ctx.font = 'bold 18px "Courier New", monospace';
+    ctx.textBaseline = 'top';
+    const w = Math.round(ctx.measureText(text).width) + 14, jx = Math.round(Math.sin(t * 40) * 1.5);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(x - 2, y - 2, w + 4, 28);
+    ctx.fillRect(x + 8, y + 26, 8, 8);
+    ctx.fillStyle = '#fff6e0';
+    ctx.fillRect(x, y, w, 24);
+    ctx.fillRect(x + 10, y + 24, 4, 6);
+    ctx.fillStyle = '#3aa86a';
+    ctx.fillText(text, x + 7 + jx, y + 4);
+  }
+
+  function drawEnding() {
+    const t = endT, manX = endManX(), manY = GROUND - MAN_H, dogX = manX - 58, dogY = GROUND - DOG_H;
+    const walking = t > END.walkIn[0] && t < END.walkIn[1];
+    const step = walking ? Math.floor(t * 6) % 2 : 0;
+    if (t > END.walkIn[0]) {
+      blitFlip(man[step], Math.round(manX), manY);
+      blitFlip(step ? dog.b : dog.a, Math.round(dogX), dogY);
+    }
+    // Popó en la cara de Don Cochino (con chorreo que crece), olor y moscas.
+    if (t >= END.hitAt) {
+      const fx = Math.round(manX + 8), fy = manY + 6, drip = Math.min(18, (t - END.hitAt) * 14);
+      ctx.fillStyle = '#7a4a1e';
+      ctx.fillRect(fx, fy, 22, 16);
+      ctx.fillRect(fx - 4, fy + 4, 30, 8);
+      ctx.fillRect(fx + 3, fy + 16, 4, drip);
+      ctx.fillRect(fx + 14, fy + 16, 4, drip * 0.6);
+      ctx.fillStyle = '#b0743a';
+      ctx.fillRect(fx + 4, fy + 2, 6, 4);
+      drawStink({ x: manX + 6, w: 30, h: MAN_H - 4 }, t);
+      drawFlies(manX + 20, manY + 12, sceneFlies, t);
+    }
+    ctx.fillStyle = '#7a4a1e';
+    for (const d of droplets) ctx.fillRect(Math.round(d.x), Math.round(d.y), 4, 4);
+    // La bolsa vuela en arco desde la mano del personaje hasta la cara.
+    if (t >= END.throwAt && t < END.hitAt) {
+      const u = (t - END.throwAt) / (END.hitAt - END.throwAt);
+      const x0 = KID_X + 30, y0 = kid.y + 18, x1 = manX + 14, y1 = manY + 10;
+      blit(tiedBag, Math.round(x0 + (x1 - x0) * u), Math.round(y0 + (y1 - y0) * u - Math.sin(u * Math.PI) * 90));
+    }
+    // "¡PUAJ!" a coro: Bigote, Don Cochino y el personaje.
+    if (t >= END.puajAt) {
+      speech(Math.round(dogX - 6), dogY - 40, '¡PUAJ!', t);
+      if (t >= END.puajAt + 0.2) speech(Math.round(manX - 4), manY - 40, '¡PUAJ!', t + 1);
+      if (t >= END.puajAt + 0.4) speech(KID_X + 4, KID_GROUND_Y - 40, '¡PUAJ!', t + 2);
+    }
+    // Cartel de llegada.
+    if (t < 2.4 && Math.floor(t * 6) % 2 === 0) {
+      ctx.font = 'bold 30px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ff4fd8';
+      ctx.fillText('¡LLEGASTE A LA META!', W / 2 + 3, 63);
+      ctx.fillStyle = '#ffd23f';
+      ctx.fillText('¡LLEGASTE A LA META!', W / 2, 60);
+      ctx.textAlign = 'start';
+    }
+  }
 
   // ---- Bolsa: aparecer, tomarla y usarla ----
   function updateBag(dt, dx) {
@@ -1512,10 +1766,10 @@
 
     for (const o of obstacles) blit(o.sprite, Math.round(o.x), GROUND + 2 - o.h);
 
-    // Nubecitas del pedo al saltar.
+    // Nubecitas del pedo al saltar, con el color y tamaño de cada personaje.
     for (const p of puffs) {
-      const k = p.t / 0.5, r = Math.round(4 + k * 10);
-      ctx.fillStyle = `rgba(170, 200, 120, ${(1 - k) * 0.8})`;
+      const k = p.t / p.life, r = Math.round((4 + k * 10) * p.size);
+      ctx.fillStyle = `rgba(${p.color}, ${(1 - k) * 0.8})`;
       ctx.fillRect(Math.round(p.x - r), Math.round(p.y - r / 2), r * 2, r);
       ctx.fillRect(Math.round(p.x - r / 2), Math.round(p.y - r), r, r * 2);
     }
@@ -1527,14 +1781,15 @@
     if (state === 'over') frame = kid.onGround ? kidFrames.sick : kidFrames.sickAir;
     else if (hasBag) frame = !kid.onGround ? kidFrames.bagAir : step ? kidFrames.bagB : kidFrames.bagA;
     else if (!kid.onGround) frame = kidFrames.air;
-    else if (state === 'running' || state === 'tutorial') frame = step ? kidFrames.runB : kidFrames.runA;
+    else if (state === 'running' || state === 'tutorial' || (state === 'ending' && endSpeed > 0)) frame = step ? kidFrames.runB : kidFrames.runA;
     // Tras embolsar, parpadea un instante.
     if (!(graceT > 0 && Math.floor(graceT * 20) % 2)) blit(frame, KID_X, Math.round(kid.y));
     if (state === 'over') drawReaction();
+    if (state === 'ending' || (state === 'over' && endT > 0)) drawEnding();
     drawFloaters();
 
     if (state !== 'start' && state !== 'begin' && state !== 'tutorial') {
-      const pad = (n) => String(n).padStart(5, '0');
+      const pad = (n) => String(n).padStart(4, '0');
       ctx.font = 'bold 18px "Courier New", monospace';
       ctx.textBaseline = 'top';
       const mult = (speed / SPEED_START).toFixed(1);
@@ -1600,6 +1855,8 @@
     if (state === 'running' && dt > 0) {
       const n = Math.ceil(dt / STEP), h = dt / n;
       for (let i = 0; i < n && state === 'running'; i++) update(h);
+    } else if (state === 'ending') {
+      endingUpdate(dt);
     } else if (state === 'tutorial') {
       tutorialUpdate(dt);
     } else if (state === 'story') {
@@ -1609,7 +1866,7 @@
       if (!overShown && reactT >= REACT_TIME) showOverScreen();
     }
     render();
-    requestAnimationFrame(loop);
+    nextFrame(loop);
   }
 
   // ---- Transiciones ----
@@ -1675,7 +1932,7 @@
     if (Math.floor((tutT - TAP_AT) / TAP_CYCLE) > before && kid.onGround) {
       kid.vy = -JUMP_VELOCITY;
       kid.onGround = false;
-      puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0 });
+      puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0, ...(PUFFS[hero.id] || PUFFS.rafa) });
     }
     if (!kid.onGround) {
       kid.vy += GRAVITY * dt;
@@ -1687,7 +1944,7 @@
     hillOff = (hillOff + dx * 0.15) % W;
     groundOff = (groundOff + dx) % W;
     for (const p of puffs) { p.x -= dx * 0.6; p.t += dt; }
-    puffs = puffs.filter((p) => p.t < 0.5);
+    puffs = puffs.filter((p) => p.t < p.life);
   }
 
   function start() {
@@ -1711,7 +1968,7 @@
     jumpBufT = 0;
     kid.vy = -JUMP_VELOCITY;
     kid.onGround = false;
-    puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0 });
+    puffs.push({ x: KID_X + 2, y: kid.y + KID_H - 16, t: 0, ...(PUFFS[hero.id] || PUFFS.rafa) });
     Music.jump(hero.id);
   }
 
@@ -1759,17 +2016,22 @@
 
   // Vibración (Android); en iPhone no existe y se ignora.
   function buzz(pattern) {
+    // El navegador solo deja vibrar después de que la persona tocó la página.
+    if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
     try { if (navigator.vibrate) navigator.vibrate(pattern); } catch { /* no soportado */ }
   }
 
-  function showOverScreen() {
+  function showOverScreen(win = false) {
+    if (win) state = 'over';
     overShown = true;
     overAt = performance.now();
     const s = score();
     lastScore = s;
     const isNew = s > best;
     if (isNew) { best = s; saveBest(); }
-    if (isNew) Music.fanfare(); else Music.sadTrombone();
+    if (isNew || win) Music.fanfare(); else Music.sadTrombone();
+    $('over-title').textContent = win ? '¡GANASTE!' : '¡Plop! Lo pisaste';
+    show($('over-win'), win);
     ui.overScore.textContent = s;
     ui.overTime.textContent = elapsed.toFixed(1);
     ui.startBest.textContent = best;
@@ -1785,7 +2047,7 @@
     } else {
       ui.again.focus({ preventScroll: true });
     }
-    announce(`Fin de la carrera. ${s} puntos.${isNew ? ' ¡Nuevo récord!' : ''}${canSave ? ' Entraste al ranking.' : ''}`);
+    announce(`${win ? '¡Ganaste! Don Cochino aprendió la lección.' : 'Fin de la carrera.'} ${s} puntos.${isNew ? ' ¡Nuevo récord!' : ''}${canSave ? ' Entraste al ranking.' : ''}`);
   }
 
   function saveScore(e) {
@@ -1839,7 +2101,7 @@
       c.append(...items.map(([s, n]) => figure(s, n)));
       return c;
     };
-    const title = el('h2', '¡Ojo al paso!');
+    const title = el('h2', '¡Ojo al paso!', 'stripes');
     title.id = 'credits-title';
     ui.creditsRoll.replaceChildren(
       title,
@@ -2037,8 +2299,37 @@
   // Primera visita: la historia (necesita un toque para poder sonar). Después, directo al menú.
   let storySeen = false;
   try { storySeen = localStorage.getItem(STORY_KEY) === '1'; } catch { /* sin almacenamiento */ }
-  if (storySeen) { show(ui.start, true); } else { state = 'begin'; show(ui.begin, true); }
-  requestAnimationFrame(loop);
+  if (storySeen || PRUEBA) { show(ui.start, true); } else { state = 'begin'; show(ui.begin, true); }
+
+  if (PRUEBA) {
+    if (PARAMS.get('bolsa') === 'ya') nextBagAt = 0.3;
+    window.juego = {
+      get estado() { return state; },
+      get puntos() { return score(); },
+      get segundos() { return elapsed; },
+      get velocidad() { return speed / SPEED_START; },
+      get tieneBolsa() { return hasBag; },
+      get bolsaEnPantalla() { return !!bagItem; },
+      get altura() { return Math.round(KID_GROUND_Y - kid.y); },  // 0 = en el suelo
+      get personaje() { return hero.id; },
+      get personajes() { return CHARACTERS.map((c) => c.id); },
+      get popos() { return obstacles.map((o) => Math.round(o.x)); },
+      elegir: pickHero,
+      jugar: start,  // sin el ejemplo del dedo
+      saltar: jump,
+      pausar: pause,
+      seguir: resume,
+      menu: goMenu,
+      creditos: openCredits,
+      bolsaYa() { nextBagAt = bagClock + 0.01; },
+    };
+    const badge = document.createElement('div');
+    badge.textContent = 'MODO PRUEBA';
+    badge.style.cssText = 'position:absolute;left:50%;bottom:2%;transform:translateX(-50%);z-index:9;'
+      + 'padding:2px 8px;background:#ff4fd8;color:#000;font:bold 11px monospace;pointer-events:none';
+    $('game').append(badge);
+  }
+  nextFrame(loop);
 })();
 </script>
 </body>

@@ -21,6 +21,14 @@ y entra a http://localhost:8081.
 - **Pausa:** botón II o Esc
 - **Sonido:** botón ♪ o M
 
+## Revisar que todo esté bien
+
+```bash
+node tests/validar.mjs
+```
+
+Para probar el juego con herramientas extra, abre `index.html?prueba` (ver [CLAUDE.md](CLAUDE.md)).
+
 ## Documentación
 
 - [Especificación de producto](docs/ESPECIFICACION.md)

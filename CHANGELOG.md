@@ -1,5 +1,36 @@
 # Historial de cambios
 
+## 1.2 — 2026-11-03
+
+- **Todas las pantallas con el estilo 70s + 2020s:** la pantalla final con el ranking, la pausa, la historia, el ejemplo del dedo, los créditos, "toca para empezar" y los avisos. El juego en sí mantiene su estilo pixel.
+- **Ranking renovado:** tarjeta de vidrio, top 3 en mostaza y tu nombre recién guardado resaltado.
+- **Pedos de colores:** cada personaje tiene su nubecita (Baby Rafa rosada, Seba mostaza, Vicky menta, Pipe naranja, Angie lavanda, Francisco humo gris grande y Rafa el verde clásico).
+
+## 1.1 — 2026-11-03
+
+- **El final ya es alcanzable:** los puntos suben 4 veces más rápido y la velocidad máxima es ×5. Se llega a 9999 en unos 34 segundos (antes ~63). Ojo: los récords antiguos se hicieron con la cuenta vieja.
+- El "ding" ahora suena cada 1000 puntos, y el aviso "¡MÁS RÁPIDO!" deja de repetirse al llegar a la velocidad máxima.
+- **Botones de texto más chicos.**
+- **Menú principal nuevo, mezcla de los 70 y los 2020:** colores cálidos setenteros, franjas detrás del título, tarjetas de vidrio redondeadas y botones tipo píldora.
+- **Nombres estilo arcade:** hasta 5 caracteres, con letras, números y símbolos como ♥ ★ ! ?
+
+## 1.0 — 2026-11-03 — ¡El juego tiene final!
+
+- **Meta de 9999 puntos.** Al llegar, dejan de salir popós, el mundo frena y aparecen **Don Cochino** (mirando el celular, como siempre) y **Bigote**.
+- **¡Venganza!** Tu personaje le lanza una **bolsa de popó a la cara** a Don Cochino: ¡PLAF!, chorrea, huele, llegan las moscas y **Bigote queda salpicado**.
+- **"¡PUAJ!" a coro:** Bigote, Don Cochino y tu personaje lo dicen en globos de diálogo, cada uno con su voz.
+- **Pantalla "¡GANASTE!"** con el mensaje "Don Cochino aprendió la lección: ¡el popó se recoge!" y fanfarria.
+- La misión en el menú y en la historia ahora dice: llegar a 9999 puntos y encontrar a Don Cochino.
+
+## 0.9.1 — 2026-11-03
+
+Mejoras internas para trabajar con más calidad (el juego se ve y se juega igual):
+
+- **Modo prueba:** abriendo el juego con `?prueba` en la dirección, Claude puede probarlo de punta a punta por su cuenta.
+- **Validación automática:** `tests/validar.mjs` revisa dibujos, que los popós siempre se puedan saltar, que en pantalla diga "popó" y que no cargue nada de internet. Corre en GitHub en cada subida (✅/❌ en la pestaña "Actions").
+- **CLAUDE.md:** las reglas del proyecto por escrito, para que cada sesión nueva las conozca.
+- El teléfono ya no intenta vibrar antes de que lo toques (el navegador lo bloqueaba y dejaba un error).
+
 ## 0.9 — 2026-11-03
 
 - **Botones 15 % más chicos:** sonido, pantalla completa, pausa, botones de texto y tarjetas de personajes (sin bajar de 44 px, el mínimo cómodo para un dedo).
