@@ -3,3 +3,6 @@
 .vscode/
 Thumbs.db
 desktop.ini
+
+# Documentos del equipo: viven en el repo privado ojo-al-paso-equipo
+CLAUDE.md

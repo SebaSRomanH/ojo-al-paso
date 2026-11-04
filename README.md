@@ -32,11 +32,11 @@ y entra a http://localhost:8081.
 node tests/validar.mjs
 ```
 
-Para probar el juego con herramientas extra, abre `index.html?prueba` (ver [CLAUDE.md](CLAUDE.md)).
+Para probar el juego con herramientas extra, abre `index.html?prueba`.
 
 ## Documentación
 
-- [Especificación de producto](docs/ESPECIFICACION.md)
+- La especificación y los acuerdos del equipo están en un repositorio privado.
 - [Historial de cambios](CHANGELOG.md)
 
 ## Flujo de publicación
