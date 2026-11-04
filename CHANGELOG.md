@@ -1,5 +1,9 @@
 # Historial de cambios
 
+## 1.3.1 — 2026-11-04
+
+- **Récord del menú en mostaza:** el número del récord en el menú ahora se ve en color mostaza, más grande y en negrita, para que llame la atención (pedido en el Issue #3).
+
 ## 1.3 — 2026-11-03
 
 - **Compartir con imagen:** el botón COMPARTIR envía por WhatsApp una foto del juego con el título y un mensaje, además del enlace:

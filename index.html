@@ -190,6 +190,8 @@
   }
   .ui p { letter-spacing: 0.02em; }
   .ui .small { font-size: clamp(10px, 3.8cqh, 15px); opacity: 0.85; }
+  /* Récord del menú: número en mostaza, grande y con sombra para que destaque. */
+  #start-best { color: var(--mustard); font-weight: 900; font-size: 1.5em; text-shadow: 0 1px 0 rgba(0,0,0,.45), 0 0 8px rgba(0,0,0,.35); }
   /* ---- Botones estilo máquina arcade de los 70 y 80 (diseño propio) ----
      Texto: placa pixelada con esquinas en escalón, luz arriba a la izquierda, sombra
      abajo y un "fondo" que se hunde al tocarla. Íconos: botones redondos de máquina,
@@ -531,7 +533,7 @@
   const MAX_DT = 0.1, STEP = 1 / 120;
   const REACT_TIME = 1.4;                // segundos de "¡puaj!" antes del fin de partida
   const SCORE_DIVISOR = 3;  // 1 punto cada 3 px recorridos (hasta v0.9 eran 12)
-  const GAME_VERSION = '1.3';
+  const GAME_VERSION = '1.3.1';
   // Cada fórmula de puntaje tiene su propio récord y ranking, para no comparar
   // puntajes calculados distinto. "f2" = distancia / 3 con tope 9999 (desde v1.1).
   // Las claves antiguas, sin fórmula, quedan intactas como "clásico" y no se mezclan.
