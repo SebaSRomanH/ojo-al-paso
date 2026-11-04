@@ -1,5 +1,20 @@
 # Historial de cambios
 
+## 1.3 — 2026-11-03
+
+- **Compartir con imagen:** el botón COMPARTIR envía por WhatsApp una foto del juego con el título y un mensaje, además del enlace:
+  - desde el menú, los siete personajes y "¡Salta los popós y gánale a Don Cochino!";
+  - al perder, tu cara de asco y "¡Hice N puntos! ¿Me ganas?";
+  - al ganar, la escena de Don Cochino lleno de popó.
+- **Vista previa del enlace:** al pegar el enlace del juego en WhatsApp aparece una imagen grande con todo el elenco (`compartir.jpg`).
+- **Bolsas más claras:** una flecha con una bolsita avisa en el borde derecho, con un "tilín", justo antes de que aparezca; al tomarla se lee "¡Te salva de 1 popó!", y cuando te salva toda la pantalla destella en verde menta.
+- **Estadísticas (botón DATOS):** partidas, victorias, reintentos, récord, promedios, bolsas y en qué tramo se pisan los popós. Se pueden descargar en un archivo JSON. Todo queda solo en el teléfono, sin nombres.
+- **Ranking justo:** el récord y el ranking de ahora no se mezclan con los de versiones que calculaban los puntos distinto. Los antiguos quedan guardados como "récord clásico".
+- **Dificultad revisada con datos:** se midió la ventana para saltar a cada velocidad y se probaron ajustes en simulaciones. Ninguno mejoró las cosas, así que no se cambió nada; las estadísticas dirán dónde ajustar.
+- **Botones de máquina arcade:** los botones de texto ahora son placas pixeladas estilo maquinitas de los 70 y 80, con colores neón que brillan (JUGAR rosado, GUARDAR amarillo y los demás celeste) y que se hunden al tocarlas; sonido, pantalla completa y pausa son botones redondos de máquina.
+- **Pantalla completa en iPhone:** el botón ya se ve. Como Safari no deja poner pantalla completa, al tocarlo explica cómo agregar el juego a la pantalla de inicio, para que se abra sin barras.
+- **Más pruebas automáticas:** puntaje, pausa, bolsas, ranking, victoria y estadísticas se prueban solos en GitHub con un Chrome sin pantalla.
+
 ## 1.2.1 — 2026-11-03
 
 - **Créditos:** en el juego, Seba aparece como **"Tío Seba"** (idea y dirección, programación y arte con Claude, y "Tío Seba 80s" en el elenco).
@@ -93,7 +108,7 @@ Mejoras internas para trabajar con más calidad (el juego se ve y se juega igual
 ## 0.3 — 2026-11-03
 
 - **Reacción de asco al pisar una caca:** el niño se pone verde, aparece una viñeta con su cara de asco estilo manhwa y el texto "¡PUAJ!", con moscas y líneas de olor. La pantalla final aparece 1,4 s después.
-- **Especificación documentada** en [docs/ESPECIFICACION.md](docs/ESPECIFICACION.md).
+- **Especificación documentada** (hoy vive en el repositorio privado del equipo).
 
 ## 0.2 — 2026-11-03
 

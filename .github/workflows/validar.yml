@@ -20,3 +20,12 @@ jobs:
           node-version: 20
       - name: Revisar dibujos, saltos, textos y recursos
         run: node tests/validar.mjs
+      # Abre tests/escenarios.html en Chrome sin pantalla (viene instalado en ubuntu-latest)
+      # y revisa puntaje, pausa, bolsas, ranking, victoria y estadísticas.
+      - name: Escenarios de juego en Chrome sin pantalla
+        run: |
+          python3 -m http.server 8081 > /dev/null 2>&1 &
+          sleep 2
+          google-chrome --headless=new --no-sandbox --disable-gpu --virtual-time-budget=180000 \
+            --dump-dom "http://localhost:8081/tests/escenarios.html" > resultado.html
+          node tests/leer-escenarios.mjs resultado.html

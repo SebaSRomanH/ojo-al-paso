@@ -11,6 +11,17 @@
 <meta name="apple-mobile-web-app-title" content="Ojo al paso">
 <meta name="description" content="Corre, salta los popós y supera tu récord.">
 <title>¡Ojo al paso!</title>
+<!-- Vista previa al pegar el enlace en WhatsApp y redes. La imagen (compartir.jpg) solo la
+     leen esos servicios; el juego no la carga. Debe ser una dirección completa. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="¡Ojo al paso!">
+<meta property="og:description" content="¡Salta los popós y gánale a Don Cochino! Juega gratis en el navegador.">
+<meta property="og:image" content="https://sebasromanh.github.io/ojo-al-paso/compartir.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Los siete personajes de ¡Ojo al paso! corriendo frente a un atardecer pixel art">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   :root {
     /* Tamaño de los botones cuadrados (sonido, pantalla completa, pausa).
@@ -120,13 +131,24 @@
     75%, 100% { transform: scale(1.9); opacity: 0; }
   }
   .icon {
+    --face: #f2c14e;
     width: var(--icon); height: var(--icon); padding: 0;
     display: grid; place-items: center;
-    background: var(--accent);
+    color: #3a1a10; border: 0; border-radius: 50%;
+    background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.8) 0 9%, transparent 32%), var(--face);
+    box-shadow:
+      inset 0 -5px 0 rgba(0, 0, 0, 0.28), inset 0 3px 0 rgba(255, 255, 255, 0.35),
+      0 0 0 3px #3a1a10, 0 0 0 6px #241238, 0 5px 0 4px #120826;
   }
-  .icon svg { width: 68%; height: 68%; }
+  .icon:active {
+    transform: translateY(3px);
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.28), 0 0 0 3px #3a1a10, 0 0 0 6px #241238;
+  }
+  #fullscreen { --face: #f28c28; }
+  #pause { --face: #e8432f; color: #fbeedd; }
+  .icon svg { width: 56%; height: 56%; }
   #sound .off { display: none; }
-  #sound[aria-pressed="false"] { background: #8a7fa8; }
+  #sound[aria-pressed="false"] { --face: #8a7fa8; }
   #sound[aria-pressed="false"] .on { display: none; }
   #sound[aria-pressed="false"] .off { display: inline; }
 
@@ -147,9 +169,8 @@
 
   /* ---- Pantallas (menú, final, pausa, historia, ejemplo, créditos): 70s + 2020s ----
      Paleta setentera cálida (crema, mostaza, naranjo, óxido) y franjas detrás de los
-     títulos, sobre vidrio esmerilado, con esquinas redondeadas, botones tipo píldora
-     y sombras suaves. Se activa con la clase "ui". El juego en sí (y sus botones de
-     sonido, pantalla completa y pausa) mantiene el estilo pixel. */
+     títulos, sobre vidrio esmerilado, con esquinas redondeadas y sombras suaves.
+     Se activa con la clase "ui". Los botones son de máquina arcade (ver abajo). */
   :root { --cream: #fbeedd; --mustard: #f2c14e; --orange: #f28c28; --rust: #c4512b; --cocoa: #3a1a10; }
   .ui { font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif; color: var(--cream); }
   .ui.overlay {
@@ -169,15 +190,42 @@
   }
   .ui p { letter-spacing: 0.02em; }
   .ui .small { font-size: clamp(10px, 3.8cqh, 15px); opacity: 0.85; }
+  /* ---- Botones estilo máquina arcade de los 70 y 80 (diseño propio) ----
+     Texto: placa pixelada con esquinas en escalón, luz arriba a la izquierda, sombra
+     abajo y un "fondo" que se hunde al tocarla. Íconos: botones redondos de máquina,
+     con aro oscuro, bisel y brillo. */
+  /* Colores neón de salón de juegos: cada botón brilla con su propio color (--glow). */
   .ui button:not(.card) {
-    font-family: inherit; letter-spacing: 0.08em; color: var(--cream);
-    border: 0; border-radius: 999px;
-    background: linear-gradient(90deg, var(--orange), var(--rust));
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --px: 3px; --face: #ffe600; --edge: #2a0a4a; --glow: rgba(255, 230, 0, 0.6);
+    font-family: "Arial Black", "Trebuchet MS", system-ui, sans-serif; font-weight: 900;
+    letter-spacing: 0.1em; color: #1b0b3a; text-shadow: none;
+    background: var(--face); border: 0; border-radius: 0;
+    margin: var(--px) var(--px) calc(3 * var(--px));
+    box-shadow:
+      inset var(--px) var(--px) 0 rgba(255, 255, 255, 0.5),
+      inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 rgba(0, 0, 0, 0.25),
+      0 calc(-1 * var(--px)) 0 var(--edge), calc(-1 * var(--px)) 0 0 var(--edge),
+      var(--px) 0 0 var(--edge), 0 calc(3 * var(--px)) 0 var(--edge),
+      0 0 16px 3px var(--glow);
   }
-  .ui button.secondary { background: rgba(251, 238, 221, 0.08); border: 1.5px solid rgba(251, 238, 221, 0.55); }
-  .ui button:active { transform: translateY(1px); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
-  .ui button:focus-visible { outline: 2px solid var(--mustard); outline-offset: 3px; }
+  .ui button.primary {
+    --face: #ff2e88; --glow: rgba(255, 46, 136, 0.75);
+    color: #fff; text-shadow: 2px 2px 0 #7a0040;
+  }
+  .ui button.small { --px: 2px; }
+  .ui button.secondary {
+    --face: #1a0b33; --edge: #19e3ff; --glow: rgba(25, 227, 255, 0.45);
+    color: #19e3ff; text-shadow: 0 0 6px rgba(25, 227, 255, 0.9);
+  }
+  .ui button:not(.card):active {
+    transform: translateY(calc(2 * var(--px)));
+    box-shadow:
+      inset var(--px) var(--px) 0 rgba(0, 0, 0, 0.25),
+      0 calc(-1 * var(--px)) 0 var(--edge), calc(-1 * var(--px)) 0 0 var(--edge),
+      var(--px) 0 0 var(--edge), 0 var(--px) 0 var(--edge),
+      0 0 22px 5px var(--glow);
+  }
+  .ui button:focus-visible { outline: 2px solid var(--mustard); outline-offset: 6px; }
 
   #start { gap: 2.2cqh; }
   #start h1 { font-size: clamp(22px, 12cqh, 56px); }
@@ -195,6 +243,17 @@
     transform: translateY(-2px);
   }
   @media (hover: hover) { #start .card:hover { transform: translateY(-2px); filter: none; } }
+
+  /* Estadísticas: tabla compacta sobre vidrio. */
+  #stats { gap: 1.6cqh; padding-top: calc(var(--icon) + 3cqh); }
+  #stats h2 { font-size: clamp(18px, 8cqh, 38px); }
+  .stats-table {
+    border-collapse: collapse; font-size: clamp(9px, 3.5cqh, 14px);
+    background: rgba(251, 238, 221, 0.06); border-radius: 12px; overflow: hidden;
+  }
+  .stats-table th, .stats-table td { padding: 0.25em 0.9em; text-align: left; }
+  .stats-table th { color: var(--mustard); font-weight: 700; }
+  .stats-table tr:nth-child(odd) { background: rgba(251, 238, 221, 0.05); }
   .cards { display: flex; gap: 1.4cqw; width: 100%; justify-content: center; }
   .card {
     flex: 1 1 0; max-width: 11cqw; min-width: 0; min-height: 0;
@@ -380,6 +439,7 @@
       <button id="story-btn" class="secondary small" type="button">HISTORIA</button>
       <button class="secondary small credits-btn" type="button">CRÉDITOS</button>
       <button class="secondary small share" type="button">COMPARTIR</button>
+      <button id="stats-btn" class="secondary small" type="button">DATOS</button>
     </div>
     <p class="small">Récord: <span id="start-best">0</span> · Espacio/↑ saltar · Esc pausa · M sonido</p>
   </section>
@@ -421,6 +481,16 @@
     </div>
   </section>
 
+  <section id="stats" class="overlay ui" aria-labelledby="stats-title" hidden>
+    <h2 id="stats-title" class="stripes">Estadísticas</h2>
+    <table class="stats-table"><tbody id="stats-body"></tbody></table>
+    <p class="small">* Últimas 100 partidas. Todo queda solo en este teléfono, sin nombres.</p>
+    <div class="row">
+      <button id="stats-download" class="primary" type="button">DESCARGAR JSON</button>
+      <button id="stats-close" class="secondary small" type="button">CERRAR</button>
+    </div>
+  </section>
+
   <section id="credits" class="credits ui" aria-labelledby="credits-title" hidden>
     <div class="credits-roll" id="credits-roll"></div>
     <button id="credits-close" class="secondary small" type="button">CERRAR</button>
@@ -456,12 +526,20 @@
   // una partida dura 15–25 s). La primera sale antes para que se descubra.
   const BAG_FIRST = [12, 22], BAG_EVERY = [25, 35];
   const BAG_GRACE = 0.35;                // s sin chocar tras embolsar (cacas dobles)
+  const BAG_WARN = 0.8;                  // s de aviso en el borde antes de que aparezca
   const GRAVITY = 3000, JUMP_VELOCITY = 950;
   const MAX_DT = 0.1, STEP = 1 / 120;
   const REACT_TIME = 1.4;                // segundos de "¡puaj!" antes del fin de partida
   const SCORE_DIVISOR = 3;  // 1 punto cada 3 px recorridos (hasta v0.9 eran 12)
-  const BEST_KEY = 'ojo-al-paso:record';
-  const RANK_KEY = 'ojo-al-paso:ranking', NAME_KEY = 'ojo-al-paso:nombre', RANK_SIZE = 10;
+  const GAME_VERSION = '1.3';
+  // Cada fórmula de puntaje tiene su propio récord y ranking, para no comparar
+  // puntajes calculados distinto. "f2" = distancia / 3 con tope 9999 (desde v1.1).
+  // Las claves antiguas, sin fórmula, quedan intactas como "clásico" y no se mezclan.
+  const SCORE_FORMULA = 'f2';
+  const BEST_KEY = `ojo-al-paso:record:${SCORE_FORMULA}`;
+  const RANK_KEY = `ojo-al-paso:ranking:${SCORE_FORMULA}`, NAME_KEY = 'ojo-al-paso:nombre', RANK_SIZE = 10;
+  const CLASSIC_BEST_KEY = 'ojo-al-paso:record', CLASSIC_RANK_KEY = 'ojo-al-paso:ranking';
+  const METRICS_KEY = 'ojo-al-paso:estadisticas', METRICS_MAX = 100;
 
   // El lienzo tiene el doble de pixeles reales (1600×600), pero todo el juego
   // sigue dibujando en coordenadas de 800×300: sprites más finos, misma lógica.
@@ -478,6 +556,7 @@
     start: $('start'), paused: $('paused'), over: $('over'),
     pause: $('pause'), tutorial: $('tutorial'), leftbar: $('leftbar'),
     credits: $('credits'), creditsRoll: $('credits-roll'),
+    stats: $('stats'), statsBody: $('stats-body'),
     startBest: $('start-best'), overScore: $('over-score'), overTime: $('over-time'), overNew: $('over-new'),
     saveForm: $('save-form'), name: $('name'), rankList: $('ranking-list'),
     begin: $('begin'), story: $('story'), storyText: $('story-text'), storyNext: $('story-next'),
@@ -1206,6 +1285,13 @@
       },
       // Final: la bolsa vuela ("fiuuu"), "¡PLAF!" en la cara y "¡puaj!" a coro.
       whoosh() { if (ensure()) tone(700, ac.currentTime, 0.6, 'square', 0.12, 260); },
+      // Aviso de que viene una bolsa: "tilín" corto y suave.
+      bagHint() {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        tone(freq('E6'), t, 0.07, 'triangle', 0.3);
+        tone(freq('A6'), t + 0.08, 0.12, 'triangle', 0.3);
+      },
       plaf() {
         if (!ensure()) return;
         const t = ac.currentTime;
@@ -1260,6 +1346,9 @@
   const JUMP_BUFFER = 0.13;
   let jumpBufT = 0, milestone = 0, maxShown = false;
   let bagClock = 0, nextBagAt = BAG_FIRST[0] + Math.random() * (BAG_FIRST[1] - BAG_FIRST[0]);  // juego acumulado
+  let bagHinted = false, flashT = 0;
+  // Contadores de la partida en curso (para las estadísticas).
+  let runStats = { bagsTaken: 0, bagsUsed: 0 };
   let ranking = loadRanking();
   let best = Math.max(loadBest(), ranking[0] ? ranking[0].score : 0);
 
@@ -1275,9 +1364,9 @@
   const rand = (a, b) => a + Math.random() * (b - a);
 
   // ---- Ranking local (top 10 en este dispositivo) ----
-  function loadRanking() {
+  function loadRanking(key = RANK_KEY) {
     try {
-      const list = JSON.parse(localStorage.getItem(RANK_KEY));
+      const list = JSON.parse(localStorage.getItem(key));
       if (!Array.isArray(list)) return [];
       return list
         .filter((r) => r && typeof r.name === 'string' && Number.isFinite(r.score))
@@ -1286,6 +1375,66 @@
     } catch { return []; }
   }
   const qualifies = (s) => s > 0 && (ranking.length < RANK_SIZE || s > ranking[ranking.length - 1].score);
+
+  // ---- Estadísticas locales: solo en este dispositivo, sin nombres ni datos personales ----
+  // Totales acumulados + las últimas METRICS_MAX partidas (fecha sin hora, personaje,
+  // resultado, puntos, duración y bolsas). Se pueden ver y descargar en JSON desde el menú.
+  const emptyMetrics = () => ({
+    formato: 1,
+    totales: { iniciadas: 0, reintentos: 0, terminadas: 0, victorias: 0, abandonadas: 0, segundosJugados: 0, bolsasRecogidas: 0, bolsasUsadas: 0 },
+    partidas: [],
+  });
+  function loadMetrics() {
+    try {
+      const m = JSON.parse(localStorage.getItem(METRICS_KEY));
+      if (m && m.formato === 1 && m.totales && Array.isArray(m.partidas)) return m;
+    } catch { /* sin datos o dañados: se parte de cero */ }
+    return emptyMetrics();
+  }
+  let metrics = loadMetrics(), runOpen = false;
+  function saveMetrics() {
+    try { localStorage.setItem(METRICS_KEY, JSON.stringify(metrics)); } catch { /* sin almacenamiento */ }
+  }
+  function metricStart(retry) {
+    metrics.totales.iniciadas++;
+    if (retry) metrics.totales.reintentos++;
+    runOpen = true;
+    saveMetrics();
+  }
+  // resultado: 'ganó' | 'perdió' | 'abandonó' (volvió al menú desde la pausa).
+  function metricEnd(resultado) {
+    if (!runOpen) return;
+    runOpen = false;
+    const t = metrics.totales;
+    if (resultado === 'abandonó') t.abandonadas++; else t.terminadas++;
+    if (resultado === 'ganó') t.victorias++;
+    t.segundosJugados = Math.round((t.segundosJugados + elapsed) * 10) / 10;
+    t.bolsasRecogidas += runStats.bagsTaken;
+    t.bolsasUsadas += runStats.bagsUsed;
+    metrics.partidas.push({
+      fecha: new Date().toISOString().slice(0, 10), version: GAME_VERSION, formula: SCORE_FORMULA,
+      personaje: hero.id, resultado, puntos: score(), segundos: Math.round(elapsed * 10) / 10,
+      bolsasRecogidas: runStats.bagsTaken, bolsasUsadas: runStats.bagsUsed,
+    });
+    if (metrics.partidas.length > METRICS_MAX) metrics.partidas.splice(0, metrics.partidas.length - METRICS_MAX);
+    saveMetrics();
+  }
+  function metricsExport() {
+    let classicBest = 0;
+    try { classicBest = Math.max(0, parseInt(localStorage.getItem(CLASSIC_BEST_KEY), 10) || 0); } catch { /* nada */ }
+    const classic = loadRanking(CLASSIC_RANK_KEY);
+    return {
+      juego: '¡Ojo al paso!',
+      exportado: new Date().toISOString().slice(0, 10),
+      versionJuego: GAME_VERSION,
+      formulaPuntaje: `${SCORE_FORMULA}: puntos = distancia / ${SCORE_DIVISOR}, tope 9999`,
+      nota: 'Datos guardados solo en este dispositivo. No incluye nombres del ranking ni datos personales.',
+      recordActual: best,
+      recordClasico: Math.max(classicBest, classic[0] ? classic[0].score : 0),
+      totales: metrics.totales,
+      partidas: metrics.partidas,
+    };
+  }
   function addToRanking(name, s) {
     const entry = { name, score: s };
     ranking = [...ranking, entry].sort((a, b) => b.score - a.score).slice(0, RANK_SIZE);
@@ -1318,6 +1467,7 @@
     reactT = 0; overShown = false; hitPoop = null; flies = [];
     puffs = [];
     bagItem = null; hasBag = false; graceT = 0; thrown = []; floaters = [];
+    flashT = 0; runStats = { bagsTaken: 0, bagsUsed: 0 };
     jumpBufT = 0; milestone = 0; maxShown = false;
     endT = 0; endSpeed = 0; endFired = {}; droplets = [];
     spawnIn = 1.0;
@@ -1521,6 +1671,7 @@
     Music.stop();
     Music.speedUp();
     controls(false);
+    metricEnd('ganó');
     announce(`¡Llegaste a los ${GOAL} puntos! Ahí viene Don Cochino…`);
   }
 
@@ -1637,10 +1788,14 @@
   // ---- Bolsa: aparecer, tomarla y usarla ----
   function updateBag(dt, dx) {
     bagClock += dt;
+    // Aviso: 0,8 s antes de que aparezca, señal en el borde derecho y un "tilín".
+    if (!bagItem && !bagHinted && bagClock >= nextBagAt - BAG_WARN) { bagHinted = true; Music.bagHint(); }
+    flashT = Math.max(0, flashT - dt);
     if (!bagItem && bagClock >= nextBagAt) {
       // Que no salga encima de un popó recién aparecido.
       if (!obstacles.some((o) => o.x > W - 140)) {
         bagItem = { x: W + 10, t: 0 };
+        bagHinted = false;
         bagClock = 0;
         nextBagAt = BAG_EVERY[0] + Math.random() * (BAG_EVERY[1] - BAG_EVERY[0]);
         spawnIn = Math.max(spawnIn, 0.6);
@@ -1656,8 +1811,10 @@
         hasBag = true;
         Music.bag();
         buzz(30);
-        floaters.push({ text: '¡BOLSA!', x: KID_X + 20, y: kid.y - 10, t: 0, color: '#5dfcc0' });
-        announce('¡Tomaste una bolsa! El próximo popó va a la basura.');
+        floaters.push({ text: '¡BOLSA!', x: KID_X + 20, y: kid.y - 30, t: 0, color: '#5dfcc0', bag: true });
+        floaters.push({ text: '¡Te salva de 1 popó!', x: KID_X + 20, y: kid.y - 8, t: 0, color: '#fbeedd', small: true, bag: true });
+        runStats.bagsTaken++;
+        announce('¡Tomaste una bolsa! Te salva de un popó.');
       } else if (bagItem.x + BAG_SIZE < -10) {
         bagItem = null;
       }
@@ -1677,11 +1834,23 @@
     thrown.push({ x0: KID_X + 14, y0: kid.y + 10, t: 0 });
     Music.toss();
     buzz(60);
+    flashT = 0.25;  // destello menta: la bolsa te acaba de salvar
+    runStats.bagsUsed++;
+    floaters = floaters.filter((f) => !f.bag);  // que "¡A LA BASURA!" no se monte sobre "¡BOLSA!"
     floaters.push({ text: '¡A LA BASURA!', x: KID_X + 30, y: kid.y - 38, t: 0, color: '#ffd23f' });
     announce('¡Popó a la basura!');
   }
 
   function drawBagStuff() {
+    // Señal de "viene una bolsa" en el borde derecho, parpadeando.
+    if (state === 'running' && bagHinted && !bagItem && Math.floor(bagClock * 8) % 2 === 0) {
+      const x = W - 64, y = GROUND - 78;
+      ctx.fillStyle = 'rgba(93, 252, 192, 0.85)';
+      ctx.beginPath();
+      ctx.moveTo(x - 14, y + 15); ctx.lineTo(x - 2, y + 5); ctx.lineTo(x - 2, y + 25);
+      ctx.fill();
+      ctx.drawImage(bagSprite, x, y - 2, bagSprite.lw * 0.75, bagSprite.lh * 0.75);
+    }
     if (bagItem) {
       const by = bagY(bagItem);
       // Destello para que se note.
@@ -1705,9 +1874,9 @@
   }
 
   function drawFloaters() {
-    ctx.font = 'bold 20px "Courier New", monospace';
     ctx.textBaseline = 'top';
     for (const f of floaters) {
+      ctx.font = `bold ${f.small ? 14 : 20}px "Courier New", monospace`;
       const y = Math.round(f.y - f.t * 30);
       ctx.fillStyle = '#000';
       ctx.fillText(f.text, f.x + 2, y + 2);
@@ -1787,6 +1956,10 @@
     if (state === 'over') drawReaction();
     if (state === 'ending' || (state === 'over' && endT > 0)) drawEnding();
     drawFloaters();
+    if (flashT > 0) {  // destello menta cuando una bolsa te salva
+      ctx.fillStyle = `rgba(93, 252, 192, ${flashT * 1.4})`;
+      ctx.fillRect(0, 0, W, H);
+    }
 
     if (state !== 'start' && state !== 'begin' && state !== 'tutorial') {
       const pad = (n) => String(n).padStart(4, '0');
@@ -1908,6 +2081,7 @@
     show(ui.story, false);
     show(ui.start, true);
     $('play').focus({ preventScroll: true });
+    prepareMenuShare();
   }
 
   // ---- Ejemplo de cómo saltar (antes de cada partida desde el menú) ----
@@ -1949,7 +2123,9 @@
 
   function start() {
     if (portrait.matches) return;
+    const retry = state === 'over';  // "OTRA VEZ" cuenta como reintento
     reset();
+    metricStart(retry);
     state = 'running';
     show(ui.start, false); show(ui.over, false); show(ui.paused, false);
     show(ui.story, false); show(ui.begin, false); show(ui.tutorial, false);
@@ -2006,6 +2182,7 @@
     Music.stop();
     Music.splat();
     controls(false);
+    metricEnd('perdió');
     buzz([70, 40, 140]);
     // Temblor de pantalla (se reinicia la animación CSS).
     canvas.classList.remove('shake');
@@ -2032,6 +2209,8 @@
     if (isNew || win) Music.fanfare(); else Music.sadTrombone();
     $('over-title').textContent = win ? '¡GANASTE!' : '¡Plop! Lo pisaste';
     show($('over-win'), win);
+    // Foto para compartir: la escena de este momento (cara de asco o Don Cochino lleno de popó).
+    prepareShare(win ? '¡Llegué a 9999 y Don Cochino recibió su merecido!' : `¡Hice ${s} puntos! ¿Me ganas?`, false, win);
     ui.overScore.textContent = s;
     ui.overTime.textContent = elapsed.toFixed(1);
     ui.startBest.textContent = best;
@@ -2065,14 +2244,62 @@
   // ---- Volver al menú (desde la pausa o el fin de partida) ----
   function goMenu() {
     Music.stop();
+    if (state === 'paused') metricEnd('abandonó');  // salió al menú a mitad de partida
     reset();
     state = 'start';
-    for (const el of [ui.paused, ui.over, ui.tutorial, ui.credits, ui.story]) show(el, false);
+    for (const el of [ui.paused, ui.over, ui.tutorial, ui.credits, ui.story, ui.stats]) show(el, false);
     show(ui.start, true);
     controls(false);
     ui.startBest.textContent = best;
     $('play').focus({ preventScroll: true });
     announce('Menú principal');
+    prepareMenuShare();
+  }
+
+  // ---- Pantalla de estadísticas (desde el menú) ----
+  function openStats() {
+    const t = metrics.totales, ps = metrics.partidas.filter((p) => p.resultado !== 'abandonó');
+    const avg = (f) => (ps.length ? Math.round(ps.reduce((a, p) => a + f(p), 0) / ps.length) : 0);
+    const pct = (n, d) => (d ? `${Math.round((100 * n) / d)} %` : '—');
+    // Dónde se pierde: sirve para ajustar la dificultad con datos reales.
+    const lost = ps.filter((p) => p.resultado === 'perdió');
+    const tramo = (a, b) => lost.filter((p) => p.puntos >= a && p.puntos < b).length;
+    const exp = metricsExport();
+    const rows = [
+      ['Partidas jugadas', t.terminadas],
+      ['Victorias', `${t.victorias} (${pct(t.victorias, t.terminadas)})`],
+      ['Reintentos ("OTRA VEZ")', t.reintentos],
+      ['Récord actual', best],
+      ['Puntaje promedio*', avg((p) => p.puntos)],
+      ['Duración promedio*', `${avg((p) => p.segundos)} s`],
+      ['Tiempo total jugado', `${Math.round(t.segundosJugados / 60)} min`],
+      ['Bolsas recogidas / usadas', `${t.bolsasRecogidas} / ${t.bolsasUsadas}`],
+      ['Popós pisados por tramo*', `0–2k: ${tramo(0, 2000)} · 2–5k: ${tramo(2000, 5000)} · 5–8k: ${tramo(5000, 8000)} · 8k+: ${tramo(8000, 10000)}`],
+      ['Récord clásico (fórmula anterior)', exp.recordClasico || '—'],
+    ];
+    ui.statsBody.replaceChildren(...rows.map(([k, v]) => {
+      const tr = document.createElement('tr');
+      const th = document.createElement('th'); th.textContent = k;
+      const td = document.createElement('td'); td.textContent = v;
+      tr.append(th, td);
+      return tr;
+    }));
+    state = 'stats';
+    show(ui.start, false);
+    show(ui.stats, true);
+    $('stats-close').focus({ preventScroll: true });
+    announce('Estadísticas');
+  }
+  function downloadStats() {
+    const blob = new Blob([JSON.stringify(metricsExport(), null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `ojo-al-paso-estadisticas-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    toast('Estadísticas descargadas (JSON).');
   }
 
   // ---- Créditos finales ----
@@ -2141,22 +2368,92 @@
 
   // ---- Compartir ----
   let toastTimer;
-  function toast(msg) {
+  function toast(msg, ms = 3500) {
     ui.toast.textContent = msg;
     show(ui.toast, true);
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => show(ui.toast, false), 3500);
+    toastTimer = setTimeout(() => show(ui.toast, false), ms);
   }
+
+  // Tarjeta para compartir (1200×630, el formato de WhatsApp): captura del juego,
+  // título con franjas setenteras, el elenco (en el menú) y un mensaje grande.
+  const CARD_W = 1200, CARD_H = 630;
+  function makeShareCard(message, withCast, wide = false) {
+    const c = document.createElement('canvas');
+    c.width = CARD_W; c.height = CARD_H;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = false;
+    g.fillStyle = '#180a28';
+    g.fillRect(0, 0, CARD_W, CARD_H);
+    if (wide) {
+      // Escena completa a lo ancho (para ver a todos, por ejemplo en el final).
+      const dh = canvas.height * (CARD_W / canvas.width);
+      g.drawImage(canvas, 0, CARD_H - dh - 110, CARD_W, dh);
+    } else {
+      const s = Math.max(CARD_W / canvas.width, CARD_H / canvas.height);
+      const dw = canvas.width * s, dh = canvas.height * s;
+      // Con el elenco, la captura se corre a la derecha (no se ve el personaje del fondo);
+      // sin elenco, a la izquierda (el personaje y su viñeta salen enteros).
+      g.drawImage(canvas, withCast ? CARD_W - dw : 0, (CARD_H - dh) / 2, dw, dh);
+    }
+    g.fillStyle = '#180a28';  // tapa los puntos del juego, arriba
+    g.fillRect(0, 0, CARD_W, 62);
+    const shade = g.createLinearGradient(0, 0, 0, CARD_H);
+    shade.addColorStop(0, 'rgba(24, 10, 40, 0.6)');
+    shade.addColorStop(0.35, 'rgba(24, 10, 40, 0)');
+    shade.addColorStop(0.65, 'rgba(24, 10, 40, 0.15)');
+    shade.addColorStop(1, 'rgba(24, 10, 40, 0.9)');
+    g.fillStyle = shade;
+    g.fillRect(0, 0, CARD_W, CARD_H);
+    ['#f2c14e', '#f28c28', '#c4512b'].forEach((col, i) => { g.fillStyle = col; g.fillRect(0, 62 + i * 22, CARD_W, 22); });
+    const layered = (text, x, y) => {  // texto crema con sombras en capas (óxido y cacao)
+      g.fillStyle = '#3a1a10'; g.fillText(text, x + 9, y + 9);
+      g.fillStyle = '#c4512b'; g.fillText(text, x + 4.5, y + 4.5);
+      g.fillStyle = '#fbeedd'; g.fillText(text, x, y);
+    };
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = 'italic 900 92px "Arial Black", "Trebuchet MS", sans-serif';
+    layered('¡Ojo al paso!', CARD_W / 2, 92);
+    if (withCast) {
+      const gap = CARD_W / (CHARACTERS.length + 1);
+      CHARACTERS.forEach((ch, i) => {
+        const f = ch.frames.runA, k = 2.4;
+        g.drawImage(f, gap * (i + 1) - (f.lw * k) / 2, 470 - f.lh * k, f.lw * k, f.lh * k);
+      });
+    }
+    g.font = 'bold 50px "Trebuchet MS", "Segoe UI", sans-serif';
+    layered(message, CARD_W / 2, 535);
+    g.font = 'bold 26px "Trebuchet MS", "Segoe UI", sans-serif';
+    g.fillStyle = '#f2c14e';
+    g.fillText('Juega gratis en el navegador · Creado por Seba, potenciado por Claude', CARD_W / 2, 598);
+    return c;
+  }
+
+  // Los teléfonos solo dejan compartir en el mismo instante del toque, así que la
+  // imagen se prepara antes (al aparecer el menú o la pantalla final).
+  let shareFile = null, shareMsg = '';
+  function prepareShare(message, withCast, wide = false) {
+    shareFile = null;
+    shareMsg = message;
+    makeShareCard(message, withCast, wide).toBlob((b) => {
+      if (b) shareFile = new File([b], 'ojo-al-paso.png', { type: 'image/png' });
+    }, 'image/png');
+  }
+  const prepareMenuShare = () => setTimeout(() => prepareShare('¡Salta los popós y gánale a Don Cochino!', true), 150);
 
   async function share() {
     const host = location.hostname;
     const isPublic = /^https?:$/.test(location.protocol) &&
       !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(host) && !host.endsWith('.localhost');
-    if (!isPublic) { toast('Primero hay que publicar el juego en internet para compartirlo.'); return; }
-    const url = location.href.split('#')[0];
-    const text = state === 'over'
-      ? `Hice ${score()} puntos en ¡Ojo al paso! ¿Me ganas?`
-      : '¡Salta los popós y supera mi récord en ¡Ojo al paso!';
+    // En modo prueba, ?publico simula que el juego está publicado (para probar este botón).
+    if (!isPublic && !(PRUEBA && PARAMS.has('publico'))) { toast('Primero hay que publicar el juego en internet para compartirlo.'); return; }
+    const url = location.origin + location.pathname;
+    const text = `${shareMsg || '¡Salta los popós y gánale a Don Cochino!'} Juega ¡Ojo al paso! aquí: ${url}`;
+    // Con imagen (Android y iPhone modernos); el enlace va dentro del texto.
+    if (shareFile && navigator.canShare && navigator.canShare({ files: [shareFile] })) {
+      try { await navigator.share({ files: [shareFile], title: '¡Ojo al paso!', text }); } catch { /* cancelado */ }
+      return;
+    }
     if (navigator.share) {
       try { await navigator.share({ title: '¡Ojo al paso!', text, url }); } catch { /* cancelado */ }
       return;
@@ -2178,6 +2475,9 @@
   document.querySelectorAll('.menu-btn').forEach((b) => b.addEventListener('click', goMenu));
   document.querySelectorAll('.credits-btn').forEach((b) => b.addEventListener('click', openCredits));
   $('credits-close').addEventListener('click', (e) => { e.stopPropagation(); closeCredits(); });
+  $('stats-btn').addEventListener('click', openStats);
+  $('stats-download').addEventListener('click', downloadStats);
+  $('stats-close').addEventListener('click', goMenu);
   ui.credits.addEventListener('pointerdown', (e) => { if (e.target === ui.credits || e.target.closest('.credits-roll')) closeCredits(); });
   ui.creditsRoll.addEventListener('animationend', closeCredits);
   // Clic sonoro en todos los botones.
@@ -2200,13 +2500,25 @@
   ui.tutorial.addEventListener('pointerdown', (e) => { e.preventDefault(); start(); });
 
   // ---- Pantalla completa ----
-  // iPhone no la permite en páginas web: ahí el botón se oculta y sirve
-  // "Agregar a pantalla de inicio" (ver metas apple-mobile-web-app-*).
+  // iPhone no la permite en páginas web: ahí el botón explica cómo usar
+  // "Agregar a pantalla de inicio" (ver metas apple-mobile-web-app-*), que abre el
+  // juego sin barras. Si ya se abrió así, o el navegador no la permite, se oculta.
   const fsBtn = $('fullscreen');
   const root = document.documentElement;
   const isFullscreen = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
-  if (!(root.requestFullscreen || root.webkitRequestFullscreen)) fsBtn.hidden = true;
+  const fakeIPhone = PRUEBA && PARAMS.has('iphone');   // ?prueba&iphone lo simula
+  const canFullscreen = !fakeIPhone && !!(root.requestFullscreen || root.webkitRequestFullscreen);
+  const isIOS = fakeIPhone || /iPhone|iPad|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isStandalone = navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+  const iosHelp = !canFullscreen && isIOS && !isStandalone;
+  if (!canFullscreen && !iosHelp) fsBtn.hidden = true;
   async function toggleFullscreen() {
+    if (iosHelp) {
+      pause();
+      toast('En iPhone: toca Compartir (el cuadrado con flecha ⬆) y elige «Agregar a pantalla de inicio». Abre el juego desde ese ícono y se verá sin barras.', 9000);
+      return;
+    }
     try {
       if (isFullscreen()) {
         await (document.exitFullscreen || document.webkitExitFullscreen).call(document);
@@ -2245,7 +2557,7 @@
     } else if (e.key === 'Escape') {
       if (state === 'story') endStory();
       else if (state === 'credits') closeCredits();
-      else if (state === 'over' && overShown) goMenu();
+      else if (state === 'stats' || (state === 'over' && overShown)) goMenu();
       else pause();
     } else if ((e.key === 'm' || e.key === 'M') && !e.repeat) {
       toggleSound();
@@ -2301,7 +2613,7 @@
   // Primera visita: la historia (necesita un toque para poder sonar). Después, directo al menú.
   let storySeen = false;
   try { storySeen = localStorage.getItem(STORY_KEY) === '1'; } catch { /* sin almacenamiento */ }
-  if (storySeen || PRUEBA) { show(ui.start, true); } else { state = 'begin'; show(ui.begin, true); }
+  if (storySeen || PRUEBA) { show(ui.start, true); prepareMenuShare(); } else { state = 'begin'; show(ui.begin, true); }
 
   if (PRUEBA) {
     if (PARAMS.get('bolsa') === 'ya') nextBagAt = 0.3;
@@ -2324,6 +2636,29 @@
       menu: goMenu,
       creditos: openCredits,
       bolsaYa() { nextBagAt = bagClock + 0.01; },
+      // Imagen para compartir como data URL (para revisarla o guardarla).
+      tarjeta: (mensaje = shareMsg, elenco = state === 'start', tipo = 'image/png', calidad = 0.9, ancha = false) =>
+        makeShareCard(mensaje, elenco, ancha).toDataURL(tipo, calidad),
+      get listaParaCompartir() { return !!shareFile; },
+      // Para las pruebas automáticas (tests/escenarios.html).
+      get distancia() { return distance; },
+      get meta() { return GOAL; },
+      get formula() { return SCORE_FORMULA; },
+      get divisor() { return SCORE_DIVISOR; },
+      get record() { return best; },
+      get ranking() { return ranking.map((r) => ({ ...r })); },
+      get claveRanking() { return RANK_KEY; },
+      get claveRankingClasico() { return CLASSIC_RANK_KEY; },
+      get titulo() { return $('over-title').textContent; },
+      get finVisible() { return !ui.over.hidden && overShown; },
+      get metricas() { return JSON.parse(JSON.stringify(metrics)); },
+      exportar: () => JSON.stringify(metricsExport()),
+      estadisticas: openStats,
+      guardarNombre(nombre) {
+        ui.name.value = nombre;
+        ui.name.dispatchEvent(new Event('input'));
+        ui.saveForm.requestSubmit();
+      },
     };
     const badge = document.createElement('div');
     badge.textContent = 'MODO PRUEBA';

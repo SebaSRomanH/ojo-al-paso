@@ -3,6 +3,8 @@ Juego creado para mi sobrino.
 
 **Creado por Seba, potenciado por Claude.**
 
+![¡Ojo al paso!: los siete personajes corriendo frente a un atardecer pixel art](compartir.jpg)
+
 Juego de navegador para móvil (en horizontal): Rafa corre y salta popós hasta llegar a 9999 puntos y encontrar a Don Cochino. Supera tu récord y compártelo por WhatsApp.
 
 🎮 **Jugar:** https://sebasromanh.github.io/ojo-al-paso/

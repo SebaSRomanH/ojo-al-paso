@@ -3,10 +3,11 @@
 //  1) todos los dibujos (sprites) estén bien formados y tengan sus colores;
 //  2) los popós (simples y dobles) siempre se puedan saltar, con cada personaje;
 //  3) ningún texto visible diga "caca" (en pantalla se dice "popó");
-//  4) el juego no cargue nada de internet (un solo HTML autónomo).
+//  4) el juego no cargue nada de internet (un solo HTML autónomo);
+//  5) exista la imagen de la vista previa de WhatsApp (og:image) y pese menos de 300 KB.
 // Sale con código 1 si algo falla (así GitHub marca la revisión con ❌).
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const html = readFileSync(process.argv[2] || fileURLToPath(new URL('../index.html', import.meta.url)), 'utf8');
@@ -151,6 +152,18 @@ const externos = [...html.matchAll(/(?:src|href)\s*=\s*["'](https?:)?\/\//gi)].l
   + [...js.matchAll(/\bfetch\(|import\(|new Worker\(/g)].length;
 if (externos) falla(`El juego intenta cargar ${externos} recurso(s) externo(s)`);
 else ok('No carga nada de internet: un solo HTML autónomo');
+
+// ---------- 5) Imagen para la vista previa en WhatsApp ----------
+const og = html.match(/<meta property="og:image" content="[^"]*\/([^/"]+)">/);
+if (!og) {
+  falla('Falta la etiqueta og:image (vista previa del enlace en WhatsApp)');
+} else {
+  let kb = -1;
+  try { kb = statSync(fileURLToPath(new URL(`../${og[1]}`, import.meta.url))).size / 1024; } catch { /* no existe */ }
+  if (kb < 0) falla(`No existe ${og[1]}, la imagen de la vista previa`);
+  else if (kb >= 300) falla(`${og[1]} pesa ${kb.toFixed(0)} KB: WhatsApp puede no mostrarla (máximo ~300 KB)`);
+  else ok(`Imagen de vista previa ${og[1]} lista (${kb.toFixed(0)} KB)`);
+}
 
 console.log(fallas ? `\n${fallas} problema(s) encontrado(s).` : '\nTodo en orden. 🎉');
 process.exit(fallas ? 1 : 0);

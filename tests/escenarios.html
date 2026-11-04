@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Escenarios — ¡Ojo al paso!</title>
+<style>
+  body { font: 14px system-ui, sans-serif; margin: 16px; background: #120826; color: #fbeedd; }
+  iframe { width: 780px; height: 292px; border: 0; display: block; margin-bottom: 12px; }
+  li.ok::marker { content: "✅ "; }
+  li.falla::marker { content: "❌ "; }
+  pre { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<!--
+  Pruebas de escenarios: abre el juego en modo prueba (?prueba) dentro de un iframe y
+  lo controla con window.juego. Debe servirse por http (mismo origen que index.html):
+    python -m http.server 8081   y abrir   http://localhost:8081/tests/escenarios.html
+  En GitHub Actions se abre con Chrome sin pantalla y se lee el resultado de #resultado.
+  Ojo: borra los datos guardados del juego en este origen (récord, ranking, estadísticas).
+-->
+<h1>Escenarios</h1>
+<iframe id="juego" title="Juego en modo prueba"></iframe>
+<ol id="lista"></ol>
+<pre id="resultado">corriendo…</pre>
+<script>
+(async () => {
+  const frame = document.getElementById('juego');
+  const espera = (ms) => new Promise((r) => setTimeout(r, ms));
+  const resultados = [];
+
+  function limpiarDatos() {
+    for (const k of Object.keys(localStorage)) if (k.startsWith('ojo-al-paso:')) localStorage.removeItem(k);
+  }
+  async function cargar(params) {
+    await new Promise((r) => { frame.onload = r; frame.src = `../index.html?prueba&${params}&t=${Math.random()}`; });
+    const w = frame.contentWindow;
+    for (let i = 0; i < 100 && !w.juego; i++) await espera(50);
+    if (!w.juego) throw new Error('El juego no expuso window.juego');
+    return w.juego;
+  }
+  async function hasta(cond, ms = 20000, paso = 20) {
+    for (let t = 0; t < ms; t += paso) { if (cond()) return true; await espera(paso); }
+    return false;
+  }
+  // Piloto automático: salta cuando el popó más cercano llegará en menos de 0,1 s.
+  function piloto(juego) {
+    return setInterval(() => {
+      if (juego.estado === 'paused') juego.seguir();
+      if (juego.estado !== 'running') return;
+      const v = juego.velocidad * 300;
+      const p = juego.popos.filter((x) => x > 100).sort((a, b) => a - b);
+      if (p.length && (p[0] - 118) / v < 0.1) juego.saltar();
+    }, 5);
+  }
+  async function prueba(nombre, fn) {
+    let ok = false, detalle = '';
+    try { detalle = (await fn()) || ''; ok = true; } catch (e) { detalle = e.message; }
+    resultados.push({ nombre, ok, detalle });
+    const li = document.createElement('li');
+    li.className = ok ? 'ok' : 'falla';
+    li.textContent = `${nombre}${detalle ? ` — ${detalle}` : ''}`;
+    document.getElementById('lista').append(li);
+  }
+  const asegurar = (cond, msg) => { if (!cond) throw new Error(msg); };
+
+  // Datos limpios + un ranking "clásico" (fórmula anterior) que no debe mezclarse.
+  function preparar() {
+    limpiarDatos();
+    localStorage.setItem('ojo-al-paso:ranking', JSON.stringify([{ name: 'VIEJO', score: 4850 }]));
+    localStorage.setItem('ojo-al-paso:record', '4850');
+  }
+  preparar();
+
+  await prueba('Puntaje = piso(distancia / 3) y sube con el tiempo', async () => {
+    const j = await cargar('v=puntaje');
+    asegurar(j.formula === 'f2' && j.divisor === 3, `fórmula inesperada: ${j.formula} / ${j.divisor}`);
+    j.jugar();
+    await espera(700);
+    if (j.estado === 'paused') j.seguir();
+    const p1 = j.puntos, d1 = j.distancia;
+    asegurar(p1 === Math.min(j.meta, Math.floor(d1 / 3)), `puntos ${p1} ≠ piso(${d1.toFixed(1)}/3)`);
+    await espera(400);
+    asegurar(j.puntos > p1 || j.estado !== 'running', 'los puntos no subieron');
+    return `${p1} pts con ${Math.round(d1)} px`;
+  });
+
+  await prueba('Pausa congela el tiempo y SEGUIR lo reanuda', async () => {
+    const j = await cargar('v=pausa');
+    j.jugar();
+    await espera(300);
+    j.pausar();
+    asegurar(j.estado === 'paused', `estado ${j.estado} en vez de paused`);
+    const s1 = j.segundos;
+    await espera(500);
+    asegurar(j.segundos === s1, 'el tiempo avanzó durante la pausa');
+    j.seguir();
+    asegurar(j.estado === 'running', 'no volvió a correr');
+    await espera(300);
+    asegurar(j.segundos > s1, 'el tiempo no avanzó después de SEGUIR');
+    return `pausado en ${s1.toFixed(2)} s`;
+  });
+
+  await prueba('Bolsa: se recoge, salva de un popó y luego se pierde', async () => {
+    const j = await cargar('bolsa=ya&v=bolsa');
+    j.jugar();
+    asegurar(await hasta(() => j.tieneBolsa, 8000), 'nunca tomó la bolsa');
+    asegurar(await hasta(() => j.metricas.partidas.length === 0 && !j.tieneBolsa && j.estado === 'running', 8000),
+      'la bolsa no se usó con el popó');
+    asegurar(await hasta(() => j.estado === 'over', 10000), 'no murió con el popó siguiente');
+    const ult = j.metricas.partidas.at(-1);
+    asegurar(ult.bolsasRecogidas === 1 && ult.bolsasUsadas === 1, `bolsas: ${ult.bolsasRecogidas}/${ult.bolsasUsadas}`);
+    return `murió con ${ult.puntos} pts tras usar la bolsa`;
+  });
+
+  await prueba('Ranking: guarda con la fórmula actual y no toca el clásico', async () => {
+    const j = await cargar('v=ranking');
+    j.jugar();
+    asegurar(await hasta(() => j.finVisible, 15000), 'no apareció la pantalla final');
+    const pts = j.puntos;
+    j.guardarNombre('test★');
+    const r = j.ranking;
+    asegurar(r.some((e) => e.name === 'TEST★' && e.score === pts), `no se guardó TEST★ con ${pts}: ${JSON.stringify(r)}`);
+    asegurar(!r.some((e) => e.name === 'VIEJO'), 'el ranking clásico se mezcló con el actual');
+    const guardado = JSON.parse(localStorage.getItem(j.claveRanking));
+    asegurar(guardado.some((e) => e.name === 'TEST★'), `no está en ${j.claveRanking}`);
+    asegurar(localStorage.getItem(j.claveRankingClasico).includes('VIEJO'), 'se modificó el ranking clásico');
+    asegurar(j.record === Math.max(...r.map((e) => e.score)), `récord ${j.record} no coincide con el ranking`);
+    return `TEST★ ${pts} en ${j.claveRanking}`;
+  });
+
+  await prueba('Victoria al llegar a la meta (tope del puntaje)', async () => {
+    // El piloto puede pisar un popó por azar: hasta 3 intentos.
+    for (let intento = 1; intento <= 3; intento++) {
+      preparar();
+      const j = await cargar(`meta=150&v=victoria${intento}`);
+      j.jugar();
+      const bot = piloto(j);
+      const llego = await hasta(() => j.finVisible, 30000);
+      clearInterval(bot);
+      asegurar(llego, `no terminó (estado ${j.estado}, ${j.puntos} pts)`);
+      if (j.titulo !== '¡GANASTE!') continue;
+      asegurar(j.puntos === 150, `puntos ${j.puntos} ≠ meta 150`);
+      asegurar(j.metricas.totales.victorias === 1, 'la victoria no se contó');
+      asegurar(j.metricas.partidas.at(-1).resultado === 'ganó', 'resultado ≠ ganó');
+      return `ganó con 150 pts (intento ${intento})`;
+    }
+    throw new Error('el piloto no llegó a la meta en 3 intentos');
+  });
+
+  await prueba('Estadísticas: reintentos, abandono y exportación JSON sin nombres', async () => {
+    preparar();
+    localStorage.setItem('ojo-al-paso:ranking:f2', JSON.stringify([{ name: 'TEST', score: 10 }]));
+    const j = await cargar('v=metricas');
+    j.jugar();                                         // partida 1
+    asegurar(await hasta(() => j.finVisible, 15000), 'no terminó la partida 1');
+    frame.contentDocument.getElementById('again').click();  // OTRA VEZ = reintento
+    await espera(200);
+    j.pausar();
+    j.menu();                                          // abandonar desde la pausa
+    const m = j.metricas.totales;
+    asegurar(m.iniciadas === 2, `iniciadas ${m.iniciadas} ≠ 2`);
+    asegurar(m.reintentos === 1, `reintentos ${m.reintentos} ≠ 1`);
+    asegurar(m.abandonadas === 1, `abandonadas ${m.abandonadas} ≠ 1`);
+    const json = JSON.parse(j.exportar());
+    asegurar(json.totales && Array.isArray(json.partidas) && json.partidas.length === 2, 'JSON incompleto');
+    asegurar(!JSON.stringify(json).includes('TEST'), 'el JSON incluye nombres del ranking');
+    asegurar(json.recordClasico === 4850, `récord clásico ${json.recordClasico} ≠ 4850`);
+    return `${json.partidas.length} partidas exportadas`;
+  });
+
+  const ok = resultados.every((r) => r.ok);
+  document.getElementById('resultado').textContent = JSON.stringify({ ok, resultados }, null, 1);
+  document.title = ok ? 'ESCENARIOS OK' : 'ESCENARIOS FALLA';
+  limpiarDatos();
+})();
+</script>
+</body>
+</html>
