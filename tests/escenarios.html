@@ -169,6 +169,128 @@
     return `${json.partidas.length} partidas exportadas`;
   });
 
+  // ---- Superpoderes (Issue #5). Con ?sinpopos no salen popós al azar: los pone la prueba. ----
+  async function conPersonaje(id, extra = '') {
+    const j = await cargar(`sinpopos&${extra}&v=poder-${id}-${Math.random()}`);
+    j.elegir(id);
+    j.jugar();
+    return j;
+  }
+
+  await prueba('Poder: botón visible (≥44 px), E lo activa, tocarlo no salta y no da puntos', async () => {
+    const j = await conPersonaje('angie');
+    const btn = frame.contentDocument.getElementById('power');
+    const r = btn.getBoundingClientRect();
+    asegurar(j.poder.botonVisible && r.width >= 44 && r.height >= 44, `botón ${Math.round(r.width)}×${Math.round(r.height)}`);
+    asegurar(j.poder.boton === 'listo' && /LISTO/.test(j.poder.textoBoton), `texto: ${j.poder.textoBoton}`);
+    btn.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    btn.click();
+    asegurar(j.poder.estado !== 'listo', 'el botón no activó el poder');
+    asegurar(j.altura === 0, `el botón provocó un salto (altura ${j.altura})`);
+    const k = await conPersonaje('seba');
+    frame.contentWindow.dispatchEvent(new KeyboardEvent('keydown', { key: 'e' }));
+    asegurar(k.poder.estado !== 'listo', 'la tecla E no activó el poder');
+    await espera(300);
+    asegurar(k.puntos === Math.min(k.meta, Math.floor(k.distancia / 3)), 'el poder alteró el puntaje');
+    return 'botón, tecla E y sin salto';
+  });
+
+  for (const id of ['angie', 'seba', 'vicky']) {
+    await prueba(`Poder ${id}: quita hasta 3 popós visibles, una sola vez, y se reinicia`, async () => {
+      const j = await conPersonaje(id);
+      for (const dx of [120, 170, 220, 690]) j.ponerPopo(dx);
+      asegurar(j.popos.length === 4, 'no se pusieron los popós');
+      j.usarPoder();
+      asegurar(j.poder.capturados === 3 && j.popos.length === 1, `quitó ${j.poder.capturados}, quedan ${j.popos.length}`);
+      asegurar(j.poder.estado === 'activo' && j.poder.boton === 'activo', 'no quedó ACTIVO');
+      await espera(1300);
+      asegurar(j.poder.estado === 'usado' && /USADO/.test(j.poder.textoBoton), `estado ${j.poder.estado}`);
+      j.ponerPopo(300); j.usarPoder();
+      asegurar(j.popos.length === 2 && j.poder.capturados === 3, 'se usó dos veces');
+      j.jugar();
+      asegurar(j.poder.estado === 'listo', 'no se reinició con otra partida');
+      return 'ok';
+    });
+  }
+
+  for (const id of ['francisco', 'pipe']) {
+    await prueba(`Poder ${id}: recoge 3 popós en ≤3 s y termina`, async () => {
+      const j = await conPersonaje(id);
+      for (const dx of [110, 150, 190, 690]) j.ponerPopo(dx);
+      j.usarPoder();
+      asegurar(await hasta(() => j.poder.estado === 'usado', 2500), `no terminó (${j.poder.estado}, ${j.poder.capturados})`);
+      asegurar(j.poder.capturados === 3 && j.estado === 'running', `capturó ${j.poder.capturados}, estado ${j.estado}`);
+      const lejos = await conPersonaje(id);   // sin popós: se consume igual y dura ≤ 3 s
+      lejos.usarPoder();
+      asegurar(lejos.poder.estado === 'activo', 'no quedó activo sin objetivos');
+      asegurar(await hasta(() => lejos.poder.estado === 'usado', 3600), 'sin objetivos no se consumió');
+      asegurar(lejos.poder.segundos <= 3.2, `duró ${lejos.poder.segundos.toFixed(2)} s`);
+      return `duración sin objetivos ${lejos.poder.segundos.toFixed(2)} s`;
+    });
+  }
+
+  await prueba('Poder francisco: la pausa congela el contador', async () => {
+    const j = await conPersonaje('francisco');
+    j.usarPoder();
+    await espera(400);
+    j.pausar();
+    const t1 = j.poder.segundos;
+    j.ponerPopo(100);
+    j.usarPoder();
+    await espera(600);
+    asegurar(j.poder.segundos === t1, 'el poder avanzó en pausa');
+    j.seguir();
+    await espera(300);
+    asegurar(j.poder.segundos > t1, 'no siguió tras la pausa');
+    return `${t1.toFixed(2)} s congelado`;
+  });
+
+  await prueba('Poder baby-rafa: queda armado hasta el próximo choque y no gasta la bolsa', async () => {
+    const j = await cargar('sinpopos&bolsa=ya&v=pañal');
+    j.elegir('baby-rafa'); j.jugar();
+    asegurar(await hasta(() => j.tieneBolsa, 8000), 'nunca tomó la bolsa');
+    j.usarPoder();
+    asegurar(j.poder.armado && j.poder.estado === 'activo', 'no quedó armado');
+    await espera(800);
+    asegurar(j.poder.armado && j.estado === 'running', 'el pañal no quedó reservado sin popós');
+    j.ponerPopo(110); j.ponerPopo(150);   // un popó doble: un solo consumo
+    asegurar(await hasta(() => j.poder.estado === 'usado', 2500), 'el pañal no atrapó el popó');
+    await espera(600);
+    asegurar(j.estado === 'running', 'murió con el pañal');
+    asegurar(j.tieneBolsa, 'el pañal consumió la bolsa');
+    j.usarPoder();
+    asegurar(!j.poder.armado, 'se rearmó el pañal');
+    return 'pañal gastado, bolsa intacta';
+  });
+
+  await prueba('Poder rafa: vuela 2 s sin chocar, aterriza y no se repite', async () => {
+    const j = await conPersonaje('rafa');
+    j.usarPoder();
+    await espera(500);
+    asegurar(j.poder.volando && j.altura > 40, `no vuela (altura ${j.altura})`);
+    j.saltar();
+    for (const dx of [60, 140, 220]) j.ponerPopo(dx);
+    await espera(700);
+    asegurar(j.estado === 'running', 'chocó con un popó mientras volaba');
+    asegurar(await hasta(() => j.poder.estado === 'usado', 2000), 'no terminó el vuelo');
+    asegurar(j.altura === 0 && !j.poder.volando, `no aterrizó (altura ${j.altura})`);
+    asegurar(j.poder.segundos >= 1.95 && j.poder.segundos <= 2.3, `duró ${j.poder.segundos.toFixed(2)} s`);
+    asegurar(j.estado === 'running', 'perdió al aterrizar');
+    j.usarPoder();
+    asegurar(!j.poder.volando, 'voló una segunda vez');
+    return `voló ${j.poder.segundos.toFixed(2)} s`;
+  });
+
+  await prueba('Poder rafa: llegar a la meta volando gana la partida', async () => {
+    const j = await cargar('sinpopos&meta=60&v=meta-vuelo');
+    j.elegir('rafa'); j.jugar();
+    j.usarPoder();
+    asegurar(await hasta(() => j.finVisible, 8000), `no terminó (estado ${j.estado})`);
+    asegurar(j.titulo === '¡GANASTE!' && j.puntos === 60, `${j.titulo} con ${j.puntos}`);
+    asegurar(!j.poder.volando, 'siguió volando en la pantalla final');
+    return 'ganó volando';
+  });
+
   const ok = resultados.every((r) => r.ok);
   document.getElementById('resultado').textContent = JSON.stringify({ ok, resultados }, null, 1);
   document.title = ok ? 'ESCENARIOS OK' : 'ESCENARIOS FALLA';

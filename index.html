@@ -145,6 +145,23 @@
     box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.28), 0 0 0 3px #3a1a10, 0 0 0 6px #241238;
   }
   #fullscreen { --face: #f28c28; }
+  /* Botón de poder: placa arcade junto a la pausa. Estados: LISTO / ACTIVO / USADO. */
+  #topbar { align-items: center; }
+  .power {
+    min-width: 44px; min-height: 44px; height: var(--icon); padding: 0 2.2cqh 0 1.2cqh;
+    display: flex; align-items: center; gap: 1.2cqh;
+    color: #1d0b2e; background: linear-gradient(180deg, #7dfbd0, #1fc9a0);
+    border: 0; border-radius: 999px; cursor: pointer; touch-action: manipulation;
+    box-shadow: inset 0 -4px 0 rgba(0,0,0,.25), 0 0 0 3px #3a1a10, 0 0 0 6px #241238, 0 5px 0 4px #120826, 0 0 14px #5dfcc0;
+  }
+  .power:active { transform: translateY(3px); }
+  .power .p-ico { font-size: clamp(18px, 7cqh, 30px); line-height: 1; }
+  .power .p-txt { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.05; }
+  .power .p-name { font: bold clamp(10px, 3.6cqh, 15px) "Courier New", monospace; white-space: nowrap; }
+  .power .p-state { font: bold clamp(10px, 3.4cqh, 14px) "Courier New", monospace; letter-spacing: .08em; }
+  .power[data-estado="listo"] { animation: pulse 1s ease-in-out infinite; }
+  .power[data-estado="activo"] { background: linear-gradient(180deg, #ffe27a, #ff9a2e); box-shadow: inset 0 -4px 0 rgba(0,0,0,.25), 0 0 0 3px #3a1a10, 0 0 0 6px #241238, 0 5px 0 4px #120826, 0 0 18px #ffd23f; }
+  .power[data-estado="usado"] { background: linear-gradient(180deg, #8a7fa8, #5d5478); color: #d8d0ee; box-shadow: inset 0 -4px 0 rgba(0,0,0,.25), 0 0 0 3px #3a1a10, 0 0 0 6px #241238, 0 5px 0 4px #120826; }
   #pause { --face: #e8432f; color: #fbeedd; }
   .icon svg { width: 56%; height: 56%; }
   #sound .off { display: none; }
@@ -407,6 +424,10 @@
     </button>
   </div>
   <div id="topbar">
+    <button id="power" class="power" type="button" data-estado="listo" aria-keyshortcuts="E" hidden>
+      <span class="p-ico" aria-hidden="true">⚡</span>
+      <span class="p-txt"><span class="p-name">PODER</span><span class="p-state">LISTO</span></span>
+    </button>
     <button id="pause" class="icon" type="button" aria-label="Pausar" hidden>
       <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 3h3v12H4zM11 3h3v12h-3z" fill="currentColor"/></svg>
     </button>
@@ -533,7 +554,7 @@
   const MAX_DT = 0.1, STEP = 1 / 120;
   const REACT_TIME = 1.4;                // segundos de "¡puaj!" antes del fin de partida
   const SCORE_DIVISOR = 3;  // 1 punto cada 3 px recorridos (hasta v0.9 eran 12)
-  const GAME_VERSION = '1.3.1';
+  const GAME_VERSION = '1.4';
   // Cada fórmula de puntaje tiene su propio récord y ranking, para no comparar
   // puntajes calculados distinto. "f2" = distancia / 3 con tope 9999 (desde v1.1).
   // Las claves antiguas, sin fórmula, quedan intactas como "clásico" y no se mezclan.
@@ -1204,6 +1225,47 @@
         tone(330, t + 0.55, 0.18, 'square', 0.25, 300);
         hiss(t + 0.55, 0.15, 0.25, 2500);
       },
+      // Superpoderes: un efecto original por personaje (todo pasa por "master", así que el silencio los apaga).
+      power(id) {
+        if (!ensure()) return;
+        const t = ac.currentTime;
+        switch (id) {
+          case 'baby-rafa':  // pañal que se infla: "plop" que sube y chapoteo
+            tone(180, t, 0.25, 'square', 0.25, 700);
+            tone(700, t + 0.28, 0.3, 'sine', 0.4, 120);
+            hiss(t + 0.2, 0.25, 0.3, 900);
+            break;
+          case 'francisco':  // lengua de resorte: "boioing" que va y vuelve
+            tone(220, t, 0.18, 'sawtooth', 0.22, 900);
+            for (let k = 0; k < 6; k++) tone(k % 2 ? 380 : 620, t + 0.2 + k * 0.07, 0.07, 'triangle', 0.35 - k * 0.04);
+            voice(t + 0.7, { pitch: [[0, 260], [1, 150]], dur: 0.4, formants: [350, 800], gain: 1.1 });
+            break;
+          case 'angie':  // besito: arpegio de campanitas y burbujas
+            ['E6', 'G6', 'B6', 'E7'].forEach((n, k) => tone(freq(n), t + 0.12 + k * 0.06, 0.18, 'sine', 0.35));
+            tone(500, t, 0.1, 'sine', 0.5, 1200);
+            hiss(t + 0.45, 0.2, 0.15, 6000);
+            break;
+          case 'seba':  // eructo grave y largo
+            fart(t, { pitch: [[0, 85], [0.4, 150], [1, 55]], dur: 0.9, lfo: [26, 8], depth: 35, cutoff: 520, q: 7, gain: 1 });
+            voice(t + 0.55, { pitch: [[0, 140], [1, 90]], dur: 0.35, formants: [500, 900], gain: 0.8 });
+            break;
+          case 'vicky':  // "a-a-¡CHÚ!"
+            tone(520, t, 0.18, 'triangle', 0.3, 760);
+            tone(600, t + 0.25, 0.18, 'triangle', 0.3, 900);
+            hiss(t + 0.55, 0.35, 0.8, 1200);
+            tone(120, t + 0.55, 0.3, 'sine', 0.9, 40);
+            break;
+          case 'pipe': {  // melodía tropical corta, a contratiempo
+            const m = ['C5', 'E5', 'G5', 'A5', 'G5', 'E5', 'D5', 'C5'];
+            m.forEach((n, k) => { tone(freq(n), t + k * 0.13, 0.16, 'triangle', 0.4); tone(freq(n) * 2, t + k * 0.13, 0.08, 'sine', 0.15); });
+            hiss(t, 0.05, 0.2, 7000);
+            break;
+          }
+          default:  // rafa: peo supersónico, largo y que sube
+            fart(t, { pitch: [[0, 70], [0.5, 140], [1, 260]], dur: 1.8, lfo: [40, 14], depth: 28, cutoff: 950, q: 6, gain: 1 });
+            tone(90, t, 0.3, 'sine', 0.9, 40);
+        }
+      },
       // Golpe de susto: acorde disonante (tritono) + bombo grave.
       stinger() {
         if (!ensure()) return;
@@ -1349,6 +1411,10 @@
   let jumpBufT = 0, milestone = 0, maxShown = false;
   let bagClock = 0, nextBagAt = BAG_FIRST[0] + Math.random() * (BAG_FIRST[1] - BAG_FIRST[0]);  // juego acumulado
   let bagHinted = false, flashT = 0;
+  // Superpoder del personaje (Issue #5): uno por partida. st = 'listo' | 'activo' | 'usado'.
+  let power = { st: 'listo', t: 0, got: 0, cd: 0, armed: false };
+  let ghosts = [];  // popós ya eliminados que todavía se animan
+  const NO_POOPS = PRUEBA && PARAMS.has('sinpopos');  // modo prueba: no salen popós al azar
   // Contadores de la partida en curso (para las estadísticas).
   let runStats = { bagsTaken: 0, bagsUsed: 0 };
   let ranking = loadRanking();
@@ -1474,6 +1540,9 @@
     endT = 0; endSpeed = 0; endFired = {}; droplets = [];
     spawnIn = 1.0;
     hillOff = 0; groundOff = 0;
+    power = { st: 'listo', t: 0, got: 0, cd: 0, armed: false, puffT: 0 };
+    ghosts = [];
+    syncPowerBtn();
   }
 
   const makePoop = (x, w, h) => ({ x, w, h, sprite: makeSprite(POOP, POOP_PAL, w / 10, h / 9) });
@@ -1492,6 +1561,119 @@
     if (r < 0.3) return rand(0.85, 1.15);
     if (r < 0.85) return rand(1.15, 2.2);
     return rand(2.2, 3.0);
+  }
+
+  // ---- Superpoderes: una sola activación voluntaria por partida ----
+  // Los poderes quitan popós pero no dan puntos ni tocan velocidad, gravedad ni meta.
+  const POWERS = {
+    'baby-rafa': { name: 'PAÑAL ASESINO', short: 'PAÑAL', ico: '🍼', kind: 'diaper' },
+    francisco:   { name: 'LENGÜETAZO INFERNAL', short: 'LENGUA', ico: '👅', kind: 'reach', reach: 240, dur: 3 },
+    angie:       { name: 'BESITO EXPLOSIVO', short: 'BESITO', ico: '💋', kind: 'burst', dur: 1 },
+    seba:        { name: 'ERUCTO DEL INFIERNO', short: 'ERUCTO', ico: '💨', kind: 'burst', dur: 1 },
+    vicky:       { name: 'ESTORNUDO NUCLEAR', short: 'ACHÚ', ico: '🤧', kind: 'burst', dur: 1 },
+    pipe:        { name: 'CAMISA TROPICAL', short: 'TROPICAL', ico: '🌺', kind: 'reach', reach: 340, dur: 3 },
+    rafa:        { name: 'PEO SUPERSÓNICO', short: 'PEO', ico: '🚀', kind: 'fly', dur: 2 },
+  };
+  const POWER_MAX = 3, FLY_RAMP = 0.3, FLY_LIFT = 80;
+  const powerDef = () => POWERS[hero.id] || POWERS.rafa;
+  const flying = () => power.st === 'activo' && powerDef().kind === 'fly';
+  const powerBtn = $('power');
+
+  function syncPowerBtn() {
+    const P = powerDef(), label = { listo: 'LISTO', activo: 'ACTIVO', usado: 'USADO' }[power.st];
+    powerBtn.dataset.estado = power.st;
+    powerBtn.querySelector('.p-ico').textContent = P.ico;
+    powerBtn.querySelector('.p-name').textContent = P.short;
+    powerBtn.querySelector('.p-state').textContent = label;
+    powerBtn.setAttribute('aria-label', `Poder ${P.name}: ${label}. Tecla E`);
+  }
+
+  // Popós visibles delante del personaje, del más cercano al más lejano.
+  const visibleTargets = () => obstacles.filter((o) => o.x < W - 4 && o.x + o.w > KID_X + 10).sort((a, b) => a.x - b.x);
+
+  function removePoops(list, kind, life = 0.7) {
+    if (!list.length) return;
+    obstacles = obstacles.filter((o) => !list.includes(o));
+    for (const o of list) ghosts.push({ sprite: o.sprite, x: o.x, y: GROUND + 2 - o.h, w: o.w, h: o.h, t: 0, life, kind, seed: Math.random() });
+    power.got += list.length;
+  }
+
+  function usePower() {
+    if (state !== 'running' || power.st !== 'listo') return;
+    const P = powerDef();
+    power.st = 'activo'; power.t = 0; power.got = 0; power.cd = 0; power.puffT = 0;
+    Music.power(hero.id);
+    buzz(40);
+    floaters.push({ text: `¡${P.name}!`, x: KID_X + 4, y: Math.max(40, kid.y - 34), t: 0, color: '#5dfcc0', power: true });
+    if (P.kind === 'diaper') {
+      power.armed = true;
+      announce('Pañal asesino listo: atrapa el próximo popó que te toque.');
+    } else if (P.kind === 'burst') {
+      removePoops(visibleTargets().slice(0, POWER_MAX), hero.id);
+      announce(`${P.name}: ${power.got} popó${power.got === 1 ? '' : 's'} fuera.`);
+    } else if (P.kind === 'fly') {
+      power.y0 = kid.y; kid.onGround = false; kid.vy = 0; jumpBufT = 0;
+      announce('¡Peo supersónico! Vuelas 2 segundos.');
+    } else {
+      announce(`${P.name}: recoge hasta 3 popós en 3 segundos.`);
+    }
+    syncPowerBtn();
+  }
+
+  function finishPower() {
+    power.st = 'usado'; power.armed = false;
+    syncPowerBtn();
+  }
+
+  // Avanza el poder con el tiempo de juego (la pausa lo congela porque update() no corre).
+  function tickPower(dt, dx) {
+    for (const g of ghosts) { g.t += dt; if (g.kind === 'angie') g.x -= dx; }
+    ghosts = ghosts.filter((g) => g.t < g.life);
+    if (power.st !== 'activo') return;
+    const P = powerDef();
+    power.t += dt;
+    if (P.kind === 'burst') {
+      if (power.t >= P.dur) finishPower();
+    } else if (P.kind === 'reach') {
+      power.cd = Math.max(0, power.cd - dt);
+      if (power.got < POWER_MAX) {
+        const near = visibleTargets().find((o) => o.x <= KID_X + P.reach);
+        // Uno cada 0,15 s; si está a punto de tocarte, se recoge al instante.
+        if (near && (power.cd === 0 || near.x < KID_X + 60)) { removePoops([near], hero.id, 0.45); power.cd = 0.15; }
+        if (power.got >= POWER_MAX) power.doneT = power.t;
+      }
+      if (power.t >= P.dur || (power.got >= POWER_MAX && power.t >= power.doneT + 0.5)) finishPower();
+    } else if (P.kind === 'fly') {
+      const hov = KID_GROUND_Y - FLY_LIFT, lerp = (a, b, u) => a + (b - a) * Math.min(1, Math.max(0, u));
+      if (power.t < FLY_RAMP) kid.y = lerp(power.y0, hov, power.t / FLY_RAMP);
+      else if (power.t < P.dur - FLY_RAMP) kid.y = hov;
+      else kid.y = lerp(hov, KID_GROUND_Y, (power.t - (P.dur - FLY_RAMP)) / FLY_RAMP);
+      power.puffT -= dt;
+      if (power.puffT <= 0) {  // estela verde
+        power.puffT = 0.035;
+        puffs.push({ x: KID_X + 4, y: kid.y + KID_H * 0.65, t: 0, color: '150, 225, 90', size: 1.3, life: 0.5 });
+      }
+      if (power.t >= P.dur) {  // aterriza: ningún popó debajo ni choque injusto
+        kid.y = KID_GROUND_Y; kid.vy = 0; kid.onGround = true;
+        const under = obstacles.filter(hits);
+        obstacles = obstacles.filter((o) => !under.includes(o));
+        for (const o of under) ghosts.push({ sprite: o.sprite, x: o.x, y: GROUND + 2 - o.h, w: o.w, h: o.h, t: 0, life: 0.3, kind: 'rafa', seed: Math.random() });
+        graceT = Math.max(graceT, 0.15);
+        finishPower();
+      }
+    }
+  }
+
+  // Pañal armado: atrapa el popó que iba a tocar al personaje y se gasta.
+  function diaperCatch(poop) {
+    removePoops([poop], 'baby-rafa', 0.8);
+    graceT = BAG_GRACE;  // el segundo popó de un doble no cuenta como otro choque
+    Music.power('baby-rafa');
+    buzz(60);
+    floaters = floaters.filter((f) => !f.power);
+    floaters.push({ text: '¡PAÑAL INFLADO!', x: KID_X + 4, y: Math.max(40, kid.y - 34), t: 0, color: '#fbeedd', power: true });
+    announce('¡El pañal atrapó un popó!');
+    finishPower();
   }
 
   function hits(o) {
@@ -1531,7 +1713,7 @@
     if (score() >= GOAL) { startEnding(); return; }
 
     jumpBufT = Math.max(0, jumpBufT - dt);
-    if (!kid.onGround) {
+    if (!kid.onGround && !flying()) {
       kid.vy += GRAVITY * dt;
       kid.y += kid.vy * dt;
       if (kid.y >= KID_GROUND_Y) {
@@ -1546,13 +1728,15 @@
     puffs = puffs.filter((p) => p.t < p.life);
 
     spawnIn -= dt;
-    if (spawnIn <= 0) spawnIn = spawn();
+    if (spawnIn <= 0) spawnIn = NO_POOPS ? 1e9 : spawn();
 
     updateBag(dt, dx);
+    tickPower(dt, dx);
 
     graceT = Math.max(0, graceT - dt);
-    const hit = graceT > 0 ? null : obstacles.find(hits);
-    if (hit && hasBag) bagPoop(hit);
+    const hit = graceT > 0 || flying() ? null : obstacles.find(hits);
+    if (hit && power.armed) diaperCatch(hit);  // el pañal va primero; la bolsa se guarda
+    else if (hit && hasBag) bagPoop(hit);
     else if (hit) gameOver(hit);
   }
 
@@ -1669,7 +1853,9 @@
   function startEnding() {
     state = 'ending';
     endT = 0; endSpeed = speed; endFired = {}; droplets = [];
-    obstacles = []; bagItem = null; puffs = []; floaters = []; bannerT = 0;
+    obstacles = []; bagItem = null; puffs = []; floaters = []; bannerT = 0; ghosts = [];
+    if (flying()) { kid.y = KID_GROUND_Y; kid.vy = 0; kid.onGround = true; }
+    if (power.st === 'activo') finishPower();
     Music.stop();
     Music.speedUp();
     controls(false);
@@ -1914,6 +2100,144 @@
     }
   }
 
+  // ---- Dibujo de los superpoderes (todo con formas simples, estilo pixel) ----
+  const HEART = ['.##.##.', '#######', '#######', '.#####.', '..###..', '...#...'];
+  function drawHeart(x, y, k, color) {
+    ctx.fillStyle = color;
+    HEART.forEach((row, j) => { for (let i = 0; i < row.length; i++) if (row[i] === '#') ctx.fillRect(Math.round(x + i * k), Math.round(y + j * k), Math.ceil(k), Math.ceil(k)); });
+  }
+  function drawFlower(x, y, k) {
+    ctx.fillStyle = '#ff5fa2';
+    for (const [a, b] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) ctx.fillRect(Math.round(x + a * k * 1.4 - k / 2), Math.round(y + b * k * 1.4 - k / 2), Math.ceil(k), Math.ceil(k));
+    ctx.fillStyle = '#ffd23f';
+    ctx.fillRect(Math.round(x - k / 2), Math.round(y - k / 2), Math.ceil(k), Math.ceil(k));
+  }
+  function ball(x, y, r, fill, stroke) {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2);
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); }
+  }
+  const drawScaled = (sp, cx, cy, k) => ctx.drawImage(sp, cx - sp.lw * k / 2, cy - sp.lh * k / 2, sp.lw * k, sp.lh * k);
+
+  // Popós eliminados: cada poder se los lleva a su manera.
+  function drawGhosts() {
+    const mx = KID_X + 30, my = kid.y + 16;
+    for (const g of ghosts) {
+      const u = g.t / g.life, cx = g.x + g.w / 2, cy = g.y + g.h / 2;
+      ctx.save();
+      switch (g.kind) {
+        case 'angie':  // el popó se encoge y estalla en burbujas y confeti
+          ctx.globalAlpha = Math.max(0, 1 - u * 1.6);
+          drawScaled(g.sprite, cx, cy, 1 - u * 0.6);
+          ctx.globalAlpha = 1 - u;
+          for (let i = 0; i < 7; i++) {
+            const a = i / 7 * Math.PI * 2 + g.seed * 6, r = 6 + u * 46;
+            ball(cx + Math.cos(a) * r, cy + Math.sin(a) * r - u * 20, 4 + (i % 3) * 2, 'rgba(255,170,215,0.35)', '#ffd1ec');
+            ctx.fillStyle = ['#ffd23f', '#5dfcc0', '#ff4fd8'][i % 3];
+            ctx.fillRect(Math.round(cx + Math.cos(a + 1) * r * 1.3), Math.round(cy + Math.sin(a + 1) * r * 1.3 + u * 24), 4, 4);
+          }
+          break;
+        case 'seba': case 'vicky': {  // sale volando, girando
+          const fast = g.kind === 'vicky';
+          ctx.translate(cx + u * (fast ? 700 : 520), cy - u * (fast ? 180 : 60) + u * u * 90);
+          ctx.rotate(u * (fast ? 14 : 8));
+          ctx.globalAlpha = 1 - u * 0.5;
+          drawScaled(g.sprite, 0, 0, 1);
+          break;
+        }
+        case 'francisco': case 'pipe': {  // el popó viaja hasta la boca / el personaje
+          const e = Math.min(1, u * 1.2), x = cx + (mx - cx) * e, y = cy + (my - cy) * e;
+          drawScaled(g.sprite, x, y, 1 - e * 0.8);
+          if (g.kind === 'pipe') drawFlower(x, y - 8, 4);
+          break;
+        }
+        case 'baby-rafa': {  // el pañal se infla grotescamente con el popó adentro
+          const e = Math.min(1, u * 3);
+          if (e < 1) drawScaled(g.sprite, cx + (KID_X + 24 - cx) * e, cy + (kid.y + KID_H * 0.6 - cy) * e, 1 - e * 0.7);
+          const r = 8 + Math.sin(Math.min(1, u * 1.3) * Math.PI) * 20, jx = Math.sin(g.t * 60) * 2;
+          ball(KID_X + 24 + jx, kid.y + KID_H * 0.55, r, '#f4f1e6', '#bdb59a');
+          ctx.fillStyle = 'rgba(143,209,106,0.6)';
+          ctx.fillRect(Math.round(KID_X + 24 + jx - r * 0.5), Math.round(kid.y + KID_H * 0.55 - r * 0.3), Math.round(r), Math.round(r * 0.6));
+          break;
+        }
+        default:  // 'rafa': el popó de abajo desaparece en una nubecita
+          ball(cx, cy, 8 + u * 22, `rgba(150,225,90,${(1 - u) * 0.7})`);
+      }
+      ctx.restore();
+    }
+  }
+
+  // Animación del poder del personaje mientras está activo (o armado, en el caso del pañal).
+  function drawPower() {
+    const P = powerDef(), t = power.t, fx = KID_X + 30, fy = kid.y + 14;
+    ctx.save();
+    ctx.font = 'bold 18px "Courier New", monospace';
+    ctx.textBaseline = 'top';
+    if (power.armed) {  // pañal armado: flota sobre la cabeza, parpadea
+      const bob = Math.sin(performance.now() / 160) * 3;
+      ctx.fillStyle = '#f4f1e6'; ctx.fillRect(KID_X + 8, Math.round(kid.y - 12 + bob), 26, 10);
+      ctx.fillStyle = '#bdb59a'; ctx.fillRect(KID_X + 8, Math.round(kid.y - 4 + bob), 26, 2);
+      if (Math.floor(performance.now() / 300) % 2) {
+        ctx.fillStyle = '#000'; ctx.fillText('PAÑAL LISTO', KID_X - 12, Math.round(kid.y - 34 + bob));
+        ctx.fillStyle = '#5dfcc0'; ctx.fillText('PAÑAL LISTO', KID_X - 14, Math.round(kid.y - 36 + bob));
+      }
+    }
+    if (power.st === 'activo') switch (hero.id) {
+      case 'francisco': {  // boca enorme y lengua elástica
+        ball(fx, fy + 4, 9, '#5a0d1a');
+        const ext = Math.sin(((t % 0.6) / 0.6) * Math.PI), len = 14 + ext * (P.reach - 14), wob = Math.sin(t * 40) * 3;
+        ctx.strokeStyle = '#ff5a8a'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(fx, fy + 4); ctx.quadraticCurveTo(fx + len / 2, fy + 4 - wob * 2, fx + len, fy + 4 + wob); ctx.stroke();
+        ball(fx + len, fy + 4 + wob, 6, '#ff2f6e');
+        if (power.got >= POWER_MAX || t > P.dur - 0.6) { ctx.fillStyle = '#8fd16a'; ctx.fillText('¡PUAJ!', fx + 14, fy - 30); }
+        break;
+      }
+      case 'pipe': {  // las flores de la camisa vuelan a recoger y vuelven
+        for (let k = 0; k < 3; k++) {
+          const ph = Math.abs(Math.sin((t + k * 0.22) * 3.2)), x = fx + 10 + ph * (P.reach - 10), y = fy - 20 + k * 20 + Math.sin(t * 9 + k) * 5;
+          ctx.strokeStyle = 'rgba(255,95,162,0.35)'; ctx.lineWidth = 2;
+          ctx.beginPath(); ctx.moveTo(fx, fy + 8); ctx.lineTo(x, y); ctx.stroke();
+          drawFlower(x, y, 5);
+        }
+        drawFlower(fx - 4, kid.y + 3, 4);  // la flor de la frente
+        break;
+      }
+      case 'angie': {  // besito-corazón gelatinoso que rebota y estalla
+        if (t < 0.45) {
+          const u = t / 0.45, k = 3 + Math.sin(t * 40) * 0.8;
+          drawHeart(fx + u * 280, fy - 14 - Math.sin(u * Math.PI) * 22, k, '#ff5fa2');
+        }
+        break;
+      }
+      case 'seba': case 'vicky': {
+        const belly = hero.id === 'seba';
+        if (belly) {  // guata inflada
+          ball(fx - 10, kid.y + KID_H * 0.55, 12 + Math.sin(t * 30) * 2, '#f0c8a0', '#b88a5a');
+        } else {  // nariz enorme y ojos desorbitados
+          ball(fx + 6, fy + 4, 10 + Math.sin(t * 40) * 2, '#ff9ab8', '#c4512b');
+          ball(fx - 4, fy - 4, 4, '#fff', '#000'); ball(fx + 10, fy - 6, 4, '#fff', '#000');
+        }
+        for (let k = 0; k < 3; k++) {  // onda sonora que se expande
+          const r = (t * 380 + k * 55) % 300;
+          ctx.strokeStyle = belly ? `rgba(255,210,60,${1 - r / 300})` : `rgba(180,235,255,${1 - r / 300})`;
+          ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.arc(fx, fy + 4, r, -0.7, 0.7); ctx.stroke();
+        }
+        if (t < 0.7) { ctx.fillStyle = belly ? '#ffd23f' : '#fbeedd'; ctx.fillText(belly ? '¡BUUURP!' : '¡AAA… ACHÚ!', fx + 16, fy - 34); }
+        break;
+      }
+      case 'rafa': {  // cara roja y propulsión a pedo
+        ctx.fillStyle = 'rgba(255,40,40,0.5)';
+        ctx.fillRect(KID_X + 14, Math.round(kid.y + 5), 24, 18);
+        const fl = 14 + Math.random() * 12;
+        ctx.fillStyle = '#9be35a'; ctx.fillRect(Math.round(KID_X - fl), Math.round(kid.y + KID_H * 0.6), Math.round(fl), 8);
+        ctx.fillStyle = '#ffd23f'; ctx.fillRect(Math.round(KID_X - fl * 0.5), Math.round(kid.y + KID_H * 0.6 + 2), Math.round(fl * 0.5), 4);
+        break;
+      }
+    }
+    ctx.restore();
+  }
+
   function render() {
     ctx.drawImage(sky, 0, 0);
 
@@ -1936,6 +2260,7 @@
     if (state === 'story') { drawStory(); return; }
 
     for (const o of obstacles) blit(o.sprite, Math.round(o.x), GROUND + 2 - o.h);
+    drawGhosts();
 
     // Nubecitas del pedo al saltar, con el color y tamaño de cada personaje.
     for (const p of puffs) {
@@ -1955,6 +2280,7 @@
     else if (state === 'running' || state === 'tutorial' || (state === 'ending' && endSpeed > 0)) frame = step ? kidFrames.runB : kidFrames.runA;
     // Tras embolsar, parpadea un instante.
     if (!(graceT > 0 && Math.floor(graceT * 20) % 2)) blit(frame, KID_X, Math.round(kid.y));
+    if (state === 'running' || state === 'paused') drawPower();
     if (state === 'over') drawReaction();
     if (state === 'ending' || (state === 'over' && endT > 0)) drawEnding();
     drawFloaters();
@@ -2046,7 +2372,7 @@
 
   // ---- Transiciones ----
   function show(el, visible) { el.hidden = !visible; }
-  function controls(visible) { show(ui.pause, visible); }
+  function controls(visible) { show(ui.pause, visible); show(powerBtn, visible); }
   function announce(msg) { ui.live.textContent = msg; }
 
   // ---- Historia ----
@@ -2138,7 +2464,7 @@
   }
 
   function jump() {
-    if (state !== 'running') return;
+    if (state !== 'running' || flying()) return;
     if (kid.onGround) doJump();
     else jumpBufT = JUMP_BUFFER;  // se guarda y salta al aterrizar
   }
@@ -2483,7 +2809,9 @@
   ui.credits.addEventListener('pointerdown', (e) => { if (e.target === ui.credits || e.target.closest('.credits-roll')) closeCredits(); });
   ui.creditsRoll.addEventListener('animationend', closeCredits);
   // Clic sonoro en todos los botones.
-  $('game').addEventListener('pointerdown', (e) => { if (e.target.closest('button')) Music.click(); });
+  $('game').addEventListener('pointerdown', (e) => { if (e.target.closest('button:not(#power)')) Music.click(); });
+  // Poder: botón propio (no salta, porque no está dentro del lienzo) o tecla E.
+  powerBtn.addEventListener('click', () => { usePower(); powerBtn.blur(); });
   ui.pause.addEventListener('click', pause);
   document.querySelectorAll('.share').forEach((b) => b.addEventListener('click', share));
 
@@ -2561,6 +2889,8 @@
       else if (state === 'credits') closeCredits();
       else if (state === 'stats' || (state === 'over' && overShown)) goMenu();
       else pause();
+    } else if ((e.key === 'e' || e.key === 'E') && !e.repeat) {
+      usePower();
     } else if ((e.key === 'm' || e.key === 'M') && !e.repeat) {
       toggleSound();
     } else if ((e.key === 'f' || e.key === 'F') && !e.repeat && !fsBtn.hidden) {
@@ -2630,6 +2960,15 @@
       get personaje() { return hero.id; },
       get personajes() { return CHARACTERS.map((c) => c.id); },
       get popos() { return obstacles.map((o) => Math.round(o.x)); },
+      get poder() {
+        const P = powerDef();
+        return { id: hero.id, nombre: P.name, tipo: P.kind, estado: power.st, armado: power.armed, capturados: power.got,
+          volando: flying(), segundos: power.t, boton: powerBtn.dataset.estado, textoBoton: powerBtn.textContent.replace(/\s+/g, ' ').trim(),
+          botonVisible: !powerBtn.hidden };
+      },
+      usarPoder: usePower,
+      // Pone un popó a `dx` px delante del personaje (con ?sinpopos no salen otros).
+      ponerPopo(dx = 150, w = 44, h = 38) { obstacles.push(makePoop(KID_X + dx, w, h)); },
       elegir: pickHero,
       jugar: start,  // sin el ejemplo del dedo
       saltar: jump,

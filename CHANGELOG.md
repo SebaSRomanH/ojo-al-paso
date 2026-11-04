@@ -1,5 +1,19 @@
 # Historial de cambios
 
+## 1.4 — 2026-11-04
+
+- **Superpoderes:** cada personaje tiene su poder y puede usarlo **una vez por partida** (pedido en el Issue #5). Se activa con el botón de arriba a la derecha (junto a la pausa) o con la tecla **E**; dice LISTO, ACTIVO o USADO. Tocar el botón no hace saltar, y tocar el resto de la pantalla salta como siempre.
+  - **Baby Rafa – Pañal asesino:** queda listo y atrapa el próximo popó que lo toque; el pañal se infla.
+  - **Francisco – Lengüetazo infernal:** lengua elástica que recoge hasta 3 popós en 3 segundos.
+  - **Angie – Besito explosivo:** un beso-corazón estalla en burbujas y confeti y elimina hasta 3 popós.
+  - **Seba – Eructo del infierno:** un eructo con onda sonora barre hasta 3 popós.
+  - **Vicky – Estornudo nuclear:** un estornudo descomunal expulsa hasta 3 popós.
+  - **Pipe – Camisa tropical:** las flores de su camisa recogen hasta 3 popós en 3 segundos, con música tropical.
+  - **Rafa – Peo supersónico:** vuela 2 segundos sin chocar con popós y aterriza sin choques injustos.
+- No dan puntos extra ni cambian la velocidad o la meta de 9999. La bolsa salvadora sigue siendo aparte (usar un poder no la gasta). La pausa congela el poder.
+- Sonidos originales para cada poder; se apagan con el botón de sonido.
+- Más pruebas automáticas para los poderes (una sola vez, reinicio, pausa, bolsa, vuelo y victoria).
+
 ## 1.3.1 — 2026-11-04
 
 - **Récord del menú en mostaza:** el número del récord en el menú ahora se ve en color mostaza, más grande y en negrita, para que llame la atención (pedido en el Issue #3).
