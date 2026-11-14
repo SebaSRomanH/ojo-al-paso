@@ -554,7 +554,7 @@
   const MAX_DT = 0.1, STEP = 1 / 120;
   const REACT_TIME = 1.4;                // segundos de "¡puaj!" antes del fin de partida
   const SCORE_DIVISOR = 3;  // 1 punto cada 3 px recorridos (hasta v0.9 eran 12)
-  const GAME_VERSION = '1.4';
+  const GAME_VERSION = '1.4.1';
   // Cada fórmula de puntaje tiene su propio récord y ranking, para no comparar
   // puntajes calculados distinto. "f2" = distancia / 3 con tope 9999 (desde v1.1).
   // Las claves antiguas, sin fórmula, quedan intactas como "clásico" y no se mezclan.
@@ -853,6 +853,28 @@
     const facePal = { ...pal, b: '#5a7bd8', g: '#8fd16a', m: '#3b200b', t: '#ff6f8a' };
     ch.bubble = makeBubble(makeSprite(makeFace(ch.face), facePal, 5, 5, null, false));
   }
+
+  // Valentín, amigo de Rafa: corre detrás de él, tomado de su mano (solo decorativo:
+  // no choca con popós ni cambia la dificultad). Uniforme de colegio genérico, sin insignia;
+  // pelo corto con chasquilla hacia abajo. El brazo (filas 11) llega a la espalda de Rafa.
+  const VALENTIN = (() => {
+    const pal = { ...BASE_PAL, h: '#4a3020', m: '#c0606a', w: '#f4f4f4', u: '#1f2f5a', g: '#6e7078', n: '#151515' };
+    const body = [
+      '....hhhhh.....', '...hhhhhhh....', '..hhhhhhhhh...', '..hhhhhhhhhh..',
+      '..hhhshshsh...', '..hhssssess...', '..hsssssssss..', '...sssssmss...',
+      '....sssss.....', '...wwwwww.....', '..uuuwwuuu....', '..uuuuuuuussss',
+      '..uuuuuuuu....', '...uuuuuu.....',
+    ];
+    const sick = { ...pal, s: SICK_SKIN };
+    return {
+      runA: makeSprite([...body, ...LEGS.a], pal, PX, PX),
+      runB: makeSprite([...body, ...LEGS.b], pal, PX, PX),
+      air: makeSprite([...body, ...LEGS.air], pal, PX, PX),
+      sick: makeSprite([...body, ...LEGS.a], sick, PX, PX),
+      sickAir: makeSprite([...body, ...LEGS.air], sick, PX, PX),
+    };
+  })();
+  const VALENTIN_DX = -36;  // a la izquierda de Rafa, con la mano tocando su espalda
 
   // Nubecita del pedo de cada personaje: color (r, g, b), tamaño y duración (s).
   const PUFFS = {
@@ -2279,7 +2301,16 @@
     else if (!kid.onGround) frame = kidFrames.air;
     else if (state === 'running' || state === 'tutorial' || (state === 'ending' && endSpeed > 0)) frame = step ? kidFrames.runB : kidFrames.runA;
     // Tras embolsar, parpadea un instante.
-    if (!(graceT > 0 && Math.floor(graceT * 20) % 2)) blit(frame, KID_X, Math.round(kid.y));
+    const visible = !(graceT > 0 && Math.floor(graceT * 20) % 2);
+    if (hero.id === 'rafa' && visible) {  // Valentín corre de la mano con Rafa
+      const V = VALENTIN;
+      let vf = V.runA;
+      if (state === 'over') vf = kid.onGround ? V.sick : V.sickAir;
+      else if (!kid.onGround) vf = V.air;
+      else if (frame === kidFrames.runB || frame === kidFrames.bagB) vf = V.runB;
+      blit(vf, KID_X + VALENTIN_DX, Math.round(kid.y));
+    }
+    if (visible) blit(frame, KID_X, Math.round(kid.y));
     if (state === 'running' || state === 'paused') drawPower();
     if (state === 'over') drawReaction();
     if (state === 'ending' || (state === 'over' && endT > 0)) drawEnding();

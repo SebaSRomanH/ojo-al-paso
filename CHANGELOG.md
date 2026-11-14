@@ -1,5 +1,9 @@
 # Historial de cambios
 
+## 1.4.1 — 2026-11-14
+
+- **Valentín, el amigo de Rafa:** cuando juegas con Rafa, Valentín corre detrás de él tomado de su mano, con uniforme de colegio (sin insignia) y pelo corto con chasquilla. Salta con él y también pone cara de asco al pisar un popó. Solo acompaña: no choca con los popós ni cambia la dificultad.
+
 ## 1.4 — 2026-11-04
 
 - **Superpoderes:** cada personaje tiene su poder y puede usarlo **una vez por partida** (pedido en el Issue #5). Se activa con el botón de arriba a la derecha (junto a la pausa) o con la tecla **E**; dice LISTO, ACTIVO o USADO. Tocar el botón no hace saltar, y tocar el resto de la pantalla salta como siempre.
